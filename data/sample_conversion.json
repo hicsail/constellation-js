@@ -1,0 +1,58 @@
+
+
+/* Swapnil's Lang
+
+one-or-more (
+    one-or-more(prom_f then spacer_f) then cds_f then 
+        zero-or-more(
+            spacer_f or one-or-more (
+                spacer_f then prom_f then spacer_f
+            ) then cds_f
+        ) then 
+        term_f or (term_f then spacer_f) or (spacer_f then term_f)
+)
+
+
+*/
+
+
+/* JSON Conversion */
+
+{
+    "one_or_more": {
+        "then": [{
+            "then": [{
+                "one_or_more": [{
+                    "then": ["prom_f", "spacer_f"]}]
+                },  
+                    "cds_f"]
+        }, {
+            "then": [{
+                "zero_or_more": {
+                    "then": [
+                        {"or": 
+                            ["spacer_f", 
+                            {"one_or_more": 
+                                {"then": [{
+                                    "or":[
+                                        "spacer_f", {
+                                            "one_or_more": {
+                                                "then": ["spacer_f", {
+                                                    "then":["spacer_f", {
+                                                        "then": ["spacer_f", "prom_f"]
+                                                    }]
+                                                }]
+                                            }
+                                        }]
+                                }, "cds_f"
+                                ]}
+                        }]
+                    }]
+                }
+            },{
+                "or": {}
+                }]
+        }
+
+    ]}
+}
