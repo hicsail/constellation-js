@@ -1,0 +1,48 @@
+<html>
+<head>
+  <script src="http://imparse.org/js/lib/imparse.js"></script>
+  <!-- <script src="ibis.js"></script>             -->
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    
+</head>
+
+  <body>
+
+    <h3>Ibis</h3>
+
+
+
+    <form action="#" >
+        <input id="langInput" type="text"> <br>
+        <input id="submitBtn" type="button" value="Submit">
+    </form>
+
+    <script>
+        $(document).ready(function() {
+          // $("#submitBtn").click(function(){
+          
+          
+          var langText = $('#langInput').serialize();
+          $.ajax({
+            type: "POST",
+            url: "/postLangText",
+            data: {"hello": "world"}, 
+            
+            success: function() {
+              
+              alert('POST success!')
+            }
+            // contentType: 'application/json; charset=utf-8',
+          });     
+   
+        });
+
+      // });
+        // function postToServer() {
+        // }
+      
+      </script>
+</body>
+
+</html>
