@@ -1,3 +1,6 @@
+const uuidv4 = require('uuid/v4');
+var Graph = require('gert').Graph;    
+
 
 var grammer_def = [
     {"Seq": [
@@ -21,82 +24,67 @@ var grammer_def = [
 var sample_str = "one-or-more (one-or-more ( prom_f then spacer_f) then cds_f then zero-or-more (spacer_f or one-or-more (spacer_f then prom_f then spacer_f) then cds_f) then term_f or (term_f then spacer_f) or (spacer_f then term_f))"
 
 
-// var conversion_obj = {"one_or_more":{"then":[{"then":[{"one_or_more":[{"then":["prom_f","spacer_f"]}]},"cds_f"]},{"then":[{"zero_or_more":{"then":[{"or":["spacer_f",{"one_or_more":{"then":[{"or":["spacer_f",{"one_or_more":{"then":["spacer_f",{"then":["spacer_f",{"then":["spacer_f","prom_f"]}]}]}}]},"cds_f"]}}]}]}},{"or":{}}]}]}};
+var parsed = '{"OneOrMore":[{"Then":[{"OneOrMore":[{"Then":[{"Atom":["prom_f"]},{"Atom":["spacer_f"]}]}]},{"Then":[{"Atom":["cds_f"]},{"Then":[{"ZeroOrMore":[{"Then":[{"Or":[{"Atom":["spacer_f"]},{"OneOrMore":[{"Then":[{"Atom":["spacer_f"]},{"Then":[{"Atom":["prom_f"]},{"Atom":["spacer_f"]}]}]}]}]},{"Atom":["cds_f"]}]}]},{"Or":[{"Atom":["term_f"]},{"Or":[{"Then":[{"Atom":["term_f"]},{"Atom":["spacer_f"]}]},{"Then":[{"Atom":["spacer_f"]},{"Atom":["term_f"]}]}]}]}]}]}]}]}';
+
+// var parsed = '{"Or": [{"Then": [{"Atom": ["term_f"]}, {"Atom": ["spacer_f"]}]},{"Then": [{"Atom": ["spacer_f"]}, {"Atom": ["term_f"]}]}]}'
 
 function init() {
 
-    var g = new Graph();
+    var g = new Graph({
+        directed: true,
+        vertices: {
+            // a: { labels: ['black'] },
+            // b: { labels: ['black'] }
+        },
+        edges: [
+            // ['a', 'b'],
+            // { pair: ['b', 'c'], weight: 8 }
+        ]
+    });
 
-    var parsed = imparse.parse(grammer_def, sample_str)
-
-    traverse(parsed);
-    // readJSON();
-
+    parsed = JSON.parse(parsed);
+    g.addVertex('root', []);    
+    traverse(parsed, 'root', g);
+    enumerateDesigns(g);
+    // console.log(g);
+    
 }
 
-function traverse(obj) {
+function traverse(obj, prevNode, g) {
+  
     for (var k in obj) {
-        // console.log('a thing',k, obj)
+  
         if ((obj[k].isArray && obj[k] != null) || (typeof obj[k] == 'object' && obj[k] != null)) {
-            // console.log(k)
-            handleOperator(k, obj[k]);
-            traverse(obj[k]);
-        }
-        else {
-            // console.log("ATOM", obj[k])
-            // atoms
+  
+            var newNode = handleOperator(k, obj[k], prevNode, g);
+            for (var i = 0; i < obj[k].length; i++) {
+                traverse(obj[k][i], newNode, g);                
+            }
         }
     }
 }
 
-function handleOperator(op, d) {
-    
-    switch (op) {
-        case "OneOrMore":
-            // console.log(op);
-            break;
-        
-        case "Then":
-            // console.log(op);
-            break;
-        
-        case "Atom":
-            console.log(op, d);
-             break;
+function enumerateDesigns(g) {
+    console.log(g);
+}
 
-        case "ZeroOrMore":
-            // console.log(op);
-            break;
+function handleOperator(op, d, prevNode, g) {
 
-        case "Or":
-            console.log(op, d);
-            break;
-        
-        case "And":
-            // console.log(op);
-            break;
+    var id = uuidv4();
+    if (op === "Or" || op === "Then" || op === "And" || op === "Atom") {
+        g.addVertex(id, []);
+        g.addEdge(prevNode, id, []);
         
     }
+
+    if (op === "OneOrMore") {
+        g.addVertex(id, []);
+        g.addEdge(id, id, []);
+    }
     
+    return id;
 
 
 }
 
-
-var Graph = require('gert').Graph;
-console.log(Graph)
-
-
-// function readJSON() {
-
-//     var req = new XMLHttpRequest();
-//     req.open("GET", "./data/sample_conversion.json", false);
-//     req.send(null);
-
-//     var obj = JSON.parse(req.responseText);
-
-//     alert(obj.result[0]);
-// }
-
-
-
+module.exports.ibis = init;  
