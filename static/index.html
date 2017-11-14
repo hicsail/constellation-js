@@ -1,7 +1,11 @@
 <html>
 <head>
   <script src="http://imparse.org/js/lib/imparse.js"></script>
-  <!-- <script src="ibis.js"></script>             -->
+
+  <!-- <script src="" -->
+  <script src="http://wzrd.in/standalone/uuid%2Fv4@latest"></script>            
+  <!-- <script src="https://gojs.net/latest/release/go.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/1.8.2/go-debug.js"></script>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     
@@ -11,38 +15,145 @@
 
     <h3>Ibis</h3>
 
+    <!-- <input id="langInput" type="text" style="height: 200px; width: 100%"> <br> -->
+    <textarea id="langInput" style="height: 200px; width:100%" name="paragraph_text" cols="50" rows="10"></textarea>
+
+    <input id="submitBtn" type="button" value="Submit">
+    <br><br>
+    <div id="stateGraph" style="border: solid 1px black; width: 100%; height: 400px"></div>
 
 
-    <form action="#" >
-        <input id="langInput" type="text"> <br>
-        <input id="submitBtn" type="button" value="Submit">
-    </form>
 
-    <script>
-        $(document).ready(function() {
-          // $("#submitBtn").click(function(){
-          
-          
-          var langText = $('#langInput').serialize();
-          $.ajax({
-            type: "POST",
-            url: "/postLangText",
-            data: {"hello": "world"}, 
-            
-            success: function() {
-              
-              alert('POST success!')
-            }
-            // contentType: 'application/json; charset=utf-8',
-          });     
-   
-        });
+<script>
 
-      // });
-        // function postToServer() {
-        // }
+
+const GRAMMER_DEF = [{"Seq":[{"Then":[["Exp"],"then",["Seq"]]},{"":[["Exp"]]}]},{"Exp":[{"Or":[["Term"],"or",["Exp"]]},{"And":[["Term"],"and",["Exp"]]},{"":[["Term"]]}]},{"Term":[{"OneOrMore":["one-or-more",["Term"]]},{"ZeroOrMore":["zero-or-more",["Term"]]},{"":["(",["Seq"],")"]},{"Atom":[{"RegExp":"([A-Za-z0-9]|-|_)+"}]}]}]
+
+const EPSILON = "epsilon";
+
+$(document).ready(function() {
+  $("#submitBtn").click(function(){
+  
+    var langText = $('#langInput').val();
+    var parsed = imparse.parse(GRAMMER_DEF, langText);
+
+    parseAndDisplay(parsed);
+  });
+});
+  
+function initializeStateGraph() {
+  var g = go.GraphObject.make;
+  var myDiagram = g(go.Diagram, 'stateGraph', {
+    initialContentAlignment: go.Spot.Center
+  });
+
+  return myDiagram;
+}
       
-      </script>
+function parseAndDisplay(parsed) {
+
+  var myDiagram = initializeStateGraph();
+
+  var stateGraph = {"nodes": [], "edges": []}  
+  var nodeStack = [];
+
+  populateGraph(parsed, stateGraph, nodeStack);
+  
+  for (n in nodeStack) {
+    stateGraph.nodes.push(nodeStack[n]);
+  }
+
+  myDiagram.model = new go.GraphLinksModel(stateGraph.nodes, stateGraph.edges);
+}
+
+function populateGraph(parsed, stateGraph, nodeStack) {
+
+  if (parsed.Atom) {
+    id = uuidv4();
+    var node = {"key": id, "text": parsed.Atom}
+    nodeStack.push(node);
+
+    return;
+  }
+
+  if (Array.isArray(parsed)) {
+
+    var parentId = uuidv4();
+    for (var i = 0; i < parsed.length; i++) {
+      populateGraph(parsed[i], stateGraph, nodeStack);
+    }
+    return;
+  }
+
+  if (Object.keys(parsed).length > 0) {
+
+    for (k in parsed) {
+      var operation = k;
+      populateGraph(parsed[k], stateGraph, nodeStack)
+      handleOp(operation, nodeStack, stateGraph);
+    }
+  }
+}
+
+function handleOp(op, nodeStack, stateGraph) {
+  console.log('op',op);
+  var parentId = uuidv4();
+
+  if (op === "Or") {
+    console.log(nodeStack);
+    var c1 = nodeStack.pop();
+    var c2 = nodeStack.pop();
+
+    stateGraph.nodes.push(c1);
+    stateGraph.nodes.push(c2);
+
+    stateGraph.edges.push({from: parentId, to: c1.key, text: op});
+    stateGraph.edges.push({from: parentId, to: c2.key, text: op});
+
+    nodeStack.push({key: parentId, text: EPSILON});
+  }
+
+  if (op === "Then") {
+    var b = nodeStack.pop();
+    var a = nodeStack.pop();
+
+    stateGraph.nodes.push(a);
+    stateGraph.nodes.push({key: parentId, text: EPSILON});
+
+    stateGraph.edges.push({from: a.key, to: b.key, text: op});
+    stateGraph.edges.push({from: parentId, to: a.key, text: op});
+    
+
+    nodeStack.push(b);
+  }
+
+  if (op === "ZeroOrMore") {
+    
+    var a = nodeStack.pop();
+    stateGraph.nodes.push(a);
+    stateGraph.edges.push({from: parentId, to: parentId});
+    stateGraph.edges.push({from: parentId, to: a.key})
+    nodeStack.push({key: parentId, text: EPSILON})
+  }
+
+  if (op === "OneOrMore") {
+    var a = nodeStack.pop();
+    stateGraph.nodes.push(a);
+    stateGraph.edges.push({from: a.key, to: a.key});
+    stateGraph.edges.push({from: parentId, to: a.key})
+
+    nodeStack.push({key: parentId, text: EPSILON})
+  }
+}
+
+// function collapseEpsilons() {
+  // dfs (post-order)
+  // if (child node is epsilon and parent node is epsilon)
+  // delete child node
+  // transfer child node's edges to parent node
+// }
+
+</script>
 </body>
 
 </html>
