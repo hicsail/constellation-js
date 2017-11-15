@@ -1,14 +1,10 @@
 <html>
 <head>
   <script src="http://imparse.org/js/lib/imparse.js"></script>
-
-  <!-- <script src="" -->
   <script src="http://wzrd.in/standalone/uuid%2Fv4@latest"></script>            
-  <!-- <script src="https://gojs.net/latest/release/go.js"></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/1.8.2/go-debug.js"></script>
-
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    
+
 </head>
 
   <body>
@@ -30,6 +26,7 @@
 const GRAMMER_DEF = [{"Seq":[{"Then":[["Exp"],"then",["Seq"]]},{"":[["Exp"]]}]},{"Exp":[{"Or":[["Term"],"or",["Exp"]]},{"And":[["Term"],"and",["Exp"]]},{"":[["Term"]]}]},{"Term":[{"OneOrMore":["one-or-more",["Term"]]},{"ZeroOrMore":["zero-or-more",["Term"]]},{"":["(",["Seq"],")"]},{"Atom":[{"RegExp":"([A-Za-z0-9]|-|_)+"}]}]}]
 
 const EPSILON = "epsilon";
+const ATOM = "atom";
 
 $(document).ready(function() {
   $("#submitBtn").click(function(){
@@ -55,13 +52,9 @@ function parseAndDisplay(parsed) {
   var myDiagram = initializeStateGraph();
 
   var stateGraph = {"nodes": [], "edges": []}  
-  var nodeStack = [];
+  var nodeStack = {"roots": [], "leaves": []};
 
   populateGraph(parsed, stateGraph, nodeStack);
-  
-  for (n in nodeStack) {
-    stateGraph.nodes.push(nodeStack[n]);
-  }
 
   myDiagram.model = new go.GraphLinksModel(stateGraph.nodes, stateGraph.edges);
 }
@@ -70,15 +63,16 @@ function populateGraph(parsed, stateGraph, nodeStack) {
 
   if (parsed.Atom) {
     id = uuidv4();
-    var node = {"key": id, "text": parsed.Atom}
-    nodeStack.push(node);
+    var node = {key: id, text: parsed.Atom, dataType: ATOM}
+    nodeStack.roots.push(node);
+    stateGraph.nodes.push(node);
 
     return;
   }
 
   if (Array.isArray(parsed)) {
 
-    var parentId = uuidv4();
+    // var parentId = uuidv4();
     for (var i = 0; i < parsed.length; i++) {
       populateGraph(parsed[i], stateGraph, nodeStack);
     }
@@ -96,54 +90,77 @@ function populateGraph(parsed, stateGraph, nodeStack) {
 }
 
 function handleOp(op, nodeStack, stateGraph) {
-  console.log('op',op);
   var parentId = uuidv4();
+  var parentNode = {key: parentId, text: EPSILON, dataType: EPSILON};
+  stateGraph.nodes.push(parentNode);
 
   if (op === "Or") {
-    console.log(nodeStack);
-    var c1 = nodeStack.pop();
-    var c2 = nodeStack.pop();
+    var a = nodeStack.roots.pop();
+    var b = nodeStack.roots.pop();
+    console.log(a, b, "ab")
 
-    stateGraph.nodes.push(c1);
-    stateGraph.nodes.push(c2);
+    stateGraph.edges.push({from: parentId, to: a.key, text: op});
+    stateGraph.edges.push({from: parentId, to: b.key, text: op});
 
-    stateGraph.edges.push({from: parentId, to: c1.key, text: op});
-    stateGraph.edges.push({from: parentId, to: c2.key, text: op});
+    // stateGraph.nodes.push({key: parentId, text: EPSILON});
+    if (a.dataType === ATOM) {
+      nodeStack.leaves.push(a);
+    } 
+    if (b.dataType === ATOM) {
+      nodeStack.leaves.push(b);
+    }
 
-    nodeStack.push({key: parentId, text: EPSILON});
+    
+    nodeStack.roots.push(parentNode);
   }
 
   if (op === "Then") {
-    var b = nodeStack.pop();
-    var a = nodeStack.pop();
+    var b = nodeStack.roots.pop();
 
-    stateGraph.nodes.push(a);
-    stateGraph.nodes.push({key: parentId, text: EPSILON});
+    if (nodeStack.leaves.length == 0) {
+      var a = nodeStack.roots.pop();
+      stateGraph.edges.push({from: parentId, to: a.key, text: op});      
+      stateGraph.edges.push({from: a.key, to: b.key, text: op});
 
-    stateGraph.edges.push({from: a.key, to: b.key, text: op});
-    stateGraph.edges.push({from: parentId, to: a.key, text: op});
-    
+    } else {
+      stateGraph.edges.push({from: parentId, to: b.key, text: op});
+      var len = nodeStack.leaves.length; 
+      for (var i = 0; i < len; i++) {
+        var id = nodeStack.leaves.pop().key;
+              
+        stateGraph.edges.push({from: id, to: parentId, text: op});
+      }
+    }
+    nodeStack.leaves.push(b);
 
-    nodeStack.push(b);
+    if (nodeStack.roots.length === 0) {
+      nodeStack.roots.push(parentNode);
+    }
   }
 
   if (op === "ZeroOrMore") {
-    
-    var a = nodeStack.pop();
-    stateGraph.nodes.push(a);
-    stateGraph.edges.push({from: parentId, to: parentId});
-    stateGraph.edges.push({from: parentId, to: a.key})
-    nodeStack.push({key: parentId, text: EPSILON})
+    var a = nodeStack.roots.pop();
+    console.log(a);
+    stateGraph.edges.push({from: parentId, to: a.key})      
+
+    for (var i = 0; i < nodeStack.leaves.length; i++) {
+      var l = nodeStack.leaves[i].key;
+      stateGraph.edges.push({from: l, to: parentId, text: op});
+    }
+
+    nodeStack.roots.push(parentNode);
+    nodeStack.leaves.push(a);
   }
 
-  if (op === "OneOrMore") {
-    var a = nodeStack.pop();
-    stateGraph.nodes.push(a);
-    stateGraph.edges.push({from: a.key, to: a.key});
-    stateGraph.edges.push({from: parentId, to: a.key})
+  // if (op === "OneOrMore") {
+  //   // edge pointing to itself should be on leaf... not parent
+  //   var a = nodeStack.roots.pop();
+  //   stateGraph.edges.push({from: a, to: a});
+  //   stateGraph.edges.push({from: parentId, to: a})
 
-    nodeStack.push({key: parentId, text: EPSILON})
-  }
+  //   nodeStack.roots.push(parentId);
+  //   nodeStack.leaves.push(a);
+  // }
 }
 
 // function collapseEpsilons() {
