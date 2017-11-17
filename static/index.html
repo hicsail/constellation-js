@@ -56,11 +56,11 @@
   }
   
   function getRootNode(stateGraph, subGraph) {
-    var r = subGraph[0].root;
+    var root = subGraph[0].root;
     var nodes = stateGraph.nodes;
   
     for (var i = 0; i < nodes.length; i++) {
-      if (r.key == nodes[i].key) {
+      if (root.key == nodes[i].key) {
         return nodes[i];
       }
     }
@@ -85,21 +85,25 @@
     var subGraph = [];
   
     populateGraph(parsed, stateGraph, subGraph);
-    // addAcceptNodes(stateGraph, subGraph);
-    // var rootNode = getRootNode(stateGraph, subGraph);
- 
-    // rootNode.text = "root";
+    addAcceptNodes(stateGraph, subGraph);
+    var rootNode = getRootNode(stateGraph, subGraph);
+    if (rootNode.text !== ACCEPT) {
+      rootNode.text = "root"; 
+    } else {
+      rootNode.text = rootNode.text + " root";
+    }
     myDiagram.model = new go.GraphLinksModel(stateGraph.nodes, stateGraph.edges);
   }
   
   function addAcceptNodes(stateGraph, subGraph) {
-    // var len = subGraph[0].leaves.length;
-    // for (var i = 0; i < len; i++) {
-    //   var n = subGraph[0].leaves.pop();
-    //   var id = uuidv4();
-    //   stateGraph.nodes.push({key: id, text: ACCEPT});
-    //   stateGraph.edges.push({from: n.key, to: id});
-    // }
+    var len = subGraph[0].leaves.length;
+
+    for (var i = 0; i < len; i++) {
+      var n = subGraph[0].leaves.pop();
+      var id = uuidv4();
+      stateGraph.nodes.push({key: id, text: ACCEPT});
+      stateGraph.edges.push({from: n.key, to: id});
+    }
   }
 
 
@@ -117,20 +121,16 @@
     stateGraph.edges.push({from: epsilonId, to: atomId});
 
     addRoot(epsilonNode, [atomNode], subGraph);
-    // addLeaf(atomNode, subGraph)
   }
   
   function populateGraph(parsed, stateGraph, subGraph) {
   
     if (parsed.Atom) {
       handleAtom(parsed.Atom, stateGraph, subGraph);
-  
       return;
     }
   
     if (Array.isArray(parsed)) {
-  
-      // var parentId = uuidv4();
       for (var i = 0; i < parsed.length; i++) {
         populateGraph(parsed[i], stateGraph, subGraph);
       }
@@ -138,7 +138,6 @@
     }
   
     if (Object.keys(parsed).length > 0) {
-  
       for (k in parsed) {
         var operation = k;
         populateGraph(parsed[k], stateGraph, subGraph)
@@ -147,28 +146,28 @@
     }
   }
 
-  function shiftLeaves(subGraph) {
-    var leaves = subGraph[1].leaves;
-    var len = leaves.length;
-    for (var i = 0; i < len; i++) {
-      var leaf = leaves.pop();
-      subGraph[0].leaves.push(leaf);
+  // function shiftLeaves(subGraph) {
+  //   var leaves = subGraph[1].leaves;
+  //   var len = leaves.length;
+  //   for (var i = 0; i < len; i++) {
+  //     var leaf = leaves.pop();
+  //     subGraph[0].leaves.push(leaf);
       
-    }
-  }
+  //   }
+  // }
 
   function getRoot(subGraph) {
     subGraph.pop();
   }
 
-  function transferChildren(leaves) {
-    var len = leaves.length;
-    var children = [];
-    for (var i = 0; i < leaves.length; i++) {
-      children.push(leaves.pop());
-    }
-    return children;
-  }
+  // function transferChildren(leaves) {
+  //   var len = leaves.length;
+  //   var children = [];
+  //   for (var i = 0; i < leaves.length; i++) {
+  //     children.push(leaves.pop());
+  //   }
+  //   return children;
+  // }
 
   function handleOr(subGraph, stateGraph, parentNode) {
     var a = subGraph.pop();
@@ -177,58 +176,87 @@
     stateGraph.edges.push({from: parentNode.key, to: a.root.key});
     stateGraph.edges.push({from: parentNode.key, to: b.root.key});
 
-    var children = transferChildren(a.leaves);
-    children.concat(transferChildren(b.leaves));
+    var children = [];
+    var len = a.leaves.length;
+    for (var i = 0; i < len; i++) {
+      children.push(a.leaves.pop());
+    }
+
+    var len = b.leaves.length;
+    for (var i = 0; i < len; i++) {
+      children.push(b.leaves.pop());
+    } 
 
     addRoot(parentNode, children, subGraph);
-  
-    // //   // (a or b) or (c or d)
-    // if (subGraph.roots[0].length > 0) {
-    //   a = subGraph.roots[0].pop();
-    //   b = subGraph.roots[1].pop();
-    // } else {
-    //   // (a or b)
-    //   if (subGraph.leaves.length % 2 === 0) {
-
-    //     a = subGraph.leaves.pop();
-    //   // (a or b) or c
-    //   } else {
-    //     a = subGraph.roots.pop();
-    //   }
-    //   b = subGraph.leaves.pop();
-    // }
-
-    // subGraph.roots.push(parentNode);
-
   }
   
   function handleThen(subGraph, stateGraph, parentNode) {
-    // if b is a root
-    // a then (b or c)
-    var b = null;
-    if (subGraph.roots.length % 2 === 0) {
-      b = subGraph.roots.pop();
-    } else {
-      b = subGraph.leaves.pop();
-    }
-    stateGraph.edges.push({from: parentId, to: b.key, text: op});
-   
-    var len = subGraph.leaves.length; 
-    var prevNode = null;
-    for (var i = 0; i < len; i++) {
-      prevNode = subGraph.leaves.pop();
-            
-      stateGraph.edges.push({from: prevNode.key, to: parentId, text: op});
-    }
-  // }
-  subGraph.leaves.push(b);
+    var b = subGraph.pop();
+    var a = subGraph.pop();
 
-  if (subGraph.roots.length === 0) {
-    subGraph.roots.push(prevNode);
-  }
+    var len = a.leaves.length;
+    var children = [];
+
+    for (var i = 0; i < len; i++) {
+      var leaf = a.leaves.pop();
+      stateGraph.edges.push({from: leaf.key, to: parentNode.key});
+    }
+    var len = b.leaves.length;
+    for (var i = 0; i < len; i++) {
+      children.push(b.leaves.pop());
+    }
+
+    stateGraph.edges.push({from: parentNode.key, to: b.root.key});
+    addRoot(a.root, children, subGraph);
   }
   
+  // Zero or more
+  function handleZeroOrMore(subGraph, stateGraph, parentNode) {
+    var a = subGraph.pop();
+
+    parentNode.text = ACCEPT;
+    parentNode.dataType = ACCEPT;
+
+    stateGraph.edges.push({from: parentNode.key, to: a.root.key});
+
+    var children = [];
+    var len = a.leaves.length;
+
+    for (var i = 0; i < len; i++) {
+      var leaf = a.leaves.pop();
+      children.push(leaf);
+      stateGraph.edges.push({from: leaf.key, to: parentNode.key});
+    }
+
+    addRoot(parentNode, [parentNode], subGraph);
+  }
+
+  // parent --> a.root -> leaves --> accept --> parent
+  function handleOneOrMore(subGraph, stateGraph, parentNode) {
+    var a = subGraph.pop();
+
+    stateGraph.edges.push({from: parentNode.key, to: a.root.key});
+
+    var acceptKey = uuidv4();
+    var acceptNode = {key: acceptKey, text: ACCEPT, dataType: ACCEPT};
+    stateGraph.nodes.push(acceptNode);
+
+    var len = a.leaves.length;
+    for (var i = 0; i < len; i++) {
+      var leaf = a.leaves.pop();
+      // console.log('leaf', leaf)
+      stateGraph.edges.push({from: leaf.key, to: acceptNode.key});
+    }
+    stateGraph.edges.push({from: acceptNode.key, to: parentNode.key});
+
+    addRoot(parentNode, [acceptNode], subGraph);
+    
+
+  }
+  
+  // Process operation
   function handleOp(op, subGraph, stateGraph) {
+
     var parentId = uuidv4();
     var parentNode = {key: parentId, text: EPSILON, dataType: EPSILON};
     stateGraph.nodes.push(parentNode);
@@ -237,45 +265,18 @@
       handleOr(subGraph, stateGraph, parentNode)
     }
   
-    // if (op === "Then") {
-    //   handleThen(subGraph, stateGraph, parentNode);
-    // }
-  
-    // if (op === "ZeroOrMore") {
-    //   // var a = subGraph.roots.pop();
-    //   parentNode.text = ACCEPT;
-    //   parentNode.dataType = ACCEPT;
-  
-    //   // If existing root
-    //   if (subGraph.roots.length === 1) {
-    //     var root = subGraph.roots.pop();
-    //     stateGraph.edges.push({from: parentId, to: root.key});
-  
-    //     for (var i = 0; i < subGraph.leaves.length; i++) {
-    //       var leaf = subGraph.leaves[i].key;
-    //       stateGraph.edges.push({from: leaf, to: parentId, text: op});
-    //       // stateGraph.edges.push({from: parentId, to: l})      
-  
-    //     }
-    //   // No root yet
-    //   } else {
-    //     var leaf = subGraph.leaves.pop();
-    //     stateGraph.edges.push({from: parentId, to: leaf.key, text: op});
-    //     stateGraph.edges.push({from: leaf.key, to: parentId, text: op});
-    //   }
-    //   subGraph.roots.push(parentNode);
-      // subGraph.leaves.push(a);
-    // }
-  
-    // if (op === "OneOrMore") {
-    //   // edge pointing to itself should be on leaf... not parent
-    //   var a = subGraph.roots.pop();
-    //   stateGraph.edges.push({from: a, to: a});
-    //   stateGraph.edges.push({from: parentId, to: a})
-  
-    //   subGraph.roots.push(parentId);
-    //   subGraph.leaves.push(a);
-    // }
+    if (op === "Then") {
+      handleThen(subGraph, stateGraph, parentNode);
+    }
+
+    if (op === "ZeroOrMore") {
+      handleZeroOrMore(subGraph, stateGraph, parentNode);
+    }
+
+    if (op === "OneOrMore") {
+      console.log("ONEORMORE")
+      handleOneOrMore(subGraph, stateGraph, parentNode);
+    }
   }
   
   // function collapseEpsilons() {
