@@ -17,14 +17,7 @@ function initializeStateGraph() {
   }
   
 function getRootNode(stateGraph, boundaryStack) {
-  var root = boundaryStack[0].root;
-  var nodes = stateGraph.nodes;
-
-  for (var i = 0; i < nodes.length; i++) {
-    if (root.key == nodes[i].key) {
-      return nodes[i];
-    }
-  }
+  return boundaryStack[0].root;
 }
 
 function addRoot(root, children, boundaryStack) {
@@ -61,19 +54,14 @@ function displayDiagram(stateGraph) {
 }
 function ibis(parsed) {
 
-
-  // var stateGraph = {"nodes": [], "edges": []}  
   var stateGraph = {};
   var boundaryStack = [];
 
   populateGraph(parsed, stateGraph, boundaryStack);
-  // addAcceptNodes(stateGraph, boundaryStack);
-  // // var rootNode = getRootNode(stateGraph, boundaryStack);
-  // if (rootNode.text !== ACCEPT) {
-  //   rootNode.text = "root"; 
-  // } else {
-  //   rootNode.text = rootNode.text + " root";
-  // }
+  addAcceptNodes(stateGraph, boundaryStack);
+  var root = getRootNode(stateGraph, boundaryStack);
+  stateGraph[root].text = "root";
+
   displayDiagram(stateGraph);
 }
 
@@ -81,10 +69,11 @@ function addAcceptNodes(stateGraph, boundaryStack) {
   var len = boundaryStack[0].leaves.length;
 
   for (var i = 0; i < len; i++) {
-    var n = boundaryStack[0].leaves.pop();
-    var id = uuidv4();
-    stateGraph.nodes.push({key: id, text: ACCEPT});
-    stateGraph.edges.push({from: n.key, to: id});
+    var atom = boundaryStack[0].leaves.pop();
+    var acceptId = uuidv4();
+    
+    stateGraph[acceptId] = {text: ACCEPT, dataType: ACCEPT, edges:[]};
+    stateGraph[atom].edges.push(acceptId);    
   }
 }
 
