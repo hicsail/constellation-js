@@ -61,9 +61,23 @@ function ibis(parsed) {
   addAcceptNodes(stateGraph, boundaryStack);
   var root = getRootNode(stateGraph, boundaryStack);
   stateGraph[root].text = "root";
-
   displayDiagram(stateGraph);
+  traverseFromRoot(root, stateGraph);
 }
+
+function traverseFromRoot(root, stateGraph) {
+  visited = {};
+
+  var rootEdges = stateGraph[root].edges;
+
+  for (var i = 0; i < rootEdges.length; i++) {
+    visited[rootEdges[i]] = false;
+  }
+
+  visitNodes(root, visited, stateGraph, []);
+
+}
+
 
 function addAcceptNodes(stateGraph, boundaryStack) {
   var len = boundaryStack[0].leaves.length;
@@ -199,24 +213,45 @@ function handleOneOrMore(boundaryStack, stateGraph, parentId) {
 }
 
 
-// function productMachine(r1, r2) {
-//   var s1 = buildSubgraph(r1);
+function printDesign(path) {
+  var pathStr = "Path: ";
+  for (var i = 0; i < path.length; i++) {
+    if (path[i].dataType !== EPSILON) {
+      pathStr += " " + path[i].text;      
+    }
+  }
+  console.log(pathStr);
+}
 
-// }
 
-// function buildSubgraph(root) {
-//   var subNodes = [];
+function visitNodes(nodeId, visited, stateGraph, path) {
+  visited[nodeId] = true;
+  var node = stateGraph[nodeId];
+  path.push(node);
 
-  
-//   while(it.next()) {
-//     var child = it.value;
-//     console.log("CHILD", child);
-//   }  
-// }
+  for (var i = 0; i < node.edges.length; i++) {
+    var child = stateGraph[node.edges[i]];
+    if (child.dataType === ACCEPT) {
+      printDesign(path);
+    }
+    if (!visited[node.edges[i]]) {
+      visitNodes(node.edges[i], visited, stateGraph, path);
+    }
+  }
+
+  path.pop();
+  visited[nodeId] = false;
+}
 
 function handleAnd(boundaryStack, stateGraph, parentId) {
   var a = boundaryStack.pop();
   var b = boundaryStack.pop();
+
+  makeSubgraph(a.root, stateGraph)
+  // getSubgraph(a, b, stateGraph);
+
+  var andGraph = {};
+
 
   console.log('AND not yet supported')
 }
@@ -233,7 +268,7 @@ function handleOp(op, boundaryStack, stateGraph) {
   }
 
   if (op === "And") {
-    // handleAnd(boundaryStack, stateGraph, parentId);
+    handleAnd(boundaryStack, stateGraph, parentId);
   }
 
   if (op === "Then") {
