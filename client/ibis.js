@@ -66,15 +66,16 @@ function ibis(parsed) {
 }
 
 function traverseFromRoot(root, stateGraph) {
-  toVisit = [];
+  visited = {};
   var rootEdges = stateGraph[root].edges;
 
-  // for (var i = 0; i < rootEdges.length; i++) {
-    
-  // }
+  for (var i = 0; i < rootEdges.length; i++) {
+    // console.log(rootEdges[i]);
+    visited[rootEdges[i]] = false;
+  }
 
 
-  visitNodes(root, {root: false}, stateGraph, []);
+  visitNodes(root, visited, stateGraph, []);
 }
 
 function enumerateDesigns(root, stateGraph) {
@@ -235,11 +236,11 @@ function visitNodes(nodeId, visited, stateGraph, path) {
   var node = stateGraph[nodeId];
   path.push(node);
 
-  if (node.dataType === ACCEPT) {
-    printDesign(path);
-   return;
-  }
   for (var i = 0; i < node.edges.length; i++) {
+    var child = stateGraph[node.edges[i]];
+    if (child.dataType === ACCEPT) {
+      printDesign(path);
+    }
     if (!visited[node.edges[i]]) {
       visitNodes(node.edges[i], visited, stateGraph, path);
     }
