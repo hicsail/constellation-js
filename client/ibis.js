@@ -62,29 +62,21 @@ function ibis(parsed) {
   var root = getRootNode(stateGraph, boundaryStack);
   stateGraph[root].text = "root";
   displayDiagram(stateGraph);
-  enumerateDesigns(root, stateGraph);
+  traverseFromRoot(root, stateGraph);
 }
 
 function traverseFromRoot(root, stateGraph) {
   visited = {};
+
   var rootEdges = stateGraph[root].edges;
 
   for (var i = 0; i < rootEdges.length; i++) {
-    // console.log(rootEdges[i]);
     visited[rootEdges[i]] = false;
   }
 
-
   visitNodes(root, visited, stateGraph, []);
-}
-
-function enumerateDesigns(root, stateGraph) {
-
-  traverseFromRoot(root, stateGraph);
-
 
 }
-
 
 
 function addAcceptNodes(stateGraph, boundaryStack) {
@@ -224,8 +216,9 @@ function handleOneOrMore(boundaryStack, stateGraph, parentId) {
 function printDesign(path) {
   var pathStr = "Path: ";
   for (var i = 0; i < path.length; i++) {
-    pathStr += " " + path[i].text;
-    // console.log(path[i].text);
+    if (path[i].dataType !== EPSILON) {
+      pathStr += " " + path[i].text;      
+    }
   }
   console.log(pathStr);
 }
@@ -249,54 +242,6 @@ function visitNodes(nodeId, visited, stateGraph, path) {
   path.pop();
   visited[nodeId] = false;
 }
-
-// function visitNodes(toVisit, visited, stateGraph, path) {
-
-//   while (toVisit.length > 0) {
-//     var len = toVisit.length;
-//     for (var i = 0; i < len; i++) {
-//       var n = toVisit.pop();
-    
-
-
-//       if (!visited[n]) {
-//         if (stateGraph[n].edges.length === 0) {
-//           console.log("LEAF")
-//           // printDesign(path);
-//           path = [];
-//           return;
-//         }
-//         console.log(stateGraph[n].text);
-//         visited[n] = true;
-//         path.push(stateGraph[n]);
-//         visitNodes(stateGraph[n].edges, visited, stateGraph, path)  
-//       }
-//     }
-//   }
-// }
-
-// function findNodes(root, stateGraph) {
-  
-
-
-// }
-
-
-// function makeSubgraph(root, stateGraph) {
-//   var nodes = [];
-//   var toVisit = [];
-//   var visited = [];
-
-//   var rootEdges = stateGraph[root].edges;
-
-//   for (var i = 0; i < rootEdges.length; i++) {
-//     toVisit.push(rootEdges[i]);
-//   }
-
-//   visitNodes(toVisit, visited, stateGraph, nodes);
-
-//   // var nodes = findNodes(root, stateGraph);
-// }
 
 function handleAnd(boundaryStack, stateGraph, parentId) {
   var a = boundaryStack.pop();
