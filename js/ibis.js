@@ -62,7 +62,8 @@ function ibis(parsed) {
   var root = getRootNode(stateGraph, boundaryStack);
   stateGraph[root].text = "root";
   displayDiagram(stateGraph);
-  traverseFromRoot(root, stateGraph);
+  var paths = traverseFromRoot(root, stateGraph);
+  return paths;
 }
 
 function traverseFromRoot(root, stateGraph) {
@@ -73,8 +74,9 @@ function traverseFromRoot(root, stateGraph) {
   for (var i = 0; i < rootEdges.length; i++) {
     visited[rootEdges[i]] = false;
   }
-
-  visitNodes(root, visited, stateGraph, []);
+  var allPaths = [];
+  visitNodes(root, visited, stateGraph, [], allPaths);
+  return allPaths;
 
 }
 
@@ -216,30 +218,84 @@ function handleOneOrMore(boundaryStack, stateGraph, parentId) {
 function printDesign(path) {
   var pathStr = "Path: ";
   for (var i = 0; i < path.length; i++) {
-    if (path[i].dataType !== EPSILON) {
-      pathStr += " " + path[i].text;      
+    if (path[i].data.dataType !== EPSILON) {
+      pathStr += " " + path[i].data.text;      
     }
   }
   console.log(pathStr);
 }
 
+function copyPath(path) {
+  var copy = [];
 
-function visitNodes(nodeId, visited, stateGraph, path) {
-  visited[nodeId] = true;
-  var node = stateGraph[nodeId];
-  path.push(node);
-
-  for (var i = 0; i < node.edges.length; i++) {
-    var child = stateGraph[node.edges[i]];
-    if (child.dataType === ACCEPT) {
-      printDesign(path);
-    }
-    if (!visited[node.edges[i]]) {
-      visitNodes(node.edges[i], visited, stateGraph, path);
+  for (var i = 0; i < path.length; i++) {
+    if (path[i].dataType !== EPSILON) {
+      copy.push(path[i]);
     }
   }
+  return copy;
+}
 
-  path.pop();
+function checkCycle(nodeId, currentPath) {
+  for (var i = 0; i < currentPath.length; i++) {
+    if (nodeId === currentPath[i].id) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+// returns all edges that are not yet in path
+function getUnprocessedEdges(edges, path) {
+  var unprocessed = [];
+  for (var i = 0; i < edges.length; i++) {
+    var inList = false;
+    for (var j = 0; j < path.length; j++) {
+      if (edges[i] === path[j].id) {
+        inList = true;
+        break;
+      }
+    }
+
+    if (!inList) {
+      unprocessed.push(edges[i]);
+    }
+  }
+  return unprocessed;
+}
+
+function processChildren(children, visited, stateGraph, currentPath, allPaths) {
+  for (var i = 0; i < children.length; i++) {
+    var childId = children[i];
+
+    if (stateGraph[childId].dataType === ACCEPT) {
+      printDesign(currentPath);
+      allPaths.push(currentPath);
+    } else {
+      if (!visited[childId]) {
+        visitNodes(childId, visited, stateGraph, currentPath, allPaths);
+      } else {
+        if (checkCycle(childId, currentPath)) {
+          // process other edges 
+          childEdges = stateGraph[childId].edges;
+          var unprocessed = getUnprocessedEdges(childEdges, currentPath);
+          processChildren(unprocessed, visited, stateGraph, currentPath, allPaths)
+        }
+      }  
+    }
+  }
+}
+
+function visitNodes(nodeId, visited, stateGraph, currentPath, allPaths) {
+  visited[nodeId] = true;
+
+  var node = stateGraph[nodeId];
+  currentPath.push({id: nodeId, data: node});
+
+  processChildren(node.edges, visited, stateGraph, currentPath, allPaths);
+
+  currentPath.pop();
   visited[nodeId] = false;
 }
 
