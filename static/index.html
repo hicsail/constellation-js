@@ -34,11 +34,9 @@
             if (myDiagram) {
               myDiagram.div = null;
             }
-        
-            var langText = $('#langInput').val();
-            var parsed = imparse.parse(GRAMMER_DEF, langText);
-        
-            ibis(parsed);
+                    
+            ibis($('#langInput').val());
+            
           });
         });
             

@@ -1,10 +1,16 @@
-
+// Global Constants
 const GRAMMER_DEF = [{"Seq":[{"Then":[["Exp"],"then",["Seq"]]},{"":[["Exp"]]}]},{"Exp":[{"Or":[["Term"],"or",["Exp"]]},{"And":[["Term"],"and",["Exp"]]},{"":[["Term"]]}]},{"Term":[{"OneOrMore":["one-or-more",["Term"]]},{"ZeroOrMore":["zero-or-more",["Term"]]},{"":["(",["Seq"],")"]},{"Atom":[{"RegExp":"([A-Za-z0-9]|-|_)+"}]}]}]
 
 const EPSILON = "o";
 const ATOM = "atom";
 const ACCEPT = "accept";
   
+
+/* * * * * * * */
+/*   DIAGRAM   */
+/* * * * * * * */
+
+// Returns an empty Go Diagram object
 function initializeStateGraph() {
   
   
@@ -15,21 +21,9 @@ function initializeStateGraph() {
   
     return myDiagram;
   }
-  
-function getRootNode(stateGraph, boundaryStack) {
-  return boundaryStack[0].root;
-}
 
-function addRoot(root, children, boundaryStack) {
-  var obj = {root: root, leaves: children};
-  boundaryStack.push(obj);
-}
 
-function addLeaf(leaf, boundaryStack) {
-  var index = boundaryStack.length-1; 
-  boundaryStack[index].leaves.push(leaf);
-}
-
+// Translates adjacency list to Go graph representation
 function displayDiagram(stateGraph) {
   var myDiagram = initializeStateGraph();
 
@@ -48,39 +42,24 @@ function displayDiagram(stateGraph) {
     }
   }
 
-  myDiagram.model = new go.GraphLinksModel(nodes, edges);
   
-  
-}
-function ibis(parsed) {
-
-  var stateGraph = {};
-  var boundaryStack = [];
-
-  populateGraph(parsed, stateGraph, boundaryStack);
-  addAcceptNodes(stateGraph, boundaryStack);
   var root = getRootNode(stateGraph, boundaryStack);
-  stateGraph[root].text = "root";
-  displayDiagram(stateGraph);
-  var paths = traverseFromRoot(root, stateGraph);
-  return paths;
+  // for graph clarity purposes
+  root.text = 'root';  
+  myDiagram.model = new go.GraphLinksModel(nodes, edges);
 }
 
-function traverseFromRoot(root, stateGraph) {
-  visited = {};
+/* * * * * * * * * * */
+/*   NODE HANDLING   */
+/* * * * * * * * * * */
 
-  var rootEdges = stateGraph[root].edges;
-
-  for (var i = 0; i < rootEdges.length; i++) {
-    visited[rootEdges[i]] = false;
-  }
-  var allPaths = [];
-  visitNodes(root, visited, stateGraph, [], allPaths);
-  return allPaths;
-
+// Root of the graph should always be the root of the only remaining element in the boundary stack
+function getRootNode(stateGraph, boundaryStack) {
+  return boundaryStack[0].root;
 }
 
 
+// Adding accept nodes to every leaf remaining on boundary stack
 function addAcceptNodes(stateGraph, boundaryStack) {
   var len = boundaryStack[0].leaves.length;
 
@@ -93,17 +72,27 @@ function addAcceptNodes(stateGraph, boundaryStack) {
   }
 }
 
+// New element on boundary stack
+function addToBoundaryStack(root, children, boundaryStack) {
+  var obj = {root: root, leaves: children};
+  boundaryStack.push(obj);
+}
 
-function handleAtom(atom, stateGraph, boundaryStack) {
-  var epsilonId = uuidv4();
-  
-  var atomId = uuidv4();
+/* * * * * * * * * * * */
+/*   GRAPH TRAVERSAL   */
+/* * * * * * * * * * * */
 
-  stateGraph[epsilonId] = {text: EPSILON, dataType: EPSILON, edges: [atomId]};
-  stateGraph[atomId] = {text: atom, dataType: ATOM, edges: []};
+function enumeratePaths(root, stateGraph) {
+  visited = {};
 
+  var rootEdges = stateGraph[root].edges;
 
-  addRoot(epsilonId, [atomId], boundaryStack);
+  for (var i = 0; i < rootEdges.length; i++) {
+    visited[rootEdges[i]] = false;
+  }
+  var allPaths = [];
+  visitNodes(root, visited, stateGraph, [], allPaths);
+  return allPaths;
 }
 
 function populateGraph(parsed, stateGraph, boundaryStack) {
@@ -129,91 +118,6 @@ function populateGraph(parsed, stateGraph, boundaryStack) {
   }
 }
 
-function getRoot(boundaryStack) {
-  boundaryStack.pop();
-}
-
-function handleOr(boundaryStack, stateGraph, parentId) {
-  var a = boundaryStack.pop();
-  var b = boundaryStack.pop();
-
-  stateGraph[parentId].edges.push(a.root);
-  stateGraph[parentId].edges.push(b.root);
-
-  var children = [];
-  var len = a.leaves.length;
-  for (var i = 0; i < len; i++) {
-    children.push(a.leaves.pop());
-  }
-
-  var len = b.leaves.length;
-  for (var i = 0; i < len; i++) {
-    children.push(b.leaves.pop());
-  } 
-
-  addRoot(parentId, children, boundaryStack);
-}
-
-function handleThen(boundaryStack, stateGraph, parentId) {
-  var b = boundaryStack.pop();
-  var a = boundaryStack.pop();
-
-  var len = a.leaves.length;
-  var children = [];
-
-  for (var i = 0; i < len; i++) {
-    var leaf = a.leaves.pop();
-    stateGraph[leaf].edges.push(parentId);
-  }
-  var len = b.leaves.length;
-  for (var i = 0; i < len; i++) {
-    children.push(b.leaves.pop());
-  }
-  
-  stateGraph[parentId].edges.push(b.root);
-  addRoot(a.root, children, boundaryStack);
-}
-
-// Zero or more
-function handleZeroOrMore(boundaryStack, stateGraph, parentId) {
-  var a = boundaryStack.pop();
-  
-  var acceptId = uuidv4();
-  stateGraph[acceptId] = {text: ACCEPT, dataType: ACCEPT, edges:[]};
-
-  stateGraph[parentId].edges.push(acceptId);    
-  stateGraph[parentId].edges.push(a.root);  
-
-  var children = [];
-  var len = a.leaves.length;
-
-  for (var i = 0; i < len; i++) {
-    var leaf = a.leaves.pop();
-    children.push(leaf);
-    stateGraph[leaf].edges.push(parentId);
-  }
-
-  addRoot(parentId, [parentId], boundaryStack);
-}
-
-// parent --> a.root -> leaves --> accept --> parent
-function handleOneOrMore(boundaryStack, stateGraph, parentId) {
-  var a = boundaryStack.pop();
-
-  var acceptId = uuidv4();
-  stateGraph[acceptId] = {text: ACCEPT, dataType: ACCEPT, edges:[]};
-
-  stateGraph[parentId].edges.push(a.root);
- 
-  var len = a.leaves.length;
-  for (var i = 0; i < len; i++) {
-    var leaf = a.leaves.pop();
-    stateGraph[leaf].edges.push(acceptId);
-  }
-  stateGraph[acceptId].edges.push(parentId);
-  addRoot(parentId, [acceptId], boundaryStack);
-}
-
 
 function printDesign(path) {
   var pathStr = "Path: ";
@@ -225,16 +129,6 @@ function printDesign(path) {
   console.log(pathStr);
 }
 
-function copyPath(path) {
-  var copy = [];
-
-  for (var i = 0; i < path.length; i++) {
-    if (path[i].dataType !== EPSILON) {
-      copy.push(path[i]);
-    }
-  }
-  return copy;
-}
 
 function checkCycle(nodeId, currentPath) {
   for (var i = 0; i < currentPath.length; i++) {
@@ -244,7 +138,6 @@ function checkCycle(nodeId, currentPath) {
   }
   return false;
 }
-
 
 // returns all edges that are not yet in path
 function getUnprocessedEdges(edges, path) {
@@ -257,7 +150,6 @@ function getUnprocessedEdges(edges, path) {
         break;
       }
     }
-
     if (!inList) {
       unprocessed.push(edges[i]);
     }
@@ -280,6 +172,7 @@ function processChildren(children, visited, stateGraph, currentPath, allPaths) {
           // process other edges 
           childEdges = stateGraph[childId].edges;
           var unprocessed = getUnprocessedEdges(childEdges, currentPath);
+          // TODO: do they need to be processed or can I just call visitNodes?
           processChildren(unprocessed, visited, stateGraph, currentPath, allPaths)
         }
       }  
@@ -299,25 +192,15 @@ function visitNodes(nodeId, visited, stateGraph, currentPath, allPaths) {
   visited[nodeId] = false;
 }
 
-function handleAnd(boundaryStack, stateGraph, parentId) {
-  var a = boundaryStack.pop();
-  var b = boundaryStack.pop();
 
-  makeSubgraph(a.root, stateGraph)
-  // getSubgraph(a, b, stateGraph);
+/* * * * * * * * */
+/*   OPERATORS   */
+/* * * * * * * * */
 
-  var andGraph = {};
-
-
-  console.log('AND not yet supported')
-}
-
-// Process operation
 function handleOp(op, boundaryStack, stateGraph) {
-
+  // Parent must always be added to the graph
   var parentId = uuidv4();
   stateGraph[parentId] = {text: EPSILON, dataType: EPSILON, edges:[]};
-
 
   if (op === "Or") {
     handleOr(boundaryStack, stateGraph, parentId);
@@ -339,3 +222,126 @@ function handleOp(op, boundaryStack, stateGraph) {
     handleOneOrMore(boundaryStack, stateGraph, parentId);
   }
 }
+
+function handleOr(boundaryStack, stateGraph, parentId) {
+  var a = boundaryStack.pop();
+  var b = boundaryStack.pop();
+
+  stateGraph[parentId].edges.push(a.root);
+  stateGraph[parentId].edges.push(b.root);
+
+  var children = [];
+  var len = a.leaves.length;
+  for (var i = 0; i < len; i++) {
+    children.push(a.leaves.pop());
+  }
+
+  var len = b.leaves.length;
+  for (var i = 0; i < len; i++) {
+    children.push(b.leaves.pop());
+  } 
+
+  addToBoundaryStack(parentId, children, boundaryStack);
+}
+
+
+function handleAnd(boundaryStack, stateGraph, parentId) {
+  console.log('AND not yet supported')
+}
+
+
+function handleThen(boundaryStack, stateGraph, parentId) {
+  var b = boundaryStack.pop();
+  var a = boundaryStack.pop();
+
+  var len = a.leaves.length;
+  var children = [];
+
+  for (var i = 0; i < len; i++) {
+    var leaf = a.leaves.pop();
+    stateGraph[leaf].edges.push(parentId);
+  }
+  var len = b.leaves.length;
+  for (var i = 0; i < len; i++) {
+    children.push(b.leaves.pop());
+  }
+  
+  stateGraph[parentId].edges.push(b.root);
+  addToBoundaryStack(a.root, children, boundaryStack);
+}
+
+// Zero or more
+function handleZeroOrMore(boundaryStack, stateGraph, parentId) {
+  var a = boundaryStack.pop();
+  
+  var acceptId = uuidv4();
+  stateGraph[acceptId] = {text: ACCEPT, dataType: ACCEPT, edges:[]};
+
+  stateGraph[parentId].edges.push(acceptId);    
+  stateGraph[parentId].edges.push(a.root);  
+
+  var children = [];
+  var len = a.leaves.length;
+
+  for (var i = 0; i < len; i++) {
+    var leaf = a.leaves.pop();
+    children.push(leaf);
+    stateGraph[leaf].edges.push(parentId);
+  }
+
+  addToBoundaryStack(parentId, [parentId], boundaryStack);
+}
+
+// parent --> a.root -> leaves --> accept --> parent
+function handleOneOrMore(boundaryStack, stateGraph, parentId) {
+  var a = boundaryStack.pop();
+
+  var acceptId = uuidv4();
+  stateGraph[acceptId] = {text: ACCEPT, dataType: ACCEPT, edges:[]};
+
+  stateGraph[parentId].edges.push(a.root);
+ 
+  var len = a.leaves.length;
+  for (var i = 0; i < len; i++) {
+    var leaf = a.leaves.pop();
+    stateGraph[leaf].edges.push(acceptId);
+  }
+  stateGraph[acceptId].edges.push(parentId);
+  addToBoundaryStack(parentId, [acceptId], boundaryStack);
+}
+
+
+function handleAtom(atom, stateGraph, boundaryStack) {
+  var epsilonId = uuidv4();
+  
+  var atomId = uuidv4();
+
+  stateGraph[epsilonId] = {text: EPSILON, dataType: EPSILON, edges: [atomId]};
+  stateGraph[atomId] = {text: atom, dataType: ATOM, edges: []};
+
+
+  addToBoundaryStack(epsilonId, [atomId], boundaryStack);
+}
+
+
+/* * * * * * */
+/*    MAIN   */
+/* * * * * * */
+function ibis(langText) {
+  
+    var stateGraph = {};
+    var boundaryStack = [];
+  
+    var parsed = imparse.parse(GRAMMER_DEF, langText);
+  
+    populateGraph(parsed, stateGraph, boundaryStack);
+    addAcceptNodes(stateGraph, boundaryStack);
+  
+  
+    displayDiagram(stateGraph);
+  
+    var root = getRootNode(stateGraph, boundaryStack);
+    var paths = enumeratePaths(root, stateGraph);
+  
+    return paths;
+  }
