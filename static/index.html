@@ -36,8 +36,8 @@
             }
            
             myDiagram = initializeStateGraph();
-         
-            var result = ibis($('#langInput').val());
+            var numDesigns = 100;
+            var result = ibis($('#langInput').val(), numDesigns);
             displayDiagram(result.stateGraph);
 
             console.log(result.designs);

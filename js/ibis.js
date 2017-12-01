@@ -298,6 +298,24 @@ function handleAtom(atom, stateGraph, boundaryStack) {
 /* * * * * * * * * * * * */
 /*   PARTS ENUMERATION   */
 /* * * * * * * * * * * * */
+function shuffleList(list) {
+  var currIndex = list.length;
+  
+  while (0 !== currIndex) {
+
+    var randIndex = Math.floor(Math.random() * currIndex);
+    currIndex--;
+
+    // And swap it with the current element.
+    var temp = list[currIndex];
+    list[currIndex] = list[randIndex];
+    list[randIndex] = temp;
+  }
+  return list;
+}
+
+
+
 function cartesianProduct(setA, setB) {
   var newSet = [];
   for (var i = 0; i < setA.length; i++) {
@@ -309,6 +327,16 @@ function cartesianProduct(setA, setB) {
   return newSet;
 }
 
+function getSelectNumDesigns(designs, numDesigns) {
+  var shuffledList = shuffleList(designs);
+  var selectedDesigns = [];
+
+  for (var i = 0; i < numDesigns; i++) {
+    selectedDesigns.push(shuffledList.pop());
+  }
+
+  return selectedDesigns;
+}
 
 // TODO: check that ID exists as a key in collection
 function combineParts(paths, collection, numDesigns) {
@@ -333,9 +361,12 @@ function combineParts(paths, collection, numDesigns) {
       index++;
       count--;
     }
+    
     designs.push(currSet);
   }
-  return designs;
+  var selectedDesigns = getSelectNumDesigns(designs[0], numDesigns);
+
+  return selectedDesigns;
 }
 
 /* * * * * * */
