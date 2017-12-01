@@ -52,7 +52,6 @@ function enumeratePaths(root, stateGraph) {
   }
   var allPaths = [];
   visitNodes(root, visited, stateGraph, [], allPaths);
-  console.log("allpaths", allPaths)
   return allPaths;
 }
 
@@ -299,6 +298,19 @@ function handleAtom(atom, stateGraph, boundaryStack) {
 /* * * * * * * * * * * * */
 /*   PARTS ENUMERATION   */
 /* * * * * * * * * * * * */
+function cartesianProduct(setA, setB) {
+  var newSet = [];
+  for (var i = 0; i < setA.length; i++) {
+    for (var j = 0; j < setB.length; j++) {
+      var combo = setA[i].concat(setB[j]);
+      newSet.push(combo);
+    }
+  }
+  return newSet;
+}
+
+
+// TODO: check that ID exists as a key in collection
 function combineParts(paths, collection, numDesigns) {
   if (collection.length <= 0) {
     collection = testCollection;
@@ -307,11 +319,23 @@ function combineParts(paths, collection, numDesigns) {
 
   for (var i = 0; i < paths.length; i++) {
     var curr_path = paths[i];
-    // console.log(curr_path);
-    for (atom in curr_path) {
-      // console.log(collection[atom]);
+    if (curr_path.length === 1) {
+      var id = curr_path[0].data.text;
+      designs.push(collection[id]);
+      continue;
     }
+    var count = curr_path.length-1;
+    var index = 1;
+    var currSet = collection[curr_path[0].data.text];
+    while (count > 0) {
+      var collB = collection[curr_path[index].data.text];
+      currSet = cartesianProduct(currSet, collB);
+      index++;
+      count--;
+    }
+    designs.push(currSet);
   }
+  return designs;
 }
 
 /* * * * * * */
