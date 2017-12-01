@@ -4,7 +4,8 @@ const GRAMMER_DEF = [{"Seq":[{"Then":[["Exp"],"then",["Seq"]]},{"":[["Exp"]]}]},
 const EPSILON = "o";
 const ATOM = "atom";
 const ACCEPT = "accept";
-  
+const ROOT = "root";  
+
 const testCollection = {"a": ["a1", "a2", "a3", "a4"], "b": ["b1", "b2", "b3", "b4"], "c": ["c1", "c2", "c3", "c4"], "d": ["d1", "d2", "d3", "d4"]};
 
 
@@ -51,7 +52,7 @@ function enumeratePaths(root, stateGraph) {
   }
   var allPaths = [];
   visitNodes(root, visited, stateGraph, [], allPaths);
-  // console.log("allpaths", allPaths)
+  console.log("allpaths", allPaths)
   return allPaths;
 }
 
@@ -95,9 +96,8 @@ function processPath(path, allPaths) {
   var processedPath = [];
   for (var i = 0; i < path.length; i++) {
     if (path[i].data.dataType !== EPSILON) {
-      var obj = JSON.parse(JSON.stringify(path[i]));
-      console.log('obj', obj)
-      processedPath.push[obj];
+      // Deep copy of object
+      processedPath.push(JSON.parse(JSON.stringify(path[i])));
     }
   }
   allPaths.push(processedPath);
@@ -137,7 +137,6 @@ function processChildren(children, visited, stateGraph, currentPath, allPaths) {
     if (stateGraph[childId].dataType === ACCEPT) {
       // printPath(currentPath);
       processPath(currentPath, allPaths);
-      console.log('currentpath', allPaths);
     } else {
       if (!visited[childId]) {
         visitNodes(childId, visited, stateGraph, currentPath, allPaths);
@@ -335,6 +334,7 @@ function ibis(langText, numDesigns) {
   addAcceptNodes(stateGraph, boundaryStack);
 
   var root = getRootNode(stateGraph, boundaryStack);
+  stateGraph[root].text = ROOT;
   var paths = enumeratePaths(root, stateGraph);
   var designs = combineParts(paths, [], numDesigns);
 
