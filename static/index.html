@@ -34,11 +34,57 @@
             if (myDiagram) {
               myDiagram.div = null;
             }
-                    
-            ibis($('#langInput').val());
-            
+           
+            myDiagram = initializeStateGraph();
+         
+            var result = ibis($('#langInput').val());
+            displayDiagram(result.stateGraph);
+          
           });
         });
+
+/* * * * * * * */
+/*   DIAGRAM   */
+/* * * * * * * */
+
+// Returns an empty Go Diagram object
+function initializeStateGraph() {
+  
+  
+    var g = go.GraphObject.make;
+    myDiagram = g(go.Diagram, 'stateGraph', {
+      initialContentAlignment: go.Spot.Center
+    });
+  
+    return myDiagram;
+  }
+
+
+// Translates adjacency list to Go graph representation
+function displayDiagram(stateGraph) {
+ 
+
+  var nodes = [];
+  var edges = [];
+
+  for (id in stateGraph) {
+    
+    var text = stateGraph[id].text;
+
+    nodes.push({key: id, text: text});
+    
+    var nodeEdges = stateGraph[id].edges;
+    for (var i = 0; i < nodeEdges.length; i++) {
+      edges.push({from: id, to: nodeEdges[i]});
+    }
+  }
+
+  
+  // var root = getRootNode(stateGraph);
+  // // for graph clarity purposes
+  // root.text = 'root';  
+  myDiagram.model = new go.GraphLinksModel(nodes, edges);
+}
             
       </script>
   </body>

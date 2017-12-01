@@ -5,49 +5,8 @@ const EPSILON = "o";
 const ATOM = "atom";
 const ACCEPT = "accept";
   
+const testCollection = {"a": ["a1", "a2", "a3", "a4"], "b": ["b1", "b2", "b3", "b4"], "c": ["c1", "c2", "c3", "c4"], "d": ["d1", "d2", "d3", "d4"]};
 
-/* * * * * * * */
-/*   DIAGRAM   */
-/* * * * * * * */
-
-// Returns an empty Go Diagram object
-function initializeStateGraph() {
-  
-  
-    var g = go.GraphObject.make;
-    myDiagram = g(go.Diagram, 'stateGraph', {
-      initialContentAlignment: go.Spot.Center
-    });
-  
-    return myDiagram;
-  }
-
-
-// Translates adjacency list to Go graph representation
-function displayDiagram(stateGraph) {
-  var myDiagram = initializeStateGraph();
-
-  var nodes = [];
-  var edges = [];
-
-  for (id in stateGraph) {
-    
-    var text = stateGraph[id].text;
-
-    nodes.push({key: id, text: text});
-    
-    var nodeEdges = stateGraph[id].edges;
-    for (var i = 0; i < nodeEdges.length; i++) {
-      edges.push({from: id, to: nodeEdges[i]});
-    }
-  }
-
-  
-  var root = getRootNode(stateGraph, boundaryStack);
-  // for graph clarity purposes
-  root.text = 'root';  
-  myDiagram.model = new go.GraphLinksModel(nodes, edges);
-}
 
 /* * * * * * * * * * */
 /*   NODE HANDLING   */
@@ -92,6 +51,7 @@ function enumeratePaths(root, stateGraph) {
   }
   var allPaths = [];
   visitNodes(root, visited, stateGraph, [], allPaths);
+  // console.log("allpaths", allPaths)
   return allPaths;
 }
 
@@ -119,16 +79,29 @@ function populateGraph(parsed, stateGraph, boundaryStack) {
 }
 
 
-function printDesign(path) {
+function printPath(path) {
   var pathStr = "Path: ";
   for (var i = 0; i < path.length; i++) {
     if (path[i].data.dataType !== EPSILON) {
       pathStr += " " + path[i].data.text;      
     }
   }
+
   console.log(pathStr);
 }
 
+function processPath(path, allPaths) {
+
+  var processedPath = [];
+  for (var i = 0; i < path.length; i++) {
+    if (path[i].data.dataType !== EPSILON) {
+      var obj = JSON.parse(JSON.stringify(path[i]));
+      console.log('obj', obj)
+      processedPath.push[obj];
+    }
+  }
+  allPaths.push(processedPath);
+}
 
 function checkCycle(nodeId, currentPath) {
   for (var i = 0; i < currentPath.length; i++) {
@@ -162,8 +135,9 @@ function processChildren(children, visited, stateGraph, currentPath, allPaths) {
     var childId = children[i];
 
     if (stateGraph[childId].dataType === ACCEPT) {
-      printDesign(currentPath);
-      allPaths.push(currentPath);
+      // printPath(currentPath);
+      processPath(currentPath, allPaths);
+      console.log('currentpath', allPaths);
     } else {
       if (!visited[childId]) {
         visitNodes(childId, visited, stateGraph, currentPath, allPaths);
@@ -313,7 +287,7 @@ function handleOneOrMore(boundaryStack, stateGraph, parentId) {
 
 function handleAtom(atom, stateGraph, boundaryStack) {
   var epsilonId = uuidv4();
-  
+
   var atomId = uuidv4();
 
   stateGraph[epsilonId] = {text: EPSILON, dataType: EPSILON, edges: [atomId]};
@@ -323,25 +297,46 @@ function handleAtom(atom, stateGraph, boundaryStack) {
   addToBoundaryStack(epsilonId, [atomId], boundaryStack);
 }
 
+/* * * * * * * * * * * * */
+/*   PARTS ENUMERATION   */
+/* * * * * * * * * * * * */
+function combineParts(paths, collection, numDesigns) {
+  if (collection.length <= 0) {
+    collection = testCollection;
+  }
+  var designs = [];
+
+  for (var i = 0; i < paths.length; i++) {
+    var curr_path = paths[i];
+    // console.log(curr_path);
+    for (atom in curr_path) {
+      // console.log(collection[atom]);
+    }
+  }
+}
 
 /* * * * * * */
 /*    MAIN   */
 /* * * * * * */
-function ibis(langText) {
-  
-    var stateGraph = {};
-    var boundaryStack = [];
-  
-    var parsed = imparse.parse(GRAMMER_DEF, langText);
-  
-    populateGraph(parsed, stateGraph, boundaryStack);
-    addAcceptNodes(stateGraph, boundaryStack);
-  
-  
-    displayDiagram(stateGraph);
-  
-    var root = getRootNode(stateGraph, boundaryStack);
-    var paths = enumeratePaths(root, stateGraph);
-  
-    return paths;
+function ibis(langText, numDesigns) {
+
+  var stateGraph = {};
+  var boundaryStack = [];
+
+  var parsed = '';
+  try {
+    parsed = imparse.parse(GRAMMER_DEF, langText);
+  } catch(err) {
+    alert("Parsing error!");
+    return;
+  }
+
+  populateGraph(parsed, stateGraph, boundaryStack);
+  addAcceptNodes(stateGraph, boundaryStack);
+
+  var root = getRootNode(stateGraph, boundaryStack);
+  var paths = enumeratePaths(root, stateGraph);
+  var designs = combineParts(paths, [], numDesigns);
+
+  return {stateGraph: stateGraph, designs: designs};
   }
