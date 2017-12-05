@@ -9,14 +9,14 @@
     <!-- <script src="../vendor/codemirror.js"></script> -->
  
     
-    <title>Ibis</title>
+    <title>Constellation</title>
 
   </head>
   
   
   <body>
   
-      <h3>Ibis</h3>
+      <h3>Constellation</h3>
   
       <textarea id="langInput" style="height: 200px; width:100%" name="paragraph_text" cols="50" rows="10"></textarea>
   
@@ -36,7 +36,7 @@
             }
            
             myDiagram = initializeStateGraph();
-            var numDesigns = 100;
+            var numDesigns = 1000;
             var result = ibis($('#langInput').val(), numDesigns);
             displayDiagram(result.stateGraph);
 
