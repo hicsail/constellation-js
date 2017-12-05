@@ -9,9 +9,6 @@ const ATOM = "atom";
 const ACCEPT = "accept";
 const ROOT = "root";  
 
-const testCollection = {"a": ["a1", "a2", "a3", "a4"], "b": ["b1", "b2", "b3", "b4"], "c": ["c1", "c2", "c3", "c4"], "d": ["d1", "d2", "d3", "d4"]};
-
-
 /* * * * * * * * * * */
 /*   NODE HANDLING   */
 /* * * * * * * * * * */
@@ -332,8 +329,12 @@ function getSelectNumDesigns(designs, numDesigns) {
   var shuffledList = shuffleList(designs);
   var selectedDesigns = [];
 
-  for (var i = 0; i < numDesigns; i++) {
-    selectedDesigns.push(shuffledList.pop());
+  var len = designs.length;
+
+  while (len > 0 && numDesigns > 0) {
+    selectedDesigns.push(shuffledList.pop());    
+    len--;
+    numDesigns--;
   }
 
   return selectedDesigns;
@@ -341,32 +342,36 @@ function getSelectNumDesigns(designs, numDesigns) {
 
 // TODO: check that ID exists as a key in collection
 function combineParts(paths, collection, numDesigns) {
-  if (collection.length <= 0) {
-    collection = testCollection;
+  if (!collection) {
+    return null;
   }
+
   var designs = [];
 
   for (var i = 0; i < paths.length; i++) {
-    var curr_path = paths[i];
-    if (curr_path.length === 1) {
-      var id = curr_path[0].data.text;
+    var currPath = paths[i];
+
+    if (currPath.length === 1) {
+      var id = currPath[0].data.text;
       designs.push(collection[id]);
       continue;
     }
-    var count = curr_path.length-1;
+
+    var count = currPath.length-1;
     var index = 1;
-    var currSet = collection[curr_path[0].data.text];
+    var currSet = collection[currPath[0].data.text];
     while (count > 0) {
-      var collB = collection[curr_path[index].data.text];
+      var collB = collection[currPath[index].data.text];
       currSet = cartesianProduct(currSet, collB);
       index++;
       count--;
     }
-    
-    designs.push(currSet);
-  }
-  var selectedDesigns = getSelectNumDesigns(designs[0], numDesigns);
 
+    designs.push(currSet);
+
+  }
+
+  var selectedDesigns = getSelectNumDesigns(designs[0], numDesigns);
   return selectedDesigns;
 }
 
@@ -392,9 +397,8 @@ module.exports = function(langText, categories, numDesigns) {
   var root = getRootNode(stateGraph, boundaryStack);
   stateGraph[root].text = ROOT;
   var paths = enumeratePaths(root, stateGraph);
+  var designs = combineParts(paths, categories, numDesigns);
 
-  // var designs = combineParts(paths, categories, numDesigns);
-
-  return {stateGraph: stateGraph, designs: paths};
+  return {stateGraph: stateGraph, designs: designs};
 };
 

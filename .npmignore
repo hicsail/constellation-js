@@ -1,0 +1,12 @@
+server.js
+
+node_modules/
+
+static/
+
+#tests
+test/
+
+# editor configs
+.idea
+.editorconfig

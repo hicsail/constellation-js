@@ -1,0 +1,101 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/1.8.2/go-debug.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    
+    <title>Constellation</title>
+
+  </head>
+  
+  
+  <body>
+  
+      <h3>Constellation</h3>
+  
+      <textarea id="langInput" style="height: 200px; width:100%" name="paragraph_text" cols="50" rows="10"></textarea>
+  
+      <input id="submitBtn" type="button" value="Submit">
+      <br><br>
+  
+      <div id="stateGraph" style="border: solid 1px black; width: 100%; height: 400px"></div>
+  
+
+      <script>
+        var myDiagram = null;
+        
+        $(document).ready(function() {
+          $("#submitBtn").click(function(){
+            if (myDiagram) {
+              myDiagram.div = null;
+            }
+           
+            myDiagram = initializeStateGraph();
+
+            var specification = $('#langInput').val();
+
+            var categories = '{"promoter": ["BBa_R0040", "BBa_J23100"], "rbs": ["BBa_B0032", "BBa_B0034"], "gene": ["BBa_E0040", "BBa_E1010"], "terminator": ["BBa_B0010"]}';
+
+
+
+            $.post('http://155.41.91.164:8082/postSpecs', {
+              "specification": specification,
+              "categories": categories,
+              "number": "2.0",
+              "name": "specificationname",
+              "clientid": "userid" 
+            }, function(data, status) {
+              displayDiagram(data.stateGraph);
+              console.log(data);          
+            });
+          });
+        });
+
+/* * * * * * * */
+/*   DIAGRAM   */
+/* * * * * * * */
+
+// Returns an empty Go Diagram object
+function initializeStateGraph() {
+  
+  
+    var g = go.GraphObject.make;
+    myDiagram = g(go.Diagram, 'stateGraph', {
+      initialContentAlignment: go.Spot.Center
+    });
+  
+    return myDiagram;
+  }
+
+
+// Translates adjacency list to Go graph representation
+function displayDiagram(stateGraph) {
+ 
+
+  var nodes = [];
+  var edges = [];
+
+  for (id in stateGraph) {
+    
+    var text = stateGraph[id].text;
+
+    nodes.push({key: id, text: text});
+    
+    var nodeEdges = stateGraph[id].edges;
+    for (var i = 0; i < nodeEdges.length; i++) {
+      edges.push({from: id, to: nodeEdges[i]});
+    }
+  }
+
+  
+  // var root = getRootNode(stateGraph);
+  // // for graph clarity purposes
+  // root.text = 'root';  
+  myDiagram.model = new go.GraphLinksModel(nodes, edges);
+}
+            
+      </script>
+  </body>
+
+
+  
+  </html>
