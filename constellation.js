@@ -1,5 +1,8 @@
+var imparse = require('./libs/imparse');
+var uuidv4 = require('./libs/uuidv4');
+
 // Global Constants
-const GRAMMER_DEF = [{"Seq":[{"Then":[["Exp"],"then",["Seq"]]},{"":[["Exp"]]}]},{"Exp":[{"Or":[["Term"],"or",["Exp"]]},{"And":[["Term"],"and",["Exp"]]},{"":[["Term"]]}]},{"Term":[{"OneOrMore":["one-or-more",["Term"]]},{"ZeroOrMore":["zero-or-more",["Term"]]},{"":["(",["Seq"],")"]},{"Atom":[{"RegExp":"([A-Za-z0-9]|-|_)+"}]}]}]
+const GRAMMER_DEF = [{"Seq":[{"Then":[["Exp"],".",["Seq"]]},{"":[["Exp"]]}]},{"Exp":[{"Or":[["Term"],"or",["Exp"]]},{"And":[["Term"],"and",["Exp"]]},{"":[["Term"]]}]},{"Term":[{"OneOrMore":["one-or-more",["Term"]]},{"ZeroOrMore":["zero-or-more",["Term"]]},{"":["{",["Seq"],"}"]},{"Atom":[{"RegExp":"([A-Za-z0-9]|-|_)+"}]}]}];
 
 const EPSILON = "o";
 const ATOM = "atom";
@@ -86,8 +89,6 @@ function printPath(path) {
       pathStr += " " + path[i].data.text;      
     }
   }
-
-  console.log(pathStr);
 }
 
 function processPath(path, allPaths) {
@@ -372,16 +373,16 @@ function combineParts(paths, collection, numDesigns) {
 /* * * * * * */
 /*    MAIN   */
 /* * * * * * */
-function ibis(langText, numDesigns) {
-
+module.exports = function(langText, categories, numDesigns) {
   var stateGraph = {};
   var boundaryStack = [];
 
   var parsed = '';
   try {
     parsed = imparse.parse(GRAMMER_DEF, langText);
+
   } catch(err) {
-    alert("Parsing error!");
+    console.error("Parsing error!");
     return;
   }
 
@@ -391,7 +392,9 @@ function ibis(langText, numDesigns) {
   var root = getRootNode(stateGraph, boundaryStack);
   stateGraph[root].text = ROOT;
   var paths = enumeratePaths(root, stateGraph);
-  var designs = combineParts(paths, [], numDesigns);
 
-  return {stateGraph: stateGraph, designs: designs};
-  }
+  // var designs = combineParts(paths, categories, numDesigns);
+
+  return {stateGraph: stateGraph, designs: paths};
+};
+

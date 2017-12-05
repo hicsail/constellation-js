@@ -1,0 +1,32 @@
+{
+  "name": "constellation",
+  "version": "0.1.0",
+  "description": "Constellation is a tool for parsing a language specifying genetic parts and their relationships",
+  "main": "constellation.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hicsail/constellation.git"
+  },
+  "keywords": [
+    "constellation",
+    "biology",
+    "gene",
+    "sequences",
+    "genetics",
+    "graph",
+    "graph",
+    "traversal"
+  ],
+  "author": "Boston University Software & Application Innovation Lab",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hicsail/constellation/issues"
+  },
+  "homepage": "https://github.com/hicsail/constellation#readme",
+  "dependencies": {
+    "chai": "^4.1.2"
+  }
+}
