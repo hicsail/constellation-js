@@ -19,7 +19,7 @@ function getRootNode(stateGraph, boundaryStack) {
 }
 
 
-// Adding accept nodes to every leaf remaining on boundary stack..unless they already have an accept node
+// Adding accept nodes to every leaf remaining on boundary stack
 function addAcceptNodes(stateGraph, boundaryStack) {
   var len = boundaryStack[0].leaves.length;
 
@@ -262,22 +262,22 @@ function handleZeroOrMore(boundaryStack, stateGraph, parentId) {
   addToBoundaryStack(parentId, [parentId], boundaryStack);
 }
 
-// parent --> a.root -> leaves --> accept --> parent
+// parent --> a.root -> leaves --> epsilon --> parent
 function handleOneOrMore(boundaryStack, stateGraph, parentId) {
   var a = boundaryStack.pop();
 
-  var acceptId = uuidv4();
-  stateGraph[acceptId] = {text: ACCEPT, dataType: ACCEPT, edges:[]};
+  var epsilonId = uuidv4();
+  stateGraph[epsilonId] = {text: EPSILON, dataType: EPSILON, edges:[]};
 
   stateGraph[parentId].edges.push(a.root);
  
   var len = a.leaves.length;
   for (var i = 0; i < len; i++) {
     var leaf = a.leaves.pop();
-    stateGraph[leaf].edges.push(acceptId);
+    stateGraph[leaf].edges.push(epsilonId);
   }
-  stateGraph[acceptId].edges.push(parentId);
-  addToBoundaryStack(parentId, [acceptId], boundaryStack);
+  stateGraph[epsilonId].edges.push(parentId);
+  addToBoundaryStack(parentId, [epsilonId], boundaryStack);
 }
 
 
