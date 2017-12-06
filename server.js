@@ -29,11 +29,11 @@ app.get('/', function(req,res) {
 
 
 app.post('/postSpecs', function(req,res) {
+
     var langText = req.body.specification.trim();
     var categories = JSON.parse(req.body.categories);
     var designObj = constellation(langText, categories, 40); 
-
+    console.log("Received new specification", langText);
     
     res.send(designObj);
-
 });

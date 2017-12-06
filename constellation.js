@@ -19,13 +19,22 @@ function getRootNode(stateGraph, boundaryStack) {
 }
 
 
-// Adding accept nodes to every leaf remaining on boundary stack
+// Adding accept nodes to every leaf remaining on boundary stack..unless they already have an accept node
 function addAcceptNodes(stateGraph, boundaryStack) {
   var len = boundaryStack[0].leaves.length;
 
   for (var i = 0; i < len; i++) {
     var atom = boundaryStack[0].leaves.pop();
     var acceptId = uuidv4();
+
+    var leaves = stateGraph[atom].edges;
+
+    for (var j = 0; j < leaves.length; j++) {
+      var l = stateGraph[leaves[j]];
+      if (l.dataType === ACCEPT) {
+        return;
+      }
+    }
     
     stateGraph[acceptId] = {text: ACCEPT, dataType: ACCEPT, edges:[]};
     stateGraph[atom].edges.push(acceptId);    
@@ -318,7 +327,7 @@ function cartesianProduct(setA, setB) {
   var newSet = [];
   for (var i = 0; i < setA.length; i++) {
     for (var j = 0; j < setB.length; j++) {
-      var combo = setA[i].concat(setB[j]);
+      var combo = setA[i].concat(" ").concat(setB[j]);
       newSet.push(combo);
     }
   }
@@ -342,7 +351,7 @@ function getSelectNumDesigns(designs, numDesigns) {
 
 // TODO: check that ID exists as a key in collection
 function combineParts(paths, collection, numDesigns) {
-  if (!collection) {
+  if (collection === undefined) {
     return null;
   }
 
@@ -350,10 +359,20 @@ function combineParts(paths, collection, numDesigns) {
 
   for (var i = 0; i < paths.length; i++) {
     var currPath = paths[i];
+    if (currPath.length < 1) {
+      continue;
+    }
 
     if (currPath.length === 1) {
       var id = currPath[0].data.text;
-      designs.push(collection[id]);
+      if (id in collection) {
+        designs.push(collection[id]);
+        // continue;        
+      // } else {
+
+      } else {
+        return "Error: " + id + " does not have any parts";
+      }
       continue;
     }
 
@@ -399,6 +418,6 @@ module.exports = function(langText, categories, numDesigns) {
   var paths = enumeratePaths(root, stateGraph);
   var designs = combineParts(paths, categories, numDesigns);
 
-  return {stateGraph: stateGraph, designs: designs};
+  return {stateGraph: stateGraph, designs: designs, paths: paths};
 };
 
