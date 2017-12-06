@@ -27,17 +27,8 @@ function addAcceptNodes(stateGraph, boundaryStack) {
     var atom = boundaryStack[0].leaves.pop();
     var acceptId = uuidv4();
 
-    var leaves = stateGraph[atom].edges;
-
-    for (var j = 0; j < leaves.length; j++) {
-      var l = stateGraph[leaves[j]];
-      if (l.dataType === ACCEPT) {
-        return;
-      }
-    }
-    
     stateGraph[acceptId] = {text: ACCEPT, dataType: ACCEPT, edges:[]};
-    stateGraph[atom].edges.push(acceptId);    
+    stateGraph[atom].edges.push(acceptId);      
   }
 }
 
@@ -254,9 +245,9 @@ function handleZeroOrMore(boundaryStack, stateGraph, parentId) {
   var a = boundaryStack.pop();
   
   var acceptId = uuidv4();
-  stateGraph[acceptId] = {text: ACCEPT, dataType: ACCEPT, edges:[]};
+  // stateGraph[acceptId] = {text: ACCEPT, dataType: ACCEPT, edges:[]};
 
-  stateGraph[parentId].edges.push(acceptId);    
+  // stateGraph[parentId].edges.push(acceptId);    
   stateGraph[parentId].edges.push(a.root);  
 
   var children = [];
