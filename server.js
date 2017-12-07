@@ -29,17 +29,19 @@ app.get('/', function(req,res) {
 
 
 app.post('/postSpecs', function(req,res) {
+  var langText = req.body.specification;
+  var categories = req.body.categories;
+  console.log("Received new specification", langText, categories);
+  
+  try {
+    langText = langText.trim();      
+    categories = JSON.parse(categories);    
+  } catch (e) {
+    res.status(500).send("Input improperly formed");
+  }
 
-    var langText = req.body.specification.trim();
-    console.log("Received new specification", langText);
-    var categories = req.body.categories;
-    try {
-      categories = JSON.parse(categories);
-    } catch (err) {
-      res.status(500).send(err);
-    }
+  var designObj = constellation(langText, categories, 40); 
+  
+  res.send(designObj);
 
-    var designObj = constellation(langText, categories, 40); 
-    
-    res.send(designObj);
 });
