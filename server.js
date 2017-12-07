@@ -31,9 +31,15 @@ app.get('/', function(req,res) {
 app.post('/postSpecs', function(req,res) {
 
     var langText = req.body.specification.trim();
-    var categories = JSON.parse(req.body.categories);
-    var designObj = constellation(langText, categories, 40); 
     console.log("Received new specification", langText);
+    var categories = req.body.categories;
+    try {
+      categories = JSON.parse(categories);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+
+    var designObj = constellation(langText, categories, 40); 
     
     res.send(designObj);
 });
