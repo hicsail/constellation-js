@@ -17,6 +17,9 @@ app.use(function(req, res, next) {
   next();
 });
 
+app.use(express.static(__dirname + '/static'));
+app.use(express.static(__dirname + '/style'));
+app.use(express.static(__dirname + '/libs'));
 
 var server = app.listen(8082, function() {
   console.log('Listening on port %d', server.address().port);
@@ -41,7 +44,7 @@ app.post('/postSpecs', function(req,res) {
   }
 
   var designObj = constellation(langText, categories, 40); 
-  
+  console.log('designObject', designObj);
   res.send(designObj);
 
 });
