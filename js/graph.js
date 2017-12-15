@@ -292,6 +292,7 @@ module.exports = function(parsed) {
     var stateGraph = {};
     var boundaryStack = [];
 
+    // stategraph.populate(parsed, boundaryStack);
     populateGraph(parsed, stateGraph, boundaryStack);
     addAcceptNodes(stateGraph, boundaryStack);
   

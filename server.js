@@ -45,7 +45,6 @@ app.post('/postSpecs', function(req,res) {
   }
 
   var designObj = constellation(langText, categories, 40); 
-  console.log('designObject', designObj);
   res.send(designObj);
 
 });
