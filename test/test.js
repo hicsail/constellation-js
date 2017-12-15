@@ -19,8 +19,7 @@ describe('#constellation', function() {
 
     it('or', function() {
         var result = constellation('c or {d . a}', categories, 10);
-        console.log(result.designs);
-
+    
         // expect(paths.length).to.equal(2);
 
         // console.log(result.designs)

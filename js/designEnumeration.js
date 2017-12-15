@@ -3,22 +3,6 @@ var Reservoir = require('reservoir');
 /* * * * * * * * * * * * */
 /*   PARTS ENUMERATION   */
 /* * * * * * * * * * * * */
-function shuffleList(list) {
-    var currIndex = list.length;
-    while (0 !== currIndex) {
-  
-      var randIndex = Math.floor(Math.random() * currIndex);
-      currIndex--;
-  
-      // And swap it with the current element.
-      var temp = list[currIndex];
-      list[currIndex] = list[randIndex];
-      list[randIndex] = temp;
-    }
-    return list;
-  }
-  
-  
   
 function cartesianProduct(setA, setB) {
   if (!setA || !setB) {
@@ -36,43 +20,6 @@ function cartesianProduct(setA, setB) {
   return newSet;
 }
   
-function createRandomIndices(shuffledDesigns) {
-  var randIndices = [];
-  for (var i = 0; i < shuffledDesigns.length; i++) {
-    for (var j = 0; j < shuffledDesigns[i].length; j++) {
-        randIndices.push([i,j]);
-    }
-  }
-
-  randIndices = shuffleList(randIndices);
-  return randIndices;
-}
-  
-function getSelectNumDesigns(designs, numDesigns) {
-
-  var shuffledDesigns = [];
-  console.log('designs', designs)
-  var selectedDesigns = [];
-
-  for (var i = 0; i < designs.length; i++) {
-    var shuffled = shuffleList(designs[i]);
-    shuffledDesigns.push(shuffleList(designs[i])); 
-  }
-
-  // Generate list of shuffled indices to randomly select
-  var randIndices = createRandomIndices(shuffledDesigns);
-
-  while(randIndices.length > 0 && numDesigns > 0) {
-    var index = randIndices.pop();
-    var r = index[0];
-    var c = index[1];
-
-    selectedDesigns.push(shuffledDesigns[r][c]);
-    numDesigns--;
-  }
-
-  return selectedDesigns;
-}
 
 function combineParts(paths, collection, numDesigns) {
 
@@ -106,8 +53,6 @@ function combineParts(paths, collection, numDesigns) {
 
 }
 
-
-
 function selectDesigns(designs, numDesigns) {
 
   var reservoir = Reservoir(numDesigns);
@@ -117,9 +62,7 @@ function selectDesigns(designs, numDesigns) {
   });
 
   delete reservoir['pushSome'];
-
   return reservoir;
-  
 }
 
 
@@ -129,6 +72,5 @@ function addDesigns(product, designs) {
   }
   return designs;
 }
-
 
 module.exports = combineParts;
