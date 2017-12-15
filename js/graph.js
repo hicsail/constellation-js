@@ -297,6 +297,7 @@ module.exports = function(parsed) {
   
     var root = getRootNode(stateGraph, boundaryStack);
     stateGraph[root].text = ROOT;
+    stateGraph[root].dataType = ROOT;
 
     var paths = enumeratePaths(root, stateGraph);
 
