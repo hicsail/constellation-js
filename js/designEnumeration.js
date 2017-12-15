@@ -74,49 +74,11 @@ function getSelectNumDesigns(designs, numDesigns) {
   return selectedDesigns;
 }
 
-// function tryRes() {
-//   // console.log(Reservoir(3))
-//   var myReservoir = Reservoir(3);
-
-//   var myData = [1,2,3,4,5,6,7,8,9,10];
-
-//   myData.forEach(function(e) {
-//     myReservoir.pushSome(e);  
-//   });
-
-//   console.log('res', myReservoir);
-
-// }
-
 function combineParts(paths, collection, numDesigns) {
 
   if (collection === undefined) {
     return null;
   }
-
-    // var currPath = paths[i];
-    // if (currPath.length == 0) {
-    //   designs.push([]);
-    // } else if (currPath.length === 1) {
-    //   var id = currPath[0].data.text;
-    //   if (id in collection) {
-    //     designs.push(collection[id]);
-    //   } else {
-    //     return "Error: " + id + " does not have any parts";
-    //   }
-    //   continue;
-    // } else {
-    //   // start at 1 since root is at 0
-      // var product = collection[currPath[1].data.text];
-      // for (var i = 1; i < currPath.length-1; i++) {
-      //   var collB = collection[currPath[i+1].data.text];
-      //   if (collB) {
-      //     product = cartesianProduct(product, collB);  
-      //   }
-      // }
-      // console.log('product', product)
-      // designs.push(product);
-    // }  
 
   var designs = [];
 
@@ -139,13 +101,25 @@ function combineParts(paths, collection, numDesigns) {
     }
 
   }
-  var selectedDesigns = selectDesigns(designs);
-
+  var selectedDesigns = selectDesigns(designs, numDesigns);
   return selectedDesigns;
+
 }
 
-function selectDesigns(designs) {
-  return designs;
+
+
+function selectDesigns(designs, numDesigns) {
+
+  var reservoir = Reservoir(numDesigns);
+
+  designs.forEach(function(e) {
+    reservoir.pushSome(e);
+  });
+
+  delete reservoir['pushSome'];
+
+  return reservoir;
+  
 }
 
 
