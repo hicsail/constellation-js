@@ -37,7 +37,6 @@ function combineParts(paths, collection, numDesigns) {
       designs = addDesigns([], designs);
     } else {
       var product = collection[path[1].data.text];
-
       for (var j = 1; j < path.length-1; j++) {
         var nextSet = collection[path[j+1].data.text];
         if (nextSet) {
@@ -53,16 +52,19 @@ function combineParts(paths, collection, numDesigns) {
 
 }
 
-function selectDesigns(designs, numDesigns) {
 
+function selectDesigns(designs, numDesigns) {
+ 
   var reservoir = Reservoir(numDesigns);
 
   designs.forEach(function(e) {
+    console.log('e', e)
     reservoir.pushSome(e);
   });
 
   delete reservoir['pushSome'];
   return reservoir;
+
 }
 
 

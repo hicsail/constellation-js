@@ -16,13 +16,11 @@ describe('#constellation', function() {
     //     // var result = constellation('c', categories, 10);
     //     // expect(JSON.stringify(result.designs[0])).to.equal(JSON.stringify(['c1']));
     // });
+    categories = {"a": ["a"], "b": ["b"]};
 
     it('or', function() {
-        var result = constellation('c or {d . a}', categories, 10);
-    
-        // expect(paths.length).to.equal(2);
-
-        // console.log(result.designs)
+        var result = constellation('a or b', categories, 10);
+        expect(result.designs.length).to.equal(2);
     });
 
     // it('then', function() {
