@@ -125,31 +125,27 @@ function combineParts(paths, collection, numDesigns) {
 
 
     if (path.length === 0) {
-      console.log('o')
       designs = addDesigns([], designs);
     } else {
       var product = collection[path[1].data.text];
-    
-      designs = addDesigns(product, designs);
-      
+
+      for (var j = 1; j < path.length-1; j++) {
+        var nextSet = collection[path[j+1].data.text];
+        if (nextSet) {
+          product = cartesianProduct(product, nextSet);
+        }
+      }
+      designs = addDesigns(product, designs);      
     }
 
-    // for (var i = 1; i < currPath.length-1; i++) {
-    //   var collB = collection[currPath[i+1].data.text];
-    //   console.log(collB);
-    // }
-
-
-
-
-
   }
-
-  // tryRes();
-  // var tryReservoir = tryRes();
-  var selectedDesigns = getSelectNumDesigns(designs, numDesigns);
+  var selectedDesigns = selectDesigns(designs);
 
   return selectedDesigns;
+}
+
+function selectDesigns(designs) {
+  return designs;
 }
 
 

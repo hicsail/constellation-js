@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var constellation = require('../constellation');
 
 // var categories = '{"promoter": ["BBa_R0040", "BBa_J23100"], "rbs": ["BBa_B0032", "BBa_B0034"], "gene": ["BBa_E0040", "BBa_E1010"], "terminator": ["BBa_B0010"]}';
-var categories = '{"a":["a1","a2","a3"],"b":["b1","b2","b3"],"c":["c1"],"d":[]}';
+var categories = '{"a":["a1","a2"],"b":["b1","b2","b3"],"c":["c1"],"d":["d1"]}';
 
 categories = JSON.parse(categories);
 
@@ -12,13 +12,13 @@ const ATOM = "atom";
 
 describe('#constellation', function() {
     // BASIC OPERATORS
-    it('atom', function() {
-        // var result = constellation('c', categories, 10);
-        // expect(JSON.stringify(result.designs[0])).to.equal(JSON.stringify(['c1']));
-    });
+    // it('atom', function() {
+    //     // var result = constellation('c', categories, 10);
+    //     // expect(JSON.stringify(result.designs[0])).to.equal(JSON.stringify(['c1']));
+    // });
 
     it('or', function() {
-        var result = constellation('a or b', categories, 10);
+        var result = constellation('c or {d . a}', categories, 10);
         console.log(result.designs);
 
         // expect(paths.length).to.equal(2);
