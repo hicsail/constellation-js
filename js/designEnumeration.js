@@ -58,7 +58,6 @@ function selectDesigns(designs, numDesigns) {
   var reservoir = Reservoir(numDesigns);
 
   designs.forEach(function(e) {
-    console.log('e', e)
     reservoir.pushSome(e);
   });
 

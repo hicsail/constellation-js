@@ -1,4 +1,4 @@
-var uuidv4 = require('./../libs/uuidv4');
+var uuidv4 = require('uuidv4');
 
 // Global Constants
 

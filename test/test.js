@@ -23,15 +23,15 @@ describe('#constellation', function() {
         expect(result.designs.length).to.equal(2);
     });
 
-    // it('then', function() {
-    //     var result = constellation('a . b', categories, 10);
-    //     expect(result.designs.length).to.equal(categories['a'].length * categories['b'].length);
-    //     // for (var i = 0; i < result.designs.length; i++) {
-    //     //     console.log(result.designs[i]);
-    //     // }
-    //     // expect(result.designs.includes('a2 b3')).to.equal(true);
-    //     // expect(JSON.stringify(result.designs)).to.equal(JSON.stringify(['c1']));
-    // });
+    it('then', function() {
+        var result = constellation('a . b', categories, 10);
+        expect(result.designs.length).to.equal(categories['a'].length * categories['b'].length);
+        // for (var i = 0; i < result.designs.length; i++) {
+        //     console.log(result.designs[i]);
+        // }
+        // expect(result.designs.includes('a2 b3')).to.equal(true);
+        // expect(JSON.stringify(result.designs)).to.equal(JSON.stringify(['c1']));
+    });
 
     // it('zero-or-more', function() {
     //     var result = constellation('zero-or-more a', categories, 10);
