@@ -10,3 +10,5 @@ test/
 # editor configs
 .idea
 .editorconfig
+.travis.yml
+.gitignore
