@@ -10,6 +10,31 @@ h3 {
     font-size: 54px;
 }
 
+#langInput{
+    height: 250px; 
+}
+
+#categories{
+    height:110px;
+    font-family: monospace;
+}
+
+textarea {
+    width:100%
+}
+
+#submitBtn {
+    /* position: absolute; */
+    
+}
+
+h5 {
+    color: white;
+    font-family: monospace;
+    text-align: left;
+    font-size:28px;
+}
+
 
 input[type="button"]{
     margin-top: 5px;

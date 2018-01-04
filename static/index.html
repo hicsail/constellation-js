@@ -16,7 +16,7 @@
     
     <script src="codemirror.js"></script>
     <script src="scheme.js"></script>
-    
+ 
 
     <title>Constellation</title>
 
@@ -31,159 +31,36 @@
   <div class="container">
     <div class="row">
       <div class="col-sm">
-        <textarea class ="codemirror" id="langInput" style="height: 200px; width:100%" name="paragraph_text" cols="50" rows="10"></textarea>          
-        <input id="submitBtn" class="btn" type="button" value="Submit">
+        <h5>Specification</h5>
+        <textarea class="codemirror" id="langInput" name="paragraph_text" cols="50" rows="10"></textarea>         
+        
+        <h5>Categories</h5>
+        <textarea class="codemirror" name="paragraph_text" id="categories" cols="50" rows="10"></textarea> 
       </div>
     <br><br>
 
     <div class="col-sm">
+      <h5>Graph</h5>
       <div id="stateGraph"></div>
     </div>
-
-    <!-- <div class="col-sm">
     
-    </div> -->
-
   </div>
+  <div class="row">
+      <input id="submitBtn" class="btn" type="button" value="Submit">      
   </div>
 
-
-      <script>
-        const THEME = "solarized light";
-
-
-        var specEditor = CodeMirror.fromTextArea(document.getElementById('langInput'), {
-          lineNumbers: true,
-        });
-
-        specEditor.setOption("theme", THEME);
-
-
-        var myDiagram = null;
-        
-        $(document).ready(function() {
-          $("#submitBtn").click(function(){
-            if (myDiagram) {
-              myDiagram.div = null;
-            }
-           
-            myDiagram = initializeStateGraph();
-
-            var specification = specEditor.getValue();
-
-            var categories = '{"promoter": ["BBa_R0040", "BBa_J23100"], "rbs": ["BBa_B0032", "BBa_B0034"], "cds": ["BBa_E0040", "BBa_E1010"], "terminator": ["BBa_B0010"]}';
-            // var categories = '{"a":["a1","a2","a3"],"b":["b1","b2","b3"],"c":["c1"],"d":[]}';
-
-            $.post('http://localhost:8082/postSpecs', {
-              "specification": specification,
-              "categories": categories,
-              "number": "2.0",
-              "name": "specificationname",
-              "clientid": "userid" 
-            }, function(data, status) {
-              displayDiagram(data.stateGraph);
-            });
-          });
-        });
-
-/* * * * * * * */
-/*   DIAGRAM   */
-/* * * * * * * */
-const EPSILON = "o";
-const ATOM = "atom";
-const ACCEPT = "accept";
-const ROOT = "root";  
-
-
-function addStyling(myDiagram, make) {
-
-  var lineColor = 'rgb(200,200,200)';
-
-  var rootColor = 'orange';
-  var acceptColor = 'rgb(126, 212, 118)';
-
-  var atomTemplate =
-    make(go.Node,
-      make(go.TextBlock,
-      "Default Text", 
-      {margin: 12, stroke: "white", font: "14px monospace"},
-
-        new go.Binding("text", "text"))
-    );
-
-    var epsilonTemplate = 
-      make(go.Node, "Auto",
-        make(go.Shape, "Circle",
-        {fill: 'white', strokeWidth: 1 ,stroke: "white", width: 10, height: 10},
-          new go.Binding("fill", "color"))
-        );
-
-    var acceptTemplate = 
-      make(go.Node, "Auto",
-        make(go.Shape, "Circle",
-        {fill: acceptColor, strokeWidth: 1 ,stroke: "white", width: 20, height: 20},
-          new go.Binding("fill", "color"))
-    );
-
-
-    var rootTemplate = 
-      make(go.Node, "Auto",
-        make(go.Shape, "Circle",
-        {fill: 'orange', strokeWidth: 1 ,stroke: "white", width: 20, height: 20},
-          new go.Binding("fill", "color"))
-    );
-
-
-    
-    var templateMap = new go.Map("string", go.Node);
-    templateMap.add(EPSILON, epsilonTemplate);
-    templateMap.add(ATOM, atomTemplate);
-    templateMap.add(ACCEPT, acceptTemplate);
-    templateMap.add(ROOT, rootTemplate);
-
-    myDiagram.nodeTemplateMap = templateMap;
-
-}
-
-// Returns an empty Go Diagram object
-function initializeStateGraph() {
-  var make = go.GraphObject.make;
-  myDiagram = make(go.Diagram, 'stateGraph', {
-    initialContentAlignment: go.Spot.Center
-  });
-
-
+  <br>
+  <div class="row">
+      <div class="col-sm">
+      <h5>Designs</h5>
+      <div id="designs"></div>
+      </div>
+  </div>
   
-  addStyling(myDiagram, make);
-
-  return myDiagram;
-}
+  </div>
 
 
-// Translates adjacency list to Go graph representation
-function displayDiagram(stateGraph) {
- 
-
-  var nodes = [];
-  var edges = [];
-
-  for (id in stateGraph) {
-    
-    var text = stateGraph[id].text;
-    var category = stateGraph[id].dataType;
-
-    nodes.push({key: id, text: text, category: category});
-    
-    var nodeEdges = stateGraph[id].edges;
-    for (var i = 0; i < nodeEdges.length; i++) {
-      edges.push({from: id, to: nodeEdges[i]});
-    }
-  }
-
-  myDiagram.model = new go.GraphLinksModel(nodes, edges);
-}
-            
-      </script>
+ <script src="/client.js"></script>
   </body>
 
 

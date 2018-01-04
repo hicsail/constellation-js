@@ -22,7 +22,7 @@ module.exports = function(langText, categories, numDesigns) {
 
   var graph = graphModule(parsed);
 
-  // var designs = designEnumeration(graph.paths, categories, numDesigns);
+  var designs = designEnumeration(graph.paths, categories, numDesigns);
 
   return {stateGraph: graph.stateGraph, designs: [], paths: graph.paths};
 };
