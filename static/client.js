@@ -8,10 +8,18 @@ var catEditor = CodeMirror.fromTextArea(document.getElementById('categories'), {
   lineNumbers: true,
 });
 
+var designsEditor = CodeMirror.fromTextArea(document.getElementById('designs'), {
+  lineNumbers: true,
+});
+
+
 specEditor.setOption("theme", THEME);
 
 catEditor.setOption("theme", THEME);
 catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"terminator": ["BBa_B0010"]}');
+
+
+designsEditor.setOption("theme", THEME);
 
 
 var myDiagram = null;
@@ -37,7 +45,7 @@ $(document).ready(function() {
       "clientid": "userid" 
     }, function(data, status) {
       displayDiagram(data.stateGraph);
-      displayDesigns(data.designs);
+      displayDesigns(JSON.stringify(data.designs));
     });
   });
 });
@@ -51,7 +59,7 @@ const ACCEPT = "accept";
 const ROOT = "root";  
 
 function displayDesigns(designs) {
-  console.log(designs);
+  designsEditor.setValue(designs);
 }
 
 
@@ -59,8 +67,11 @@ function addStyling(myDiagram, make) {
 
   var lineColor = 'rgb(200,200,200)';
 
-  var rootColor = 'orange';
-  var acceptColor = 'rgb(126, 212, 118)';
+  // var rootColor = 'orange';
+
+  var rootColor = 'rgb(209,58,130)';
+  // var acceptColor = 'rgb(126, 212, 118)';
+  var acceptColor = 'rgb(133,152,28)';
 
   var atomTemplate =
     make(go.Node,
@@ -89,7 +100,7 @@ function addStyling(myDiagram, make) {
     var rootTemplate = 
       make(go.Node, "Auto",
         make(go.Shape, "Circle",
-        {fill: 'orange', strokeWidth: 1 ,stroke: "white", width: 20, height: 20},
+        {fill: rootColor, strokeWidth: 1 ,stroke: "white", width: 20, height: 20},
           new go.Binding("fill", "color"))
     );
 

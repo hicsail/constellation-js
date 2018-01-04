@@ -24,6 +24,6 @@ module.exports = function(langText, categories, numDesigns) {
 
   var designs = designEnumeration(graph.paths, categories, numDesigns);
 
-  return {stateGraph: graph.stateGraph, designs: [], paths: graph.paths};
+  return {stateGraph: graph.stateGraph, designs: designs, paths: graph.paths};
 };
 

@@ -36,9 +36,8 @@ function combineParts(paths, collection, numDesigns) {
     if (path.length === 0) {
       designs = addDesigns([], designs);
     } else {
-      console.log(path);
-      var product = collection[path[0].data.text];
-      for (var j = 0; j < path.length-1; j++) {
+      var product = collection[path[1].data.text];
+      for (var j = 1; j < path.length-1; j++) {
         var nextSet = collection[path[j+1].data.text];
         if (nextSet) {
           product = cartesianProduct(product, nextSet);
