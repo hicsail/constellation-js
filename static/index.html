@@ -25,16 +25,28 @@
   
   <body>
   
-      <h3>Constellation</h3>
-      </br>
-  
-      <textarea class ="codemirror" id="langInput" style="height: 200px; width:100%" name="paragraph_text" cols="50" rows="10"></textarea>
-  
-      <input id="submitBtn" class="btn" type="button" value="Submit">
-      <br><br>
-  
+  <h3>Constellation</h3>
+  </br>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <textarea class ="codemirror" id="langInput" style="height: 200px; width:100%" name="paragraph_text" cols="50" rows="10"></textarea>          
+        <input id="submitBtn" class="btn" type="button" value="Submit">
+      </div>
+    <br><br>
+
+    <div class="col-sm">
       <div id="stateGraph"></div>
-  
+    </div>
+
+    <!-- <div class="col-sm">
+    
+    </div> -->
+
+  </div>
+  </div>
+
 
       <script>
         const THEME = "solarized light";

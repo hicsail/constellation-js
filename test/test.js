@@ -33,21 +33,21 @@ describe('#constellation', function() {
         // expect(JSON.stringify(result.designs)).to.equal(JSON.stringify(['c1']));
     });
 
-    // it('zero-or-more', function() {
-    //     var result = constellation('zero-or-more a', categories, 10);
-    //     var paths = result.paths;
-    //     expect(paths.length).to.equal(2);
-    // });
+    it('zero-or-more', function() {
+        var result = constellation('zero-or-more a', categories, 10);
+        var paths = result.paths;
+        expect(paths.length).to.equal(2);
+    });
 
 
-    // it('one-or-more', function() {
-    //     var result = constellation('one-or-more a', categories, 10);
-    //     var paths = result.paths;
+    it('one-or-more', function() {
+        var result = constellation('one-or-more a', categories, 10);
+        var paths = result.paths;
         
-    //     expect(paths.length).to.equal(1);
-    //     expect(paths[0].length).to.equal(1);
-    //     expect(paths[0][0].dataType === ATOM)
-    // });
+        expect(paths.length).to.equal(1);
+        expect(paths[0].length).to.equal(1);
+        expect(paths[0][0].dataType === ATOM)
+    });
 
 
     // // CHAINED EXPRESSIONS
