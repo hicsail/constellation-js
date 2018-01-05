@@ -16,38 +16,38 @@ describe('#constellation', function() {
     //     // var result = constellation('c', categories, 10);
     //     // expect(JSON.stringify(result.designs[0])).to.equal(JSON.stringify(['c1']));
     // });
-    categories = {"a": ["a"], "b": ["b"]};
 
     it('or', function() {
+        categories = {"a": ["a1", "a2"], "b": ["b"]};
+        
         var result = constellation('a or b', categories, 10);
-        expect(result.designs.length).to.equal(2);
+        var len = categories['a'].length + categories['b'].length;
+        expect(result.designs.length).to.equal(len);
     });
 
     it('then', function() {
-        var result = constellation('a . b', categories, 10);
-        expect(result.designs.length).to.equal(categories['a'].length * categories['b'].length);
-        // for (var i = 0; i < result.designs.length; i++) {
-        //     console.log(result.designs[i]);
-        // }
-        // expect(result.designs.includes('a2 b3')).to.equal(true);
-        // expect(JSON.stringify(result.designs)).to.equal(JSON.stringify(['c1']));
-    });
-
-    it('zero-or-more', function() {
-        var result = constellation('zero-or-more a', categories, 10);
-        var paths = result.paths;
-        expect(paths.length).to.equal(2);
-    });
-
-
-    it('one-or-more', function() {
-        var result = constellation('one-or-more a', categories, 10);
-        var paths = result.paths;
+        categories = {"a": ["a1", "a2"], "b": ["b"]};
         
-        expect(paths.length).to.equal(1);
-        expect(paths[0].length).to.equal(1);
-        expect(paths[0][0].dataType === ATOM)
+        var result = constellation('a . b', categories, 10);
+        var len = categories['a'].length * categories['b'].length;
+        expect(result.designs.length).to.equal(len);
     });
+
+    // it('zero-or-more', function() {
+    //     var result = constellation('zero-or-more a', categories, 10);
+    //     var paths = result.paths;
+    //     expect(paths.length).to.equal(2);
+    // });
+
+
+    // it('one-or-more', function() {
+    //     var result = constellation('one-or-more a', categories, 10);
+    //     var paths = result.paths;
+        
+    //     expect(paths.length).to.equal(1);
+    //     expect(paths[0].length).to.equal(1);
+    //     expect(paths[0][0].dataType === ATOM)
+    // });
 
 
     // // CHAINED EXPRESSIONS
@@ -57,9 +57,9 @@ describe('#constellation', function() {
     //     expect(result.paths.length).to.equal(1);
     // });
 
-    // // BASIC ERRORS
-    // it ('basic errors', function() {
-    //     var result = constellation('d', categories, 10);
-    //     expect(JSON.stringify(result.designs)).to.equal(JSON.stringify([]));
-    // });
+    // BASIC ERRORS
+    it ('basic errors', function() {
+        var result = constellation('d', categories, 10);
+        expect(JSON.stringify(result.designs)).to.include("Error");
+    });
 });

@@ -45,7 +45,7 @@ $(document).ready(function() {
       "clientid": "userid" 
     }, function(data, status) {
       displayDiagram(data.stateGraph);
-      displayDesigns(JSON.stringify(data.designs));
+      displayDesigns(JSON.stringify(data.designs, null, "\t"));
     });
   });
 });

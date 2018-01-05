@@ -28,15 +28,19 @@ function combineParts(paths, collection, numDesigns) {
   }
 
   var designs = [];
-
+  
   for (var i = 0; i < paths.length; i++) {
     var path = paths[i];
-
 
     if (path.length === 0) {
       designs = addDesigns([], designs);
     } else {
-      var product = collection[path[1].data.text];
+      var key = path[1].data.text;
+      if (!(key in collection)) {
+        return ['Error: ' + key + ' not in part categories'];
+      }
+
+      var product = collection[key];
       for (var j = 1; j < path.length-1; j++) {
         var nextSet = collection[path[j+1].data.text];
         if (nextSet) {
@@ -45,16 +49,15 @@ function combineParts(paths, collection, numDesigns) {
       }
       designs = addDesigns(product, designs);      
     }
-
   }
   var selectedDesigns = selectDesigns(designs, numDesigns);
   return selectedDesigns;
 
 }
 
-
+// Takes all designs, uses reservoir selection to pick a specified number
 function selectDesigns(designs, numDesigns) {
- 
+
   var reservoir = Reservoir(numDesigns);
 
   designs.forEach(function(e) {
@@ -63,7 +66,6 @@ function selectDesigns(designs, numDesigns) {
 
   delete reservoir['pushSome'];
   return reservoir;
-
 }
 
 
