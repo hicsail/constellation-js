@@ -34,3 +34,36 @@ var result = constellation(langText, categories, numDesigns);
 
 ```one-or-more a```  <br />
 <img width="104" alt="one" src="https://user-images.githubusercontent.com/6438622/34654707-8ac29702-f3cd-11e7-8e92-7c694241fbd7.png">
+
+## Example
+Specification <br/>
+```
+one-or-more (a or (a then (zero-or-more b)))
+```
+
+Part Categories <br/>
+```
+{"a": ["a1", "a2"],
+"b": ["b1", "b2"]}
+```
+<strong>Results</strong> <br/>
+Graph <br/>
+<img width="168" alt="screen shot 2018-01-07 at 5 24 17 pm" src="https://user-images.githubusercontent.com/6438622/34654908-165ca382-f3d0-11e7-803d-4bdf7d3c1145.png">
+
+Designs: <br/>
+```
+[
+	"a1,b1",
+	"a1,b2",
+	"a2,b1",
+	"a2,b2",
+	"a1",
+	"a2"
+]
+```
+
+
+
+
+
+
