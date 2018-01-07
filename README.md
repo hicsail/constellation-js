@@ -20,17 +20,17 @@ var result = constellation(langText, categories, numDesigns);
 
 
 ## Supported Operators
-```a```
+```a```  <br />
 <img width="86" alt="atom" src="https://user-images.githubusercontent.com/6438622/34654704-86d369c8-f3cd-11e7-8405-96b67a1202f1.png">
 
-```a or b```
+```a or b```  <br />
 <img width="94" alt="or" src="https://user-images.githubusercontent.com/6438622/34654699-79ac8388-f3cd-11e7-9bce-3b43153281a1.png">
 
-```a then b```
+```a then b```  <br />
 <img width="102" alt="then" src="https://user-images.githubusercontent.com/6438622/34654706-8805feaa-f3cd-11e7-8a47-dea5cc17efdc.png">
 
-```zero-or-more a```
+```zero-or-more a```  <br />
 <img width="71" alt="zero" src="https://user-images.githubusercontent.com/6438622/34654691-65bfcca4-f3cd-11e7-860b-557168dc36ee.png">
 
-```one-or-more a```
+```one-or-more a```  <br />
 <img width="104" alt="one" src="https://user-images.githubusercontent.com/6438622/34654707-8ac29702-f3cd-11e7-8e92-7c694241fbd7.png">
