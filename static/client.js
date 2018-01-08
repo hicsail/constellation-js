@@ -66,11 +66,7 @@ function displayDesigns(designs) {
 function addStyling(myDiagram, make) {
 
   var lineColor = 'rgb(200,200,200)';
-
-  // var rootColor = 'orange';
-
   var rootColor = 'rgb(209,58,130)';
-  // var acceptColor = 'rgb(126, 212, 118)';
   var acceptColor = 'rgb(133,152,28)';
 
   var atomTemplate =

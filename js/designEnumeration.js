@@ -18,15 +18,14 @@ function cartesianProduct(setA, setB) {
     }
   }
   return newSet;
+} 
+
+function generateError(error) {
+  return ['Error: ' + error];
 }
-  
 
-function combineParts(paths, collection, numDesigns) {
 
-  if (collection === undefined) {
-    return null;
-  }
-
+function enumerateDesigns(paths, collection) {
   var designs = [];
   
   for (var i = 0; i < paths.length; i++) {
@@ -35,9 +34,10 @@ function combineParts(paths, collection, numDesigns) {
     if (path.length === 0) {
       designs = addDesigns([], designs);
     } else {
+
       var key = path[1].data.text;
       if (!(key in collection)) {
-        return ['Error: ' + key + ' not in part categories'];
+        return ['Error: key ' + key + ' not in part categories'];
       }
 
       var product = collection[key];
@@ -50,9 +50,41 @@ function combineParts(paths, collection, numDesigns) {
       designs = addDesigns(product, designs);      
     }
   }
+  return designs;
+}
+
+
+/**
+ * 
+ * @param {path-object} paths - Array of path-objects
+ * @param {*} collection 
+ * @param {*} numDesigns 
+ */
+function combineParts(paths, collection, numDesigns) {
+
+  if (collection === undefined) {
+    return null;
+  }
+
+  if (numDesigns === 0) {
+    return [];
+  }
+
+  if (numDesigns > 10000) {
+    return generateError('number of designs specified is too large. Must be under 10000');
+  }
+
+  var designs = enumerateDesigns(paths, collection);
+  designs = removeDuplicates(designs);
   var selectedDesigns = selectDesigns(designs, numDesigns);
   return selectedDesigns;
+}
 
+function removeDuplicates(designs) {
+  var seen = {};
+  return designs.filter(function(item) {
+    return seen.hasOwnProperty(item) ? false: (seen[item] = true);
+  });
 }
 
 // Takes all designs, uses reservoir selection to pick a specified number

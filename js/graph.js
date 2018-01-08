@@ -221,7 +221,7 @@ function handleOp(op, boundaryStack, stateGraph) {
   if (op === "Or") {
     handleOr(boundaryStack, stateGraph, parentId);
   }
-
+  
   if (op === "And") {
     handleAnd(boundaryStack, stateGraph, parentId);
   }
