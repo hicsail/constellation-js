@@ -3,8 +3,6 @@ const enumeration = require('../js/designEnumeration');
 const imparse = require('imparse');
 const uuidv4 = require('uuidv4');
 
-
-
 const EPSILON = "o";
 const ATOM = "atom";
 const ACCEPT = "accept";
@@ -56,7 +54,6 @@ module.exports = function() {
       expect(JSON.stringify(designs)).to.equal(JSON.stringify(collection['a']));
     });
 
-
     // NUM DESIGNS
     it('select 1 of 2 designs', function() {
       var collection = {'a': ['a1', 'a2']};
@@ -71,7 +68,5 @@ module.exports = function() {
       var designs = enumeration(paths, collection, 0);
       expect(designs.length).to.equal(0);
     });
-
-
   });
 }
