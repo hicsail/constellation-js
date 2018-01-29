@@ -18,6 +18,10 @@ var langText = '{a . b}';
 var result = constellation(langText, categories, numDesigns);
 ```
 
+## Dependencies
+- [imparse](http://imparse.org/)
+- [reservoir](https://github.com/imbcmdth/reservoir)
+- [uuidv4](https://github.com/thenativeweb/uuidv4)
 
 ## Supported Operators
 ```a```  <br />
@@ -62,8 +66,23 @@ Designs: <br/>
 ]
 ```
 
+## Data Structures
 
+### Boundary Graph
 
+### Node Object
 
+#### Example
+```
+{
+  "id": "604571a7-9e38-4647-afd0-9546399480b5",
+  "data": {
+    "text": "root",
+    "dataType": "root",
+    "edges": [
+      "b79407eb-95f0-4b78-99da-779f2c9cad46",
+      "7f6ca2fb-ef67-4687-924c-4285de896877"]
+}
+```
 
 
