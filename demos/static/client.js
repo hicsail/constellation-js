@@ -12,43 +12,13 @@ var designsEditor = CodeMirror.fromTextArea(document.getElementById('designs'), 
   lineNumbers: true,
 });
 
-
 specEditor.setOption("theme", THEME);
-
 catEditor.setOption("theme", THEME);
 catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"terminator": ["BBa_B0010"]}');
 
-
 designsEditor.setOption("theme", THEME);
 
-
 var myDiagram = null;
-
-// Main function
-$(document).ready(function() {
-  $("#submitBtn").click(function(){
-    if (myDiagram) {
-      myDiagram.div = null;
-    }
-    
-    myDiagram = initializeStateGraph();
-
-    var specification = specEditor.getValue();
-    var categories = catEditor.getValue();
-    // var categories = '{"a":["a1","a2","a3"],"b":["b1","b2","b3"],"c":["c1"],"d":[]}';
-
-    $.post('http://localhost:8082/postSpecs', {
-      "specification": specification,
-      "categories": categories,
-      "number": "2.0",
-      "name": "specificationname",
-      "clientid": "userid" 
-    }, function(data, status) {
-      displayDiagram(data.stateGraph);
-      displayDesigns(JSON.stringify(data.designs, null, "\t"));
-    });
-  });
-});
 
 /* * * * * * * */
 /*   DIAGRAM   */
@@ -61,7 +31,6 @@ const ROOT = "root";
 function displayDesigns(designs) {
   designsEditor.setValue(designs);
 }
-
 
 function addStyling(myDiagram, make) {
 
@@ -92,7 +61,6 @@ function addStyling(myDiagram, make) {
           new go.Binding("fill", "color"))
     );
 
-
     var rootTemplate = 
       make(go.Node, "Auto",
         make(go.Shape, "Circle",
@@ -100,8 +68,6 @@ function addStyling(myDiagram, make) {
           new go.Binding("fill", "color"))
     );
 
-
-    
     var templateMap = new go.Map("string", go.Node);
     templateMap.add(EPSILON, epsilonTemplate);
     templateMap.add(ATOM, atomTemplate);
@@ -109,7 +75,6 @@ function addStyling(myDiagram, make) {
     templateMap.add(ROOT, rootTemplate);
 
     myDiagram.nodeTemplateMap = templateMap;
-
 }
 
 // Returns an empty Go Diagram object
@@ -119,8 +84,6 @@ function initializeStateGraph() {
     initialContentAlignment: go.Spot.Center
   });
 
-
-  
   addStyling(myDiagram, make);
 
   return myDiagram;
@@ -129,7 +92,6 @@ function initializeStateGraph() {
 
 // Translates adjacency list to Go graph representation
 function displayDiagram(stateGraph) {
- 
 
   var nodes = [];
   var edges = [];

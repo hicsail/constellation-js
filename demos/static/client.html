@@ -48,6 +48,32 @@
         </div>
       </div-->
     </div>
-    <script src="/client.js"></script>
+    <script src="client.js"></script>
+    <script>
+      $(document).ready(function() {
+        $("#submitBtn").click(function(){
+          if (myDiagram) {
+            myDiagram.div = null;
+          }
+
+          myDiagram = initializeStateGraph();
+
+          var specification = specEditor.getValue();
+          var categories = catEditor.getValue();
+          // var categories = '{"a":["a1","a2","a3"],"b":["b1","b2","b3"],"c":["c1"],"d":[]}';
+
+          $.post('http://localhost:8082/postSpecs', {
+            "specification": specification,
+            "categories": categories,
+            "number": "2.0",
+            "name": "specificationname",
+            "clientid": "userid" 
+          }, function(data, status) {
+            displayDiagram(data.stateGraph);
+            displayDesigns(JSON.stringify(data.designs, null, "\t"));
+          });
+        });
+      });
+    </script>
   </body>
 </html>
