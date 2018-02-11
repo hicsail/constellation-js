@@ -2,13 +2,13 @@
   <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="codemirror.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="theme/solarized.css">
+    <link rel="stylesheet" href="css/codemirror.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/theme/solarized.css">
 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" 
             crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" 
             crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
             crossorigin="anonymous"></script>    
@@ -16,9 +16,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/1.8.2/go-debug.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-    <script src="codemirror.js"></script>
-    <script src="scheme.js"></script>
-    <script src="graph.js"></script><!-- For graph module constants. -->
+    <script src="js/codemirror.js"></script>
+    <script src="js/scheme.js"></script>
+    <script src="js/sha1.js"></script>
+    <script src="js/uuidv4.js"></script>
+    <script src="js/reservoir.js"></script>
+    <script src="js/imparse.js"></script>
+    <script src="../../lib/graph.js"></script>
+    <script src="../../lib/designEnumeration.js"></script>
+    <script src="../../lib/constellation.js"></script>
 
     <title>Constellation</title>
   </head>
@@ -74,23 +80,19 @@
           if (myDiagram) {
             myDiagram.div = null;
           }
-
           myDiagram = initializeStateGraph();
-
           var specification = editors.specEditor.getValue();
           var categories = editors.catEditor.getValue();
-          // var categories = '{"a":["a1","a2","a3"],"b":["b1","b2","b3"],"c":["c1"],"d":[]}';
-
-          $.post('http://localhost:8082/postSpecs', {
-            "specification": specification,
-            "categories": categories,
-            "number": "2.0",
-            "name": "specificationname",
-            "clientid": "userid" 
-          }, function(data, status) {
-            displayDiagram(data.stateGraph);
-            displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
-          });
+          var langText = specification;
+          try {
+            langText = langText.trim();      
+            categories = JSON.parse(categories);    
+          } catch (e) {
+            Alert("Input improperly formed.");
+          }
+          var data = constellation(langText, categories, 40);      
+          displayDiagram(data.stateGraph);
+          displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
         });
       });
     </script>

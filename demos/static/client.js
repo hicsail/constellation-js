@@ -1,35 +1,5 @@
-const THEME = "solarized light";
-
-var specEditor = CodeMirror.fromTextArea(document.getElementById('langInput'), {
-  lineNumbers: true,
-});
-
-var catEditor = CodeMirror.fromTextArea(document.getElementById('categories'), {
-  lineNumbers: true,
-});
-
-var designsEditor = CodeMirror.fromTextArea(document.getElementById('designs'), {
-  lineNumbers: true,
-});
-
-specEditor.setOption("theme", THEME);
-catEditor.setOption("theme", THEME);
-catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"terminator": ["BBa_B0010"]}');
-
-designsEditor.setOption("theme", THEME);
-
-var myDiagram = null;
-
-/* * * * * * * */
-/*   DIAGRAM   */
-/* * * * * * * */
-const EPSILON = "o";
-const ATOM = "atom";
-const ACCEPT = "accept";
-const ROOT = "root";  
-
-function displayDesigns(designs) {
-  designsEditor.setValue(designs);
+function displayDesigns(editors, designs) {
+  editors.designsEditor.setValue(designs);
 }
 
 function addStyling(myDiagram, make) {
@@ -69,10 +39,10 @@ function addStyling(myDiagram, make) {
     );
 
     var templateMap = new go.Map("string", go.Node);
-    templateMap.add(EPSILON, epsilonTemplate);
-    templateMap.add(ATOM, atomTemplate);
-    templateMap.add(ACCEPT, acceptTemplate);
-    templateMap.add(ROOT, rootTemplate);
+    templateMap.add(graph.EPSILON, epsilonTemplate);
+    templateMap.add(graph.ATOM, atomTemplate);
+    templateMap.add(graph.ACCEPT, acceptTemplate);
+    templateMap.add(graph.ROOT, rootTemplate);
 
     myDiagram.nodeTemplateMap = templateMap;
 }
