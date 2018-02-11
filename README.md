@@ -20,9 +20,15 @@ var result = constellation(langText, categories, numDesigns);
 
 ## Demos
 
+Constellation can run either entirely in the browser or as a client-server application.
+
+### Browser Demo
+
+A demo that runs entirely in the browser can be viewed at [`https://sail.codes/constellation-js/demos/static/browser.html`](https://sail.codes/constellation-js/demos/static/browser.html).
+
 ### Client-Server Demo
 
-Start the server-side service:
+To run the application as a client-server pair, first start the server:
 ```javascript
 node demos/server.js
 ```
