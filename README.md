@@ -18,6 +18,16 @@ var langText = '{a . b}';
 var result = constellation(langText, categories, numDesigns);
 ```
 
+## Demos
+
+### Client-Server Demo
+
+Start the server-side service:
+```javascript
+node demos/server.js
+```
+Then view the demo in a browser at `http://localhost:8082/`.
+
 ## Dependencies
 - [imparse](http://imparse.org/)
 - [reservoir](https://github.com/imbcmdth/reservoir)

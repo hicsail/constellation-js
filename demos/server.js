@@ -4,12 +4,11 @@ const path = require('path');
 const http = require('http');
 const bodyParser = require('body-parser');
 
-const constellation = require('./constellation');
+const constellation = require('../lib/constellation');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set('json spaces', 1);
-
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -18,9 +17,8 @@ app.use(function(req, res, next) {
 });
 
 app.use(express.static(__dirname + '/static'));
-app.use(express.static(__dirname + '/style'));
-app.use(express.static(__dirname + '/libs'));
-app.use(express.static(__dirname + '/js'));
+app.use(express.static(__dirname + '/static/css'));
+app.use(express.static(__dirname + '/static/js'));
 
 var server = app.listen(8082, function() {
   console.log('Listening on port %d', server.address().port);
@@ -30,7 +28,6 @@ var server = app.listen(8082, function() {
 app.get('/', function(req,res) {
   res.sendFile((path.join(__dirname + '/static/index.html')));
 });
-
 
 app.post('/postSpecs', function(req,res) {
   var langText = req.body.specification;
@@ -46,8 +43,5 @@ app.post('/postSpecs', function(req,res) {
 
   var designObj = constellation(langText, categories, 40); 
 
-
-  
   res.send(designObj);
-
 });
