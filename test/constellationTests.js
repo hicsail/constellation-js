@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const constellation = require('../constellation');
+const constellation = require('../lib/constellation');
 const imparse = require('imparse');
 
 // var categories = '{"promoter": ["BBa_R0040", "BBa_J23100"], "rbs": ["BBa_B0032", "BBa_B0034"], "gene": ["BBa_E0040", "BBa_E1010"], "terminator": ["BBa_B0010"]}';

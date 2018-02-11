@@ -1,5 +1,5 @@
 const expect = require('chai').expect;
-const enumeration = require('../js/designEnumeration');
+const enumeration = require('../lib/designEnumeration');
 const imparse = require('imparse');
 const uuidv4 = require('uuidv4');
 
