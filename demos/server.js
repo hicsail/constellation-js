@@ -26,7 +26,7 @@ var server = app.listen(8082, function() {
 });
 
 app.get('/', function(req,res) {
-  res.sendFile((path.join(__dirname + '/static/index.html')));
+  res.sendFile((path.join(__dirname + '/static/client.html')));
 });
 
 app.post('/postSpecs', function(req,res) {
