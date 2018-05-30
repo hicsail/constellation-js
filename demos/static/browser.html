@@ -6,12 +6,12 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/theme/solarized.css">
 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" 
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
             crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
             crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
-            crossorigin="anonymous"></script>    
+            crossorigin="anonymous"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/1.8.2/go-debug.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -34,18 +34,15 @@
     <div class="container">
       <div class="row">
         <div class="col-sm">
-          <h5>Specification</h5>
-          <textarea class="codemirror" id="langInput" name="paragraph_text" cols="50" rows="10"></textarea>
-          <h5>Categories</h5>
-          <textarea class="codemirror" name="paragraph_text" id="categories" cols="50" rows="10"></textarea> 
+          <label for="langInput"><h5>Specification</h5></label><textarea class="codemirror" id="langInput" name="paragraph_text" cols="50" rows="10"></textarea>
+          <label for="categories"><h5>Categories</h5></label><textarea class="codemirror" name="paragraph_text" id="categories" cols="50" rows="10"></textarea>
         </div>
         <br/><br/>
         <div class="col-sm">
           <h5>Graph</h5>
           <div id="stateGraph"></div>
-          <h5>Designs</h5>
           <!--div id="designs"></div-->
-          <textarea class="codemirror" name="paragraph_text" id="designs" cols="50" rows="10"></textarea>
+          <label for="designs"><h5>Designs</h5></label><textarea class="codemirror" name="paragraph_text" id="designs" cols="50" rows="10"></textarea>
         </div>
       </div>
       <div class="row">
@@ -85,12 +82,12 @@
           var categories = editors.catEditor.getValue();
           var langText = specification;
           try {
-            langText = langText.trim();      
-            categories = JSON.parse(categories);    
+            langText = langText.trim();
+            categories = JSON.parse(categories);
           } catch (e) {
             Alert("Input improperly formed.");
           }
-          var data = constellation(langText, categories, 40);      
+          var data = constellation(langText, categories, 40);
           displayDiagram(data.stateGraph);
           displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
         });

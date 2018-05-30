@@ -11,40 +11,40 @@ function addStyling(myDiagram, make) {
   var atomTemplate =
     make(go.Node,
       make(go.TextBlock,
-      "Default Text", 
-      {margin: 12, stroke: "white", font: "14px monospace"},
+        'Default Text',
+        {margin: 12, stroke: 'white', font: '14px monospace'},
 
-        new go.Binding("text", "text"))
+        new go.Binding('text', 'text'))
     );
 
-    var epsilonTemplate = 
-      make(go.Node, "Auto",
-        make(go.Shape, "Circle",
-        {fill: 'white', strokeWidth: 1 ,stroke: "white", width: 10, height: 10},
-          new go.Binding("fill", "color"))
-        );
+  var epsilonTemplate =
+      make(go.Node, 'Auto',
+        make(go.Shape, 'Circle',
+          {fill: 'white', strokeWidth: 1 ,stroke: 'white', width: 10, height: 10},
+          new go.Binding('fill', 'color'))
+      );
 
-    var acceptTemplate = 
-      make(go.Node, "Auto",
-        make(go.Shape, "Circle",
-        {fill: acceptColor, strokeWidth: 1 ,stroke: "white", width: 20, height: 20},
-          new go.Binding("fill", "color"))
-    );
+  var acceptTemplate =
+      make(go.Node, 'Auto',
+        make(go.Shape, 'Circle',
+          {fill: acceptColor, strokeWidth: 1 ,stroke: 'white', width: 20, height: 20},
+          new go.Binding('fill', 'color'))
+      );
 
-    var rootTemplate = 
-      make(go.Node, "Auto",
-        make(go.Shape, "Circle",
-        {fill: rootColor, strokeWidth: 1 ,stroke: "white", width: 20, height: 20},
-          new go.Binding("fill", "color"))
-    );
+  var rootTemplate =
+      make(go.Node, 'Auto',
+        make(go.Shape, 'Circle',
+          {fill: rootColor, strokeWidth: 1 ,stroke: 'white', width: 20, height: 20},
+          new go.Binding('fill', 'color'))
+      );
 
-    var templateMap = new go.Map("string", go.Node);
-    templateMap.add(graph.EPSILON, epsilonTemplate);
-    templateMap.add(graph.ATOM, atomTemplate);
-    templateMap.add(graph.ACCEPT, acceptTemplate);
-    templateMap.add(graph.ROOT, rootTemplate);
+  var templateMap = new go.Map('string', go.Node);
+  templateMap.add(graph.EPSILON, epsilonTemplate);
+  templateMap.add(graph.ATOM, atomTemplate);
+  templateMap.add(graph.ACCEPT, acceptTemplate);
+  templateMap.add(graph.ROOT, rootTemplate);
 
-    myDiagram.nodeTemplateMap = templateMap;
+  myDiagram.nodeTemplateMap = templateMap;
 }
 
 // Returns an empty Go Diagram object
@@ -67,12 +67,12 @@ function displayDiagram(stateGraph) {
   var edges = [];
 
   for (id in stateGraph) {
-    
+
     var text = stateGraph[id].text;
     var category = stateGraph[id].dataType;
 
     nodes.push({key: id, text: text, category: category});
-    
+
     var nodeEdges = stateGraph[id].edges;
     for (var i = 0; i < nodeEdges.length; i++) {
       edges.push({from: id, to: nodeEdges[i]});

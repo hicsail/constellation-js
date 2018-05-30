@@ -3,18 +3,18 @@ const enumeration = require('../lib/designEnumeration');
 const imparse = require('imparse');
 const uuidv4 = require('uuidv4');
 
-const EPSILON = "o";
-const ATOM = "atom";
-const ACCEPT = "accept";
-const ROOT = "root";
+const EPSILON = 'o';
+const ATOM = 'atom';
+const ACCEPT = 'accept';
+const ROOT = 'root';
 
 
 function generateRoot() {
   return {'id': 'root',
-  'data': {
-    'text': 'root',
-    'dataType': 'root',
-    'edges': []}};
+    'data': {
+      'text': 'root',
+      'dataType': 'root',
+      'edges': []}};
 }
 
 function generateAtom() {
@@ -27,10 +27,10 @@ module.exports = function() {
       var collection = {'a': ['a']};
       var paths = [[generateRoot(), generateAtom()]];
       var designs = enumeration(paths, collection, 1);
-  
+
       expect(JSON.stringify(designs)).to.equal(JSON.stringify(collection['a']));
     });
-    
+
     it('empty-part', function() {
       var collection = {'a': []};
       var paths = [[generateRoot(), generateAtom()]];
@@ -69,4 +69,4 @@ module.exports = function() {
       expect(designs.length).to.equal(0);
     });
   });
-}
+};

@@ -11,8 +11,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.set('json spaces', 1);
 
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
 
@@ -33,16 +33,16 @@ app.get('/', function(req,res) {
 app.post('/postSpecs', function(req,res) {
   var langText = req.body.specification;
   var categories = req.body.categories;
-  console.log("Received new specification", langText, categories);
-  
+  console.log('Received new specification', langText, categories);
+
   try {
-    langText = langText.trim();      
-    categories = JSON.parse(categories);    
+    langText = langText.trim();
+    categories = JSON.parse(categories);
   } catch (e) {
-    res.status(500).send("Input improperly formed");
+    res.status(500).send('Input improperly formed');
   }
 
-  var designObj = constellation(langText, categories, 40); 
+  var designObj = constellation(langText, categories, 40);
 
   res.send(designObj);
 });
