@@ -60,10 +60,10 @@
       $(document).ready(function() {
         const THEME = "solarized light";
 
-        var editors = {
-          "specEditor": CodeMirror.fromTextArea(document.getElementById('langInput'), { lineNumbers:true }),
-          "catEditor": CodeMirror.fromTextArea(document.getElementById('categories'), { lineNumbers:true }),
-          "designsEditor": CodeMirror.fromTextArea(document.getElementById('designs'), { lineNumbers:true })
+        const editors = {
+          "specEditor": CodeMirror.fromTextArea(document.getElementById('langInput'), {lineNumbers: true}),
+          "catEditor": CodeMirror.fromTextArea(document.getElementById('categories'), {lineNumbers: true}),
+          "designsEditor": CodeMirror.fromTextArea(document.getElementById('designs'), {lineNumbers: true})
         };
 
         editors.specEditor.setOption("theme", THEME);
@@ -71,24 +71,24 @@
         editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"terminator": ["BBa_B0010"]}');
         editors.designsEditor.setOption("theme", THEME);
 
-        var myDiagram = null;
+        let myDiagram = null;
 
         $("#submitBtn").click(function(){
           if (myDiagram) {
             myDiagram.div = null;
           }
           myDiagram = initializeStateGraph();
-          var specification = editors.specEditor.getValue();
-          var categories = editors.catEditor.getValue();
-          var langText = specification;
+          const specification = editors.specEditor.getValue();
+          let categories = editors.catEditor.getValue();
+          let langText = specification;
           try {
             langText = langText.trim();
             categories = JSON.parse(categories);
           } catch (e) {
             Alert("Input improperly formed.");
           }
-          var data = constellation(langText, categories, 40);
-          displayDiagram(data.stateGraph);
+          const data = constellation(langText, categories, 40);
+          myDiagram.model = displayDiagram(data.stateGraph);
           displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
         });
       });

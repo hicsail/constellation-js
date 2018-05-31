@@ -1,3 +1,5 @@
+'use strict';
+
 const expect = require('chai').expect;
 const graph = require('../lib/graph');
 const imparse = require('imparse');

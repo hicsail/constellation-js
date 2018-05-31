@@ -1,3 +1,4 @@
+'use strict';
 
 const graphTests = require('./graphTests');
 const enumerationTests = require('./enumerationTests');

@@ -21,7 +21,7 @@ app.use(express.static(__dirname + '/static/css'));
 app.use(express.static(__dirname + '/static/js'));
 app.use(express.static(__dirname + '/../lib'));
 
-var server = app.listen(8082, function() {
+const server = app.listen(8082, function () {
   console.log('Listening on port %d', server.address().port);
   console.log('http://localhost:8082/');
 });
@@ -31,8 +31,8 @@ app.get('/', function(req,res) {
 });
 
 app.post('/postSpecs', function(req,res) {
-  var langText = req.body.specification;
-  var categories = req.body.categories;
+  let langText = req.body.specification;
+  let categories = req.body.categories;
   console.log('Received new specification', langText, categories);
 
   try {
@@ -42,7 +42,7 @@ app.post('/postSpecs', function(req,res) {
     res.status(500).send('Input improperly formed');
   }
 
-  var designObj = constellation(langText, categories, 40);
+  const designObj = constellation(langText, categories, 40);
 
   res.send(designObj);
 });
