@@ -1,5 +1,7 @@
 'use strict';
 
+const ATOM = 'atom';
+
 const expect = require('chai').expect;
 const constellation = require('../lib/constellation');
 
