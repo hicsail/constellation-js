@@ -1,9 +1,9 @@
 'use strict';
 
-const ATOM = 'atom';
-
 const expect = require('chai').expect;
 const constellation = require('../lib/constellation');
+
+const ATOM = 'atom';
 
 // var categories = '{"promoter": ["BBa_R0040", "BBa_J23100"], "rbs": ["BBa_B0032", "BBa_B0034"], "gene": ["BBa_E0040", "BBa_E1010"], "terminator": ["BBa_B0010"]}';
 let categories = '{"a":["a1","a2"],"b":["b1","b2","b3"],"c":["c1"],"d":["d1"]}';
