@@ -4,7 +4,6 @@ function displayDesigns(editors, designs) {
 
 function addStyling(myDiagram, make) {
 
-
   const rootColor = 'rgb(209,58,130)';
   const acceptColor = 'rgb(133,152,28)';
 
