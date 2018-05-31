@@ -14,7 +14,7 @@ module.exports = function() {
   describe('#constellation', function() {
   // BASIC OPERATORS
     it('atom', function() {
-      const result = constellation('c', categories, 10);
+      let result = constellation('c', categories, 10);
       expect(result.designs[0]).to.equal('c1');
     });
 

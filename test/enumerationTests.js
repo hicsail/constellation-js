@@ -24,7 +24,6 @@ module.exports = function() {
       const collection = {'a': ['a']};
       const paths = [[generateRoot(), generateAtom()]];
       const designs = enumeration(paths, collection, 1);
-
       expect(JSON.stringify(designs)).to.equal(JSON.stringify(collection['a']));
     });
 
