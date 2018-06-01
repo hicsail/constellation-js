@@ -95,7 +95,7 @@ module.exports = function() {
     // });
 
     it('Mixing functions', function() {
-      const result = constellation('a then (one-or-more b or zero-or-more c)', categories, 10); // TODO add and
+      const result = constellation('a then (one-or-more b or zero-or-more c)', categories, 50); // TODO add and
       let len = categories['a'].length + categories['a'].length * categories['b'].length + categories['a'].length * categories['c'].length;
       expect(result.designs.length).to.equal(len);
     });

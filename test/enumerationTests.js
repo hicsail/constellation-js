@@ -66,4 +66,27 @@ module.exports = function() {
       });
     });
   });
+
+  describe('Cartesian product tests', function() {
+    it('Empty setA', function() {
+      let setA = [];
+      let setB = ['a', 'b'];
+      expect(enumeration.getCartesianProduct(setA, setB)).to.equal(setB);
+    })
+    it('Empty setB', function() {
+      let setA = ['a', 'b'];
+      let setB = [];
+      expect(enumeration.getCartesianProduct(setA, setB)).to.equal(setA);
+    })
+    it('Product test', function() {
+      let setA = ['a', 'b'];
+      let setB = ['c', 'd'];
+      let result = enumeration.getCartesianProduct(setA, setB);
+      expect(result).to.contain('a,c');
+      expect(result).to.contain('a,d');
+      expect(result).to.contain('b,c');
+      expect(result).to.contain('b,d');
+    })
+  })
+
 };
