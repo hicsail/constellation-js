@@ -31,8 +31,8 @@ module.exports = function() {
       const collection = {'d': []};
       const paths = [[generateRoot(), generateAtom()]];
       const designs = enumeration(paths, collection, 1);
-      expect(JSON.stringify(designs)).to.contain('Error');
-      expect(designs.length).to.equal(1);
+      expect(designs.length).to.equal(0);
+      expect(designs).to.be.an('array').that.is.empty;
     });
 
     it('Enumerate all duplicates in category', function() {
