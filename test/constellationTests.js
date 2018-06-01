@@ -10,7 +10,7 @@ categories = JSON.parse(categories);
 
 module.exports = function() {
 
-  describe('Specification parsing', function() {
+  describe('Basic operators', function() {
     it('atom', function() {
       let result = constellation('c', categories, 10);
       expect(result.designs[0]).to.equal('c1');
@@ -40,12 +40,12 @@ module.exports = function() {
       expect(result.designs).to.contain('a2,c1');
     });
 
-    it('and', function() {
-      const result = constellation('(a or c) and a', categories, 10);
-      expect(result.designs.length).to.equal(1);
-      expect(result.designs).to.contain('a1');
-      expect(result.designs).to.contain('a2');
-    });
+    // it('and', function() {
+    //   const result = constellation('(a or c) and a', categories, 10);
+    //   expect(result.designs.length).to.equal(1);
+    //   expect(result.designs).to.contain('a1');
+    //   expect(result.designs).to.contain('a2');
+    // });
 
     it('one-or-more', function() {
         let result = constellation('one-or-more a', categories, 10);
@@ -73,6 +73,33 @@ module.exports = function() {
         const result = constellation('a then b then c', categories, 10);
         expect(result.designs.length).to.equal(categories['a'].length * categories['b'].length * categories['c'].length);
     });
+
+    it('Multiple or', function() {
+      const result = constellation('a or b or c', categories, 10);
+      expect(result.designs.length).to.equal(categories['a'].length + categories['b'].length + categories['c'].length);
+    });
+
+    // it('Multiple and', function() {
+    //   const result = constellation('a and b and c', categories, 10);
+    //   expect(result.designs.length).to.equal(0);
+    // });
+
+    it('Multiple one-or-more', function() {
+      const result = constellation('one-or-more (one-or-more a)', categories, 10);
+      expect(result.designs.length).to.equal(categories['a'].length);
+    });
+
+    // it('Multiple zero-or-more', function() {
+    //   const result = constellation('zero-or-more (zero-or-more a)', categories, 10);
+    //   expect(result.designs.length).to.equal(categories['a'].length + 1);
+    // });
+
+    it('Mixing functions', function() {
+      const result = constellation('a then (one-or-more b or zero-or-more c)', categories, 10); // TODO add and
+      let len = categories['a'].length + categories['a'].length * categories['b'].length + categories['a'].length * categories['c'].length;
+      expect(result.designs.length).to.equal(len);
+    });
+
   });
 
   describe('Sanitise specification input', function () {
@@ -101,9 +128,37 @@ module.exports = function() {
   });
 
   describe('Sanitise category input', function () {
-    it ('', function () {
-
+    it('Empty categories', function () {
+      let categories = '{}';
+      const result = constellation('a', categories, 10);
+      expect(result.designs).to.contain('');
     });
+
+    it('Empty category', function () {
+      let categories = '{"a":[]}';
+      const result = constellation('a', categories, 10);
+      expect(result.designs).to.contain('');
+    });
+
+    it('Mismatched brackets', function () {
+      let categories = '{"a":["a1"]}';
+      expect(constellation('(a}', categories, 10)).to.throw('Parsing error!');
+    });
+
+    describe('Invalid characters', function () {
+      it('Whitespace should not be included in designs', function () {
+        let categories = '{"a":["\ta1", " a2"]}';
+        const result = constellation('a', categories, 10);
+        expect(result.designs[0]).to.equal(['a1', 'a2']);
+      });
+
+      it('Other symbols should be parsed into category', function () {
+        let categories = '{"a":["$a1", "a2"]}';
+        const result = constellation('$a', categories, 10);
+        expect(result.designs[0]).to.equal(['$a1', 'a2']);
+      });
+    });
+
   });
 
 };

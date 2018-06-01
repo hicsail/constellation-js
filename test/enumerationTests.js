@@ -48,7 +48,6 @@ module.exports = function() {
       const path = [generateRoot(), generateAtom()];
       const paths = [path, path];
       const designs = enumeration(paths, collection, 4);
-
     });
 
     describe ('Number of designs chosen', function() {
