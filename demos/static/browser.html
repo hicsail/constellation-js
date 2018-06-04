@@ -82,14 +82,13 @@
           const specification = editors.specEditor.getValue();
           let categories = editors.catEditor.getValue();
           let langText = specification;
-          // try {
+          try {
             const data = constellation(langText, categories, 40);
             myDiagram.model = displayDiagram(data.stateGraph);
             displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
-          // } catch (error) {
-          //   alert('Input error: ' + error);
-          //   displayDesigns(editors, 'Input error');
-          // }
+          } catch (error) {
+            displayDesigns(editors, 'Error: ' + error);
+          }
         });
       });
     </script>
