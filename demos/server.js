@@ -3,7 +3,6 @@ const app = express();
 const path = require('path');
 const http = require('http');
 const bodyParser = require('body-parser');
-
 const constellation = require('../lib/constellation');
 
 app.use(bodyParser.json());
@@ -35,14 +34,11 @@ app.post('/postSpecs', function(req,res) {
   let categories = req.body.categories;
   console.log('Received new specification', langText, categories);
 
+  let designObj;
   try {
-    langText = langText.trim();
-    categories = JSON.parse(categories);
-  } catch (e) {
-    res.status(500).send('Input improperly formed');
+    designObj = constellation(langText, categories, 40);
+    res.send(designObj);
+  } catch (error) {
+    res.send(error);
   }
-
-  const designObj = constellation(langText, categories, 40);
-
-  res.send(designObj);
 });

@@ -16,15 +16,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/1.8.2/go-debug.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-    <script src="js/codemirror.js"></script>
-    <script src="js/scheme.js"></script>
     <script src="js/sha1.js"></script>
     <script src="js/uuidv4.js"></script>
     <script src="js/reservoir.js"></script>
     <script src="js/imparse.js"></script>
+    <script src="js/codemirror.js"></script>
+    <script src="js/scheme.js"></script>
     <script src="../../lib/graph.js"></script>
     <script src="../../lib/designEnumeration.js"></script>
     <script src="../../lib/constellation.js"></script>
+
 
     <title>Constellation</title>
   </head>
@@ -81,15 +82,14 @@
           const specification = editors.specEditor.getValue();
           let categories = editors.catEditor.getValue();
           let langText = specification;
-          try {
-            langText = langText.trim();
-            categories = JSON.parse(categories);
-          } catch (e) {
-            Alert("Input improperly formed.");
-          }
-          const data = constellation(langText, categories, 40);
-          myDiagram.model = displayDiagram(data.stateGraph);
-          displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+          // try {
+            const data = constellation(langText, categories, 40);
+            myDiagram.model = displayDiagram(data.stateGraph);
+            displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+          // } catch (error) {
+          //   alert('Input error: ' + error);
+          //   displayDesigns(editors, 'Input error');
+          // }
         });
       });
     </script>
