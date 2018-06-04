@@ -14,54 +14,66 @@ function generateRoot() {
       'edges': []}};
 }
 
-function generateAtom() {
-  return {id: uuidv4(), data: {text: 'a', dataType: ATOM, edges: []}};
+function generateAtom(text) {
+  return {id: uuidv4(), data: {text: text, dataType: ATOM, edges: []}};
 }
 
 module.exports = function() {
   describe('Design enumeration', function() {
     it('Enumerate designs for one atom', function() {
-      const collection = {'a': ['a']};
-      const paths = [[generateRoot(), generateAtom()]];
-      const designs = enumeration(paths, collection, 1);
-      expect(JSON.stringify(designs)).to.equal(JSON.stringify(collection['a']));
+      const categories = {'a': ['a']};
+      const paths = [[generateRoot(), generateAtom('a')]];
+      const designs = enumeration(paths, categories, 1);
+      expect(JSON.stringify(designs)).to.contain('a');
+    });
+
+    it('Handle defined but empty category', function() {
+      const categories = {'a': []};
+      const paths = [[generateRoot(), generateAtom('a')]];
+      const designs = enumeration(paths, categories, 1);
+      expect(JSON.stringify(designs)).to.equal('[]');
     });
 
     it('Handle empty categories', function() {
-      const collection = {'d': []};
-      const paths = [[generateRoot(), generateAtom()]];
-      const designs = enumeration(paths, collection, 1);
-      expect(designs.length).to.equal(0);
-      expect(designs).to.be.an('array').that.is.empty;
+      const categories = {};
+      const paths = [[generateRoot(), generateAtom('a')]];
+      expect(() => enumeration(paths, categories, 1)).to.throw('a is not defined in categories');
+    });
+
+    it('Handle undefined atom', function() {
+      const categories = {'b': ['b']};
+      const paths = [[generateRoot(), generateAtom('a')]];
+      expect(() => enumeration(paths, categories, 1)).to.throw('a is not defined in categories');
     });
 
     it('Enumerate all duplicates in category', function() {
-      const collection = {'a': ['a1', 'a2']};
-      const path = [generateRoot(), generateAtom()];
+      const categories = {'a': ['a1', 'a2']};
+      const path = [generateRoot(), generateAtom('a')];
       const paths = [path, path];
-      const designs = enumeration(paths, collection, 4);
-      expect(JSON.stringify(designs)).to.equal(JSON.stringify(collection['a']));
+      const designs = enumeration(paths, categories, 4);
+      expect(JSON.stringify(designs)).to.equal(JSON.stringify(categories['a']));
     });
 
-    it('Multi-level graphs', function() {
-      const collection = {'a': ['a1', 'a2'], 'b': ['b1']};
-      const path = [generateRoot(), generateAtom()];
-      const paths = [path, path];
-      const designs = enumeration(paths, collection, 4);
-    });
+    // it('Multi-level graphs', function() {
+    //   const collection = {'a': ['a1', 'a2'], 'b': ['b1']};
+    //   const path = [generateRoot(), generateAtom('a')];
+    //   const paths = [path, path];
+    //   const designs = enumeration(paths, collection, 4);
+    //   // TODO finish
+    // });
 
     describe ('Number of designs chosen', function() {
       it('Select 1 of 2 designs', function () {
-        const collection = {'a': ['a1', 'a2']};
-        const paths = [[generateRoot(), generateAtom()]];
-        const designs = enumeration(paths, collection, 1);
+        const categories = {'a': ['a1', 'a2']};
+        const paths = [[generateRoot(), generateAtom('a')]];
+        const designs = enumeration(paths, categories, 1);
         expect(designs.length).to.equal(1);
       });
 
       it('Select 0 designs', function () {
-        const collection = {'a': ['a1', 'a2']};
-        const paths = [[generateRoot(), generateAtom()]];
-        const designs = enumeration(paths, collection, 0);
+        const categories = {'a': ['a1', 'a2']};
+        const paths = [[generateRoot(), generateAtom('a')]];
+        const designs = enumeration(paths, categories, 0);
         expect(designs.length).to.equal(0);
       });
     });
@@ -72,12 +84,12 @@ module.exports = function() {
       let setA = [];
       let setB = ['a', 'b'];
       expect(enumeration.getCartesianProduct(setA, setB)).to.equal(setB);
-    })
+    });
     it('Empty setB', function() {
       let setA = ['a', 'b'];
       let setB = [];
       expect(enumeration.getCartesianProduct(setA, setB)).to.equal(setA);
-    })
+    });
     it('Product test', function() {
       let setA = ['a', 'b'];
       let setB = ['c', 'd'];

@@ -48,12 +48,12 @@ module.exports = function() {
     // });
 
     it('one-or-more', function() {
-        let result = constellation('one-or-more a', categories, 10);
-        expect(result.designs).to.contain('a1');
-        expect(result.designs).to.contain('a2');
-        expect(result.paths.length).to.equal(1); // Number of paths
-        expect(result.paths[0].length).to.equal(2); // Length of each path, including root
-        expect(result.paths[0][0].dataType === ATOM);
+      let result = constellation('one-or-more a', categories, 10);
+      expect(result.designs).to.contain('a1');
+      expect(result.designs).to.contain('a2');
+      expect(result.paths.length).to.equal(1); // Number of paths
+      expect(result.paths[0].length).to.equal(2); // Length of each path, including root
+      expect(result.paths[0][0].dataType === ATOM);
     });
 
     it('zero-or-more', function() {
@@ -70,12 +70,13 @@ module.exports = function() {
 
   describe ('Chained expressions', function() {
     it('Multiple then', function() {
-        const result = constellation('a then b then c', categories, 10);
-        expect(result.designs.length).to.equal(categories['a'].length * categories['b'].length * categories['c'].length);
+      const result = constellation('a then b then c', categories, 10);
+      expect(result.designs.length).to.equal(categories['a'].length * categories['b'].length * categories['c'].length);
     });
 
     it('Multiple or', function() {
       const result = constellation('a or b or c', categories, 10);
+      console.log(result.designs);
       expect(result.designs.length).to.equal(categories['a'].length + categories['b'].length + categories['c'].length);
     });
 
@@ -96,7 +97,8 @@ module.exports = function() {
 
     it('Mixing functions', function() {
       const result = constellation('a then (one-or-more b or zero-or-more c)', categories, 50); // TODO add and
-      let len = categories['a'].length + categories['a'].length * categories['b'].length + categories['a'].length * categories['c'].length;
+      console.log(result.designs);
+      let len = categories['a'].length * (1 + categories['b'].length + categories['c'].length);
       expect(result.designs.length).to.equal(len);
     });
 
@@ -104,24 +106,28 @@ module.exports = function() {
 
   describe('Sanitise specification input', function () {
     it('Atom not in categories', function () {
-      const result = constellation('d', categories, 10);
-      expect(JSON.stringify(result.designs)).to.include('Error');
-      expect(JSON.stringify(result.designs)).to.include('not in part categories');
+      expect(() => constellation('d', categories, 10)).to.throw('d is not defined in categories');
     });
 
     it('Mismatched brackets', function () {
-      expect(constellation('(a}', categories, 10)).to.throw(Error);
+      expect(constellation('(a}', categories, 10)).to.be.undefined;
     });
 
     describe('Invalid characters', function () {
       it('Tabs used should not throw errors', function () {
         const result = constellation('\ta', categories, 10);
-        expect(result.designs[0]).to.equal(['a1', 'a2']);
+        expect(result.designs).to.contain('a1');
+        expect(result.designs).to.contain('a2');
       });
 
       it('$', function () {
-        const result = constellation('$a', categories, 10);
-        expect(JSON.stringify(result.designs)).to.include('Error');
+        let result = constellation('$a', categories, 10);
+        expect(result).to.be.undefined;
+      });
+
+      it('Other symbols should be parsed into specification', function () {
+        let result = constellation('$a', categories, 10);
+        expect(result).to.be.undefined;
       });
     });
 
@@ -129,33 +135,33 @@ module.exports = function() {
 
   describe('Sanitise category input', function () {
     it('Empty categories', function () {
-      let categories = '{}';
-      const result = constellation('a', categories, 10);
-      expect(result.designs).to.contain('');
+      let categories = {};
+      expect(() => constellation('a', categories, 1)).to.throw('a is not defined in categories');
     });
 
-    it('Empty category', function () {
-      let categories = '{"a":[]}';
+    it('Handle defined but empty category', function () {
+      let categories = {'a': []};
       const result = constellation('a', categories, 10);
-      expect(result.designs).to.contain('');
+      expect(JSON.stringify(result.designs)).to.equal('[]');
     });
 
     it('Mismatched brackets', function () {
-      let categories = '{"a":["a1"]}';
-      expect(constellation('(a}', categories, 10)).to.throw('Parsing error!');
+      expect(constellation('(a}', categories, 10)).to.be.undefined;
     });
 
     describe('Invalid characters', function () {
       it('Whitespace should not be included in designs', function () {
-        let categories = '{"a":["\ta1", " a2"]}';
+        let categories = {"a":["\ta1", " a2"]};
         const result = constellation('a', categories, 10);
-        expect(result.designs[0]).to.equal(['a1', 'a2']);
+        expect(JSON.stringify(result.designs)).to.contain('a1');
+        expect(JSON.stringify(result.designs)).to.contain('a2');
       });
 
       it('Other symbols should be parsed into category', function () {
-        let categories = '{"a":["$a1", "a2"]}';
-        const result = constellation('$a', categories, 10);
-        expect(result.designs[0]).to.equal(['$a1', 'a2']);
+        let categories = {"a":["$a1", "a2"]};
+        const result = constellation('a', categories, 10);
+        expect(JSON.stringify(result.designs)).to.contain('a1');
+        expect(JSON.stringify(result.designs)).to.contain('a2');
       });
     });
 
