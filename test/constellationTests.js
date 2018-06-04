@@ -90,10 +90,11 @@ module.exports = function() {
       expect(result.designs.length).to.equal(categories['a'].length);
     });
 
-    // it('Multiple zero-or-more', function() {
-    //   const result = constellation('zero-or-more (zero-or-more a)', categories, 10);
-    //   expect(result.designs.length).to.equal(categories['a'].length + 1);
-    // });
+    it.only('Multiple zero-or-more', function() {
+      const result = constellation('zero-or-more (zero-or-more a)', categories, 10);
+      console.log(result.designs);
+      expect(result.designs.length).to.equal(categories['a'].length + 1);
+    });
 
     it('Mixing functions', function() {
       const result = constellation('a then (one-or-more b or zero-or-more c)', categories, 50); // TODO add and
