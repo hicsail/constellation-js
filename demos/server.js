@@ -34,11 +34,11 @@ app.post('/postSpecs', function(req,res) {
   let categories = req.body.categories;
   console.log('Received new specification', langText, categories);
 
-  let designObj;
+  let data;
   try {
-    designObj = constellation(langText, categories, 40);
-    res.send(designObj);
+    data = constellation(langText, categories, 40);
+    res.status(200).send(data);
   } catch (error) {
-    res.send(error);
+    res.send(String(error));
   }
 });

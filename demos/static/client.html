@@ -70,15 +70,15 @@
         let myDiagram = null;
 
         $("#submitBtn").click(function(){
+          // Reset UI
           if (myDiagram) {
             myDiagram.div = null;
           }
-
           myDiagram = initializeStateGraph();
+          displayDesigns(editors, '');
 
           const specification = editors.specEditor.getValue();
           const categories = editors.catEditor.getValue();
-          // var categories = '{"a":["a1","a2","a3"],"b":["b1","b2","b3"],"c":["c1"],"d":[]}';
 
           $.post('http://localhost:8082/postSpecs', {
             "specification": specification,
@@ -86,10 +86,22 @@
             "number": "2.0",
             "name": "specificationname",
             "clientid": "userid"
-          }, function(data, status) {
-            displayDiagram(data.stateGraph);
+          }, function (data) {
+            // Undefined error
+            if (String(data.designs).includes('is not defined')) {
+              myDiagram.model = displayDiagram(data.stateGraph);
+              displayDesigns(editors, String(data.designs));
+              return;
+            }
+            // Generic error
+            if (String(data).includes('Error:')) {
+              alert(data);
+              return;
+            }
+            // Success
+            myDiagram.model = displayDiagram(data.stateGraph);
             displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
-          });
+          })
         });
       });
     </script>
