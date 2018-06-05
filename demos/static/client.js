@@ -80,3 +80,9 @@ function displayDiagram(stateGraph) {
 
   return new go.GraphLinksModel(nodes, edges);
 }
+
+function generateD3Diagram() {
+  let nodes;
+  let links;
+
+}

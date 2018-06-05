@@ -14,6 +14,7 @@
             crossorigin="anonymous"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/1.8.2/go-debug.js"></script>
+    <script src="https://d3js.org/d3-force.v1.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
     <script src="js/sha1.js"></script>
@@ -75,19 +76,26 @@
         let myDiagram = null;
 
         $("#submitBtn").click(function(){
+          // Reset UI
           if (myDiagram) {
             myDiagram.div = null;
           }
           myDiagram = initializeStateGraph();
+          displayDesigns(editors, '');
+
           const specification = editors.specEditor.getValue();
           let categories = editors.catEditor.getValue();
           let langText = specification;
           try {
-            const data = constellation(langText, categories, 40);
+            let data = constellation(langText, categories, 40);
             myDiagram.model = displayDiagram(data.stateGraph);
-            displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+            if (String(data.designs).includes('is not defined')) {
+              displayDesigns(editors, String(data.designs));
+            } else {
+              displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+            }
           } catch (error) {
-            displayDesigns(editors, 'Error: ' + error);
+            alert(error);
           }
         });
       });

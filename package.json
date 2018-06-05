@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/hicsail/constellation-js#readme",
   "dependencies": {
+    "d3-force": "^1.1.0",
     "express": "^4.16.2",
     "imparse": "0.0.2",
     "mocha": "^4.0.1",
