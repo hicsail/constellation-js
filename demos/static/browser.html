@@ -13,9 +13,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
             crossorigin="anonymous"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/1.8.2/go-debug.js"></script>
-    <script src="https://d3js.org/d3-force.v1.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/1.8.2/go-debug.js"></script>-->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
 
     <script src="js/sha1.js"></script>
     <script src="js/uuidv4.js"></script>
@@ -37,13 +37,12 @@
       <div class="row">
         <div class="col-sm">
           <label for="langInput"><h5>Specification</h5></label><textarea class="codemirror" id="langInput" name="paragraph_text" cols="50" rows="10"></textarea>
+          <br/>
           <label for="categories"><h5>Categories</h5></label><textarea class="codemirror" name="paragraph_text" id="categories" cols="50" rows="10"></textarea>
         </div>
-        <br/><br/>
         <div class="col-sm">
-          <h5>Graph</h5>
-          <div id="stateGraph"></div>
-          <!--div id="designs"></div-->
+          <label for="designs"><h5>Graph</h5></label><div id="graph"></div>
+          <br/>
           <label for="designs"><h5>Designs</h5></label><textarea class="codemirror" name="paragraph_text" id="designs" cols="50" rows="10"></textarea>
         </div>
       </div>
@@ -73,14 +72,9 @@
         editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"terminator": ["BBa_B0010"]}');
         editors.designsEditor.setOption("theme", THEME);
 
-        let myDiagram = null;
-
         $("#submitBtn").click(function(){
           // Reset UI
-          if (myDiagram) {
-            myDiagram.div = null;
-          }
-          myDiagram = initializeStateGraph();
+          resetDiagram();
           displayDesigns(editors, '');
 
           const specification = editors.specEditor.getValue();
@@ -88,12 +82,12 @@
           let langText = specification;
           try {
             let data = constellation(langText, categories, 40);
-            myDiagram.model = displayDiagram(data.stateGraph);
             if (String(data.designs).includes('is not defined')) {
               displayDesigns(editors, String(data.designs));
             } else {
               displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
             }
+            displayDiagram(data.stateGraph);
           } catch (error) {
             alert(error);
           }
