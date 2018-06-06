@@ -1,3 +1,5 @@
+<!--TODO transfer over browser.html changes-->
+
 <html>
   <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
@@ -71,10 +73,7 @@
 
         $("#submitBtn").click(function(){
           // Reset UI
-          if (myDiagram) {
-            myDiagram.div = null;
-          }
-          myDiagram = initializeStateGraph();
+          resetDiagram();
           displayDesigns(editors, '');
 
           const specification = editors.specEditor.getValue();
@@ -89,17 +88,12 @@
           }, function (data) {
             // Undefined error
             if (String(data.designs).includes('is not defined')) {
-              myDiagram.model = displayDiagram(data.stateGraph);
               displayDesigns(editors, String(data.designs));
-              return;
-            }
-            // Generic error
-            if (String(data).includes('Error:')) {
+            } else if (String(data).includes('Error:')) {
               alert(data);
               return;
             }
-            // Success
-            myDiagram.model = displayDiagram(data.stateGraph);
+            displayDiagram(data.stateGraph);
             displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
           })
         });

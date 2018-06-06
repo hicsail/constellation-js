@@ -60,7 +60,7 @@ input[type="button"]{
 }
 
 .node circle {
-  r: 7;
+  r: 4;
 }
 
 .node text {

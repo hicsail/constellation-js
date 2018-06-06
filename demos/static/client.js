@@ -4,17 +4,21 @@ let width;
 let height; // TODO implement centering and resizing
 let simulation;
 let svg;
+
+const linkDistance = 50;
+const imageSize = 30;
+
 // TODO constrain to rectangle only
 // TODO add arrows
 // TODO add symbols
 // TODO prevent loops from collapsing
+// TODO make graph horizontal with root at left
 
 function displayDesigns(editors, designs) {
   editors.designsEditor.setValue(designs);
 }
 
 function displayDiagram(stateGraph) {
-  // alert(JSON.stringify(stateGraph));
   let links = [];
   let nodes = [];
 
@@ -37,16 +41,16 @@ function displayDiagram(stateGraph) {
   simulation = d3.forceSimulation()
     .nodes(nodes)
     .force('charge', d3.forceManyBody())
-    .force('link', d3.forceLink(links).id(function(d) { return d.id }))
+    .force('link', d3.forceLink(links).id(function(d) { return d.id }).distance(linkDistance))
     .force('collide', d3.forceCollide( function(d){return d.r + 8 }).iterations(16))
     .force('centre', d3.forceCenter(200, 125))
     .on('tick', tick);
 
-  link = svg.append('g')
-    .attr('class', 'link')
-    .selectAll('line')
+  link = svg.selectAll('.link')
     .data(links)
     .enter()
+    .append('g')
+    .attr('class', 'link')
     .append('line');
 
   node = svg.selectAll('.node')
@@ -66,15 +70,52 @@ function displayDiagram(stateGraph) {
       }
       return '#0000ff';
     });
+  // TODO look into using filter functions instead
 
   node.append('text')
-    .attr('dx', 12)
-    .attr('dy', '.35em')
+    .attr('dx', 5)
+    .attr('dy', '.20em')
     .text(function(d) {
       if (d.dataType === 'atom') {
         return d.text;
       }
     });
+
+  node.append('g')
+    .attr('transform', 'translate(-5, -30)')
+    .append('svg:image')
+    .attr('xlink:href', function(d) {
+      if (d.dataType !== 'atom') {
+        return '';
+      }
+      switch (d.text[0]) {
+        case 'promoter':
+        case 'terminator':
+        case 'CDS':
+        case 'restriction_enzyme_assembly_scar':
+        case 'restriction_enzyme_recognition_site':
+        case 'protein_stability_element':
+        case 'blunt_end_restriction_enzyme_cleavage_site':
+        case 'ribonuclease_site':
+        case 'restriction_enzyme_five_prime_single_strand_overhang':
+        case 'ribosome_entry_site':
+        case 'five_prime_sticky_end_restriction_enzyme_cleavage_site':
+        case 'RNA_stability_element':
+        case 'ribozyme':
+        case 'insulator':
+        case 'signature':
+        case 'operator':
+        case 'origin_of_replication':
+        case 'restriction_enzyme_three_prime_single_strand_overhang':
+        case 'primer_binding_site':
+        case 'three_prime_sticky_end_restriction_enzyme_cleavage_site':
+        case 'protease_site':
+          return './sbol/' + d.text + '.svg';
+        default:
+          return './sbol/' + 'user_defined.svg';
+      }
+    })
+    .attr('width', '30');
 
   svg.call(d3.drag()
     .subject(dragSubject)
