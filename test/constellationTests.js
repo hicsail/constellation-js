@@ -109,6 +109,11 @@ module.exports = function() {
       expect(() => constellation('(a}', categories, 10)).to.throw('Parsing error!');
     });
 
+
+    it('Empty specification', function () {
+      expect(() => constellation('', categories, 10)).to.throw('No input received')
+    });
+
     describe('Invalid characters', function () {
       it('Tabs used should not throw errors', function () {
         const result = constellation('\ta', categories, 10);
@@ -117,12 +122,11 @@ module.exports = function() {
       });
 
       it('$', function () {
-        expect(() => constellation('$a', categories, 10)).to.throw('Parsing error!');
-        // TODO Should work anyway. Shouldn't throw an error. Bug with imparse
+        expect(() => constellation('$a', categories, 10)).to.throw('$a is not defined in categories');
       });
 
-      it('Other symbols should be parsed into specification', function () {
-        expect(() => constellation('$a', categories, 10)).to.throw('Parsing error!')
+      it('_', function () {
+        expect(() => constellation('_a', categories, 10)).to.throw('_a is not defined in categories');
       });
     });
 
