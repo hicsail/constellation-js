@@ -1,14 +1,14 @@
 let node;
 let link;
-let width;
-let height; // TODO implement centering and resizing
+let width = 398;
+let height = 250; // TODO implement centering and resizing
 let simulation;
 let svg;
 
 const linkDistance = 50;
 const imageSize = 30;
+const radius = 4;
 
-// TODO constrain to rectangle only
 // TODO add arrows
 // TODO add symbols
 // TODO prevent loops from collapsing
@@ -33,17 +33,18 @@ function displayDiagram(stateGraph) {
     }
   }
 
-  svg = d3.select('#graph').append('svg')
-    .attr('width', '100%')
-    .attr('height', '100%')
-    .attr('preserveAspectRatio', 'none');
+  // updateSvgSize();
+  svg = d3.select('#graph')
+    .append('svg')
+    .attr('width', width)
+    .attr('height', height);
 
   simulation = d3.forceSimulation()
     .nodes(nodes)
     .force('charge', d3.forceManyBody())
     .force('link', d3.forceLink(links).id(function(d) { return d.id }).distance(linkDistance))
     .force('collide', d3.forceCollide( function(d){return d.r + 8 }).iterations(16))
-    .force('centre', d3.forceCenter(200, 125))
+    .force('centre', d3.forceCenter(width / 2, height / 2))
     .on('tick', tick);
 
   link = svg.selectAll('.link')
@@ -115,7 +116,7 @@ function displayDiagram(stateGraph) {
           return './sbol/' + 'user_defined.svg';
       }
     })
-    .attr('width', '30');
+    .attr('width', imageSize);
 
   svg.call(d3.drag()
     .subject(dragSubject)
@@ -126,7 +127,16 @@ function displayDiagram(stateGraph) {
 }
 
 function tick() {
-  node.attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
+  // updateSvgSize();
+  // svg.attr('height', height)
+  //   .attr('width', width);
+  simulation.force('centre', d3.forceCenter(width / 2, height / 2));
+
+  node.attr('transform', function(d) {
+    d.x = Math.max(radius, Math.min(width - radius, d.x));
+    d.y = Math.max(radius, Math.min(height - radius, d.y));
+    return 'translate(' + d.x + ',' + d.y + ')'
+  });
 
   link.attr('x1', function(d) { return d.source.x; })
     .attr('x2', function(d) { return d.target.x; })
@@ -157,4 +167,10 @@ function dragEnded() {
 
 function resetDiagram() {
   d3.selectAll('svg').remove();
+}
+
+function updateSvgSize() {
+  let g = document.getElementById('graph');
+  width = g.clientWidth;
+  height = g.clientHeight;
 }
