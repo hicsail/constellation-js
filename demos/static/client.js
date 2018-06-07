@@ -4,9 +4,13 @@ let width;
 let height;
 let simulation;
 let svg;
+let circle;
+let image;
+let text;
 
 const linkDistance = 50;
-const chargeForceStrength = -100;
+const chargeForceStrength = -150;
+const distanceMax = 100;
 const imageSize = 30;
 const radius = 7;
 
@@ -41,7 +45,10 @@ function displayDiagram(stateGraph) {
 
   simulation = d3.forceSimulation()
     .nodes(nodes)
-    .force('charge', d3.forceManyBody().strength(chargeForceStrength))
+    .force('charge', d3.forceManyBody()
+      .strength(chargeForceStrength)
+      .distanceMax(distanceMax)
+    )
     .force('link', d3.forceLink(links).id(function(d) { return d.id }).distance(linkDistance))
     .force('collide', d3.forceCollide( function(d){return d.r + 8 }).iterations(16))
     .force('centre', d3.forceCenter(width / 2, height / 2))
@@ -60,7 +67,22 @@ function displayDiagram(stateGraph) {
     .append('g')
     .attr('class', 'node');
 
-  node.filter(function (d) { return d.dataType !== 'atom'; })
+  text = node.append('text')
+    .text( function(d) {
+      if (d.dataType === 'root') {
+        return 'Root';
+      } else if (d.dataType === 'o') {
+        return 'Epsilon'
+      } else if (d.dataType === 'accept') {
+        return 'Accept';
+      }
+      return d.text[0];
+    })
+    .attr('opacity', 0)
+    .attr('dx', '20px')
+    .attr('dy', '4px');
+
+  circle = node.filter(function (d) { return d.dataType !== 'atom'; })
     .append('circle')
     .attr('fill', function(d) {
       if (d.text === 'root') {
@@ -74,9 +96,9 @@ function displayDiagram(stateGraph) {
     .attr('title', function(d) {return d.dataType})
     .attr('r', radius);
 
-  node.filter(function(d) { return d.dataType === 'atom'; })
+  image = node.filter(function(d) { return d.dataType === 'atom'; })
     .append('g')
-    .attr('transform', 'translate(-5, -30)')
+    .attr('transform', 'translate(-15 , -30)')
     .append('svg:image')
     .attr('xlink:href', function(d) {
       switch (d.text[0]) {
@@ -108,21 +130,6 @@ function displayDiagram(stateGraph) {
     })
     .attr('width', imageSize);
 
-  node.append('text')
-    .text( function(d) {
-      if (d.dataType === 'root') {
-        return 'Root';
-      } else if (d.dataType === 'o') {
-        return 'Epsilon'
-      } else if (d.dataType === 'accept') {
-        return 'Accept';
-      }
-      return d.text[0];
-    })
-    .attr('opacity', 0)
-    .attr('dx', '20px')
-    .attr('dy', '4px');
-
   svg.call(d3.drag()
     .subject(dragSubject)
     .on('start', dragStarted)
@@ -147,7 +154,19 @@ function tick() {
     .attr('width', width);
   simulation.force('centre', d3.forceCenter(width / 2, height / 2));
 
-  node.attr('transform', function(d) {
+  circle.attr('transform', function(d) {
+    d.x = Math.max(radius, Math.min(width - radius, d.x));
+    d.y = Math.max(radius, Math.min(height - radius, d.y));
+    return 'translate(' + d.x + ',' + d.y + ')'
+  });
+
+  image.attr('transform', function(d) {
+    d.x = Math.max(20, Math.min(width - 20, d.x));
+    d.y = Math.max(25, Math.min(height - 10, d.y));
+    return 'translate(' + d.x + ',' + d.y + ')'
+  });
+
+  text.attr('transform', function(d) {
     d.x = Math.max(radius, Math.min(width - radius, d.x));
     d.y = Math.max(radius, Math.min(height - radius, d.y));
     return 'translate(' + d.x + ',' + d.y + ')'
