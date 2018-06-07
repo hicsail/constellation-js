@@ -1,7 +1,7 @@
 let node;
 let link;
-let width = 398;
-let height = 250; // TODO implement centering and resizing
+let width;
+let height; // TODO implement centering and resizing
 let simulation;
 let svg;
 
@@ -33,7 +33,7 @@ function displayDiagram(stateGraph) {
     }
   }
 
-  // updateSvgSize();
+  updateSvgSize();
   svg = d3.select('#graph')
     .append('svg')
     .attr('width', width)
@@ -127,9 +127,9 @@ function displayDiagram(stateGraph) {
 }
 
 function tick() {
-  // updateSvgSize();
-  // svg.attr('height', height)
-  //   .attr('width', width);
+  updateSvgSize();
+  svg.attr('height', height)
+    .attr('width', width);
   simulation.force('centre', d3.forceCenter(width / 2, height / 2));
 
   node.attr('transform', function(d) {
