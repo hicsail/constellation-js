@@ -8,7 +8,7 @@ let svg;
 const linkDistance = 50;
 const chargeForceStrength = -100;
 const imageSize = 30;
-const radius = 4;
+const radius = 7;
 
 // TODO add arrows
 // TODO prevent loops from collapsing
@@ -71,7 +71,8 @@ function displayDiagram(stateGraph) {
         return '#ffff00';
       }
     })
-    .attr('title', function(d) {return d.dataType});
+    .attr('title', function(d) {return d.dataType})
+    .attr('r', radius);
 
   node.filter(function(d) { return d.dataType === 'atom'; })
     .append('g')
@@ -105,14 +106,39 @@ function displayDiagram(stateGraph) {
           return './sbol/' + 'user_defined.svg';
       }
     })
-    .attr('width', imageSize)
-    .attr('title', function(d) { return d.text[0]; });
+    .attr('width', imageSize);
+
+  node.append('text')
+    .text( function(d) {
+      if (d.dataType === 'root') {
+        return 'Root';
+      } else if (d.dataType === 'o') {
+        return 'Epsilon'
+      } else if (d.dataType === 'accept') {
+        return 'Accept';
+      }
+      return d.text[0];
+    })
+    .attr('opacity', 0)
+    .attr('dx', '20px')
+    .attr('dy', '4px');
 
   svg.call(d3.drag()
     .subject(dragSubject)
     .on('start', dragStarted)
     .on('drag', dragged)
     .on('end', dragEnded));
+
+  node.on('mouseover', function() {
+    d3.select(this)
+      .select('text')
+      .attr('opacity', 1);
+  })
+    .on('mouseout', function() {
+      d3.select(this)
+        .select('text')
+        .attr('opacity', 0);
+    });
 }
 
 function tick() {
@@ -149,7 +175,7 @@ function dragged() {
 }
 
 function dragEnded() {
-  if (!d3.event.active) simulation.alphaTarget(0);
+  if (!d3.event.active) simulation.alphaTarget(0.1);
   d3.event.subject.fx = null;
   d3.event.subject.fy = null;
 }
