@@ -9,12 +9,11 @@ let image;
 let text;
 
 const linkDistance = 50;
-const chargeForceStrength = -150;
+const chargeForceStrength = -250;
 const distanceMax = 100;
 const imageSize = 30;
 const radius = 7;
 
-// TODO add arrows
 // TODO prevent loops from collapsing
 // TODO make graph horizontal with root at left
 
@@ -54,12 +53,24 @@ function displayDiagram(stateGraph) {
     .force('centre', d3.forceCenter(width / 2, height / 2))
     .on('tick', tick);
 
-  link = svg.selectAll('.link')
+  svg.append('svg:defs').append('svg:marker')
+    .attr('id', 'arrow')
+    .attr('viewBox', '0 -5 10 10')
+    .attr('refX', 10) // Move away from line's end
+    .attr('markerWidth', 10)
+    .attr('markerHeight', 10)
+    .attr('orient', 'auto')
+    .append('svg:path')
+    .style('fill', '#585858')
+    .attr('d', 'M0, -3L3, 0L0,3'); // Define shape
+
+  link = svg.selectAll('line.link')
     .data(links)
-    .enter()
-    .append('g')
+    .enter().append('path')
     .attr('class', 'link')
-    .append('line');
+    .style('stroke', '#585858')
+    .attr('marker-end', 'url(#arrow)') //attach the arrow from defs
+    .style( 'stroke-width', 2 );
 
   node = svg.selectAll('.node')
     .data(nodes)
@@ -172,10 +183,7 @@ function tick() {
     return 'translate(' + d.x + ',' + d.y + ')'
   });
 
-  link.attr('x1', function(d) { return d.source.x; })
-    .attr('x2', function(d) { return d.target.x; })
-    .attr('y1', function(d) { return d.source.y; })
-    .attr('y2', function(d) { return d.target.y; });
+  link.attr( 'd', function(d) {return 'M' + d.source.x + ',' + d.source.y + ', ' + d.target.x + ',' + d.target.y});
 }
 
 function dragSubject() {
@@ -194,7 +202,7 @@ function dragged() {
 }
 
 function dragEnded() {
-  if (!d3.event.active) simulation.alphaTarget(0.1);
+  if (!d3.event.active) simulation.alphaTarget(0.01);
   d3.event.subject.fx = null;
   d3.event.subject.fy = null;
 }

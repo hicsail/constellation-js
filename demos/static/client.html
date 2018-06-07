@@ -86,15 +86,18 @@
             "name": "specificationname",
             "clientid": "userid"
           }, function (data) {
-            // Undefined error
-            if (String(data.designs).includes('is not defined')) {
-              displayDesigns(editors, String(data.designs));
-            } else if (String(data).includes('Error:')) {
-              alert(data);
-              return;
+            if (String(data).includes('Error:')) {
+              // Undefined design
+              if (String(data.designs).includes('is not defined')) {
+                displayDesigns(editors, String(data.designs));
+              }
+              else {
+                alert(data);
+                return;
+              }
+              displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
             }
             displayDiagram(data.stateGraph);
-            displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
           })
         });
       });
