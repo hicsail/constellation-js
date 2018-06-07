@@ -1,16 +1,16 @@
 let node;
 let link;
 let width;
-let height; // TODO implement centering and resizing
+let height;
 let simulation;
 let svg;
 
 const linkDistance = 50;
+const chargeForceStrength = -100;
 const imageSize = 30;
 const radius = 4;
 
 // TODO add arrows
-// TODO add symbols
 // TODO prevent loops from collapsing
 // TODO make graph horizontal with root at left
 
@@ -41,7 +41,7 @@ function displayDiagram(stateGraph) {
 
   simulation = d3.forceSimulation()
     .nodes(nodes)
-    .force('charge', d3.forceManyBody())
+    .force('charge', d3.forceManyBody().strength(chargeForceStrength))
     .force('link', d3.forceLink(links).id(function(d) { return d.id }).distance(linkDistance))
     .force('collide', d3.forceCollide( function(d){return d.r + 8 }).iterations(16))
     .force('centre', d3.forceCenter(width / 2, height / 2))
@@ -60,7 +60,8 @@ function displayDiagram(stateGraph) {
     .append('g')
     .attr('class', 'node');
 
-  node.append('circle')
+  node.filter(function (d) { return d.dataType !== 'atom'; })
+    .append('circle')
     .attr('fill', function(d) {
       if (d.text === 'root') {
         return '#ff0008';
@@ -69,26 +70,14 @@ function displayDiagram(stateGraph) {
       } else if (d.text === 'o') {
         return '#ffff00';
       }
-      return '#0000ff';
-    });
-  // TODO look into using filter functions instead
+    })
+    .attr('title', function(d) {return d.dataType});
 
-  node.append('text')
-    .attr('dx', 5)
-    .attr('dy', '.20em')
-    .text(function(d) {
-      if (d.dataType === 'atom') {
-        return d.text;
-      }
-    });
-
-  node.append('g')
+  node.filter(function(d) { return d.dataType === 'atom'; })
+    .append('g')
     .attr('transform', 'translate(-5, -30)')
     .append('svg:image')
     .attr('xlink:href', function(d) {
-      if (d.dataType !== 'atom') {
-        return '';
-      }
       switch (d.text[0]) {
         case 'promoter':
         case 'terminator':
@@ -116,14 +105,14 @@ function displayDiagram(stateGraph) {
           return './sbol/' + 'user_defined.svg';
       }
     })
-    .attr('width', imageSize);
+    .attr('width', imageSize)
+    .attr('title', function(d) { return d.text[0]; });
 
   svg.call(d3.drag()
     .subject(dragSubject)
     .on('start', dragStarted)
     .on('drag', dragged)
     .on('end', dragEnded));
-
 }
 
 function tick() {
@@ -149,7 +138,7 @@ function dragSubject() {
 }
 
 function dragStarted() {
-  if (!d3.event.active) simulation.alphaTarget(0.1).restart();
+  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
   d3.event.subject.fx = d3.event.subject.x;
   d3.event.subject.fy = d3.event.subject.y;
 }
@@ -160,7 +149,7 @@ function dragged() {
 }
 
 function dragEnded() {
-  if (!d3.event.active) simulation.alphaTarget(0.1);
+  if (!d3.event.active) simulation.alphaTarget(0);
   d3.event.subject.fx = null;
   d3.event.subject.fy = null;
 }
