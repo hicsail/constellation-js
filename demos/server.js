@@ -18,7 +18,7 @@ app.use(function(req, res, next) {
 app.use(express.static(__dirname + '/static'));
 app.use(express.static(__dirname + '/static/css'));
 app.use(express.static(__dirname + '/static/js'));
-app.use(express.static(__dirname + '/../lib'));
+app.use(express.static(__dirname + '/../lib/'));
 
 const server = app.listen(8082, function () {
   console.log('Listening on port %d', server.address().port);
