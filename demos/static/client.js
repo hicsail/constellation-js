@@ -1,5 +1,5 @@
 const LINKDISTANCE = 25;
-const CHARGESTRENGTH = -250;
+const CHARGESTRENGTH = -400;
 const MAXDISTANCE = 100;
 const IMAGESIZE = 30;
 const RADIUS = 7;
@@ -217,8 +217,32 @@ function tick() {
     return 'translate(' + d.x + ',' + d.y + ')'
   });
 
-  linkPointer.attr('d', function(d) { return 'M' + d.source.x + ',' + d.source.y
-    + ' ' + d.target.x + ',' + d.target.y });
+  // linkPointer.attr('d', function(d) { return 'M' + d.source.x + ',' + d.source.y
+  //   + ' ' + d.target.x + ',' + d.target.y });
+  linkPointer.attr('d', updateLinks);
+}
+
+function updateLinks(d) {
+  let deltaX = d.target.x - d.source.x,
+    deltaY = d.target.y - d.source.y,
+    dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
+    normX = deltaX / dist,
+    normY = deltaY / dist;
+
+  let sourcePadding = 10,
+    targetPadding = 10;
+
+  if (d.source.type === INTERMEDIATE) {
+    sourcePadding = 0;
+  } else if (d.target.type === INTERMEDIATE) {
+    targetPadding = 0;
+  }
+
+  let sourceX = d.source.x + normX * sourcePadding,
+    sourceY = d.source.y + normY * sourcePadding,
+    targetX = d.target.x - normX * targetPadding,
+    targetY = d.target.y - normY * targetPadding;
+  return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
 }
 
 /**
