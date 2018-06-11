@@ -11,7 +11,7 @@ h3 {
 }
 
 #langInput{
-    height: 250px; 
+    height: 250px;
 }
 
 #categories{
@@ -27,7 +27,6 @@ textarea {
     margin: auto;
     display: block;
     font-size: 20px;
-    
 }
 
 h5 {
@@ -47,9 +46,22 @@ input[type="button"]{
     cursor: pointer;
 }
 
-#stateGraph {
+#categoryGraph {
     border: 1px solid white;
     width: 100%;
-    /* max-width: screen.width / 2; */
     height: 250px;
+    max-height: 250px;
+}
+
+.link line {
+  stroke: #585858;
+  stroke-opacity: 100;
+  stroke-width: 2px;
+}
+
+.node text {
+  pointer-events: none;
+  fill: #000000;
+  font: 14px sans-serif;
+  text-align: center;
 }
