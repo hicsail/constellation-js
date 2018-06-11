@@ -24,6 +24,8 @@
     <script src="../../lib/designEnumeration.js"></script>
     <script src="../../lib/constellation.js"></script>
 
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+
     <title>Constellation</title>
   </head>
   <body>
@@ -33,13 +35,12 @@
       <div class="row">
         <div class="col-sm">
           <label for="langInput"><h5>Specification</h5></label><textarea class="codemirror" id="langInput" name="paragraph_text" cols="50" rows="10"></textarea>
+          <br/>
           <label for="categories"><h5>Categories</h5></label><textarea class="codemirror" name="paragraph_text" id="categories" cols="50" rows="10"></textarea>
         </div>
-        <br/><br/>
         <div class="col-sm">
-          <h5>Graph</h5>
-          <div id="stateGraph"></div>
-          <!--div id="designs"></div-->
+          <label for="designs"><h5>Graph</h5></label><div id="graph"></div>
+          <br/>
           <label for="designs"><h5>Designs</h5></label><textarea class="codemirror" name="paragraph_text" id="designs" cols="50" rows="10"></textarea>
         </div>
       </div>
