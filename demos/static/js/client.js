@@ -134,7 +134,6 @@ function drawNodes(nodes) {
   circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
     .append('circle')
     .attr('fill', function(d) {
-      console.log(d.type, graph)
       if (d.type === graph.ROOT) {
         return '#ff0008';
       } else if (d.type === graph.ACCEPT) {
