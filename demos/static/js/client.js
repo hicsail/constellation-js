@@ -219,8 +219,6 @@ function tick() {
     return 'translate(' + d.x + ',' + d.y + ')'
   });
 
-  // linkPointer.attr('d', function(d) { return 'M' + d.source.x + ',' + d.source.y
-  //   + ' ' + d.target.x + ',' + d.target.y });
   linkPointer.attr('d', updateLinks);
 }
 
