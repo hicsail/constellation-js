@@ -303,3 +303,56 @@ function dragEnded() {
 function resetDiagram() {
   d3.selectAll('svg').remove();
 }
+
+
+
+/* * * * * * */
+/*    */
+/* * * * * * */
+$(document).ready(function() {
+
+  const THEME = "solarized light";
+
+  const editors = {
+    "specEditor": CodeMirror.fromTextArea(document.getElementById('langInput'), {lineNumbers: true}),
+    "catEditor": CodeMirror.fromTextArea(document.getElementById('categories'), {lineNumbers: true}),
+    "designsEditor": CodeMirror.fromTextArea(document.getElementById('designs'), {lineNumbers: true})
+  };
+
+  editors.specEditor.setOption("theme", THEME);
+  editors.catEditor.setOption("theme", THEME);
+  editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"terminator": ["BBa_B0010"]}');
+  editors.designsEditor.setOption("theme", THEME);
+
+  let myDiagram = null;
+
+  $("#submitBtn").click(function(){
+    // Reset UI
+    resetDiagram();
+    displayDesigns(editors, '');
+
+    const specification = editors.specEditor.getValue();
+    const categories = editors.catEditor.getValue();
+
+    $.post('http://localhost:8082/postSpecs', {
+      "specification": specification,
+      "categories": categories,
+      "number": "2.0",
+      "name": "specificationname",
+      "clientid": "userid"
+    }, function (data) {
+      if (String(data).includes('Error:')) {
+        // Undefined design
+        if (String(data.designs).includes('is not defined')) {
+          displayDesigns(editors, String(data.designs));
+        }
+        else {
+          alert(data);
+          return;
+        }
+        displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+      }
+      displayDiagram(data.stateGraph);
+    })
+  });
+});
