@@ -65,7 +65,7 @@ function generateGraph(stateGraph) {
   for (let node in stateGraph) {
     let text = '';
     if (stateGraph[node].type === graph.ATOM) {
-      text = stateGraph[node].text[0];
+      text = stateGraph[node].text;
     }
     nodes.push({id: node, type: stateGraph[node].type, text});
   }
