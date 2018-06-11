@@ -80,17 +80,19 @@
           const specification = editors.specEditor.getValue();
           let categories = editors.catEditor.getValue();
           let langText = specification;
+          let data;
           try {
-            let data = constellation(langText, categories, 40);
+            data = constellation(langText, categories, 40);
             if (String(data.designs).includes('is not defined')) {
               displayDesigns(editors, String(data.designs));
             } else {
               displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
             }
-            displayDiagram(data.stateGraph);
+
           } catch (error) {
             alert(error);
           }
+          displayDiagram(data.stateGraph);
         });
       });
     </script>

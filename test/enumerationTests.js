@@ -10,12 +10,12 @@ function generateRoot() {
   return {'id': 'root',
     'data': {
       'text': 'root',
-      'dataType': 'root',
+      'type': 'root',
       'edges': []}};
 }
 
 function generateAtom(text) {
-  return {id: uuidv4(), data: {text: text, dataType: ATOM, edges: []}};
+  return {id: uuidv4(), data: {text: text, type: ATOM, edges: []}};
 }
 
 module.exports = function() {

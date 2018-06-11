@@ -49,7 +49,7 @@ module.exports = function() {
       expect(result.designs).to.contain('a2');
       expect(result.paths.length).to.equal(1); // Number of paths
       expect(result.paths[0].length).to.equal(2); // Length of each path, including root
-      expect(result.paths[0][0].dataType === ATOM);
+      expect(result.paths[0][0].type === ATOM);
     });
 
     it('zero-or-more', function() {
@@ -59,7 +59,7 @@ module.exports = function() {
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
       expect(result.paths.length).to.equal(2); // Number of paths, including empty path
-      expect(result.paths[0][0].dataType === ATOM);
+      expect(result.paths[0][0].type === ATOM);
     });
 
   });

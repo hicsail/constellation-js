@@ -8,14 +8,12 @@ let circle;
 let image;
 let text;
 
-const linkDistance = 50;
+const LINKDISTANCE = 20;
 const chargeForceStrength = -250;
-const distanceMax = 100;
-const imageSize = 30;
-const radius = 7;
-
-// TODO prevent loops from collapsing
-// TODO make graph horizontal with root at left
+const MAXDISTANCE = 100;
+const IMAGESIZE = 30;
+const RADIUS = 7;
+const INTERMEDIATE = 'intermediate';
 
 function displayDesigns(editors, designs) {
   editors.designsEditor.setValue(designs);
@@ -26,13 +24,21 @@ function displayDiagram(stateGraph) {
   let nodes = [];
 
   for (let node in stateGraph) {
-    nodes.push({id: node, dataType: stateGraph[node].dataType, text: stateGraph[node].text})
+    let text = '';
+    if (stateGraph[node].type === graph.ATOM) {
+      text = stateGraph[node].text[0];
+    }
+    nodes.push({id: node, type: stateGraph[node].type, text});
   }
 
   // Get edges from stateGraph
+  let id = 0;
   for (let node in stateGraph) {
     for (let edge of stateGraph[node].edges) {
-      links.push({source: node, target: edge});
+      nodes.push({id, type: INTERMEDIATE});
+      links.push({source: node, target: id});
+      links.push({source: id, target: edge});
+      id++;
     }
   }
 
@@ -46,9 +52,9 @@ function displayDiagram(stateGraph) {
     .nodes(nodes)
     .force('charge', d3.forceManyBody()
       .strength(chargeForceStrength)
-      .distanceMax(distanceMax)
+      .distanceMax(MAXDISTANCE)
     )
-    .force('link', d3.forceLink(links).id(function(d) { return d.id }).distance(linkDistance))
+    .force('link', d3.forceLink(links).id(function(d) { return d.id }).distance(LINKDISTANCE))
     .force('collide', d3.forceCollide( function(d){return d.r + 8 }).iterations(16))
     .force('centre', d3.forceCenter(width / 2, height / 2))
     .on('tick', tick);
@@ -69,8 +75,11 @@ function displayDiagram(stateGraph) {
     .enter().append('path')
     .attr('class', 'link')
     .style('stroke', '#585858')
-    .attr('marker-end', 'url(#arrow)') //attach the arrow from defs
     .style( 'stroke-width', 2 );
+
+  // Attach arrowhead
+  link.filter( function(d) { return d.source.type  === INTERMEDIATE; } )
+    .attr('marker-end', 'url(#arrow)');
 
   node = svg.selectAll('.node')
     .data(nodes)
@@ -78,41 +87,49 @@ function displayDiagram(stateGraph) {
     .append('g')
     .attr('class', 'node');
 
-  text = node.append('text')
+  text = node.filter( function(d) { return d.type !== INTERMEDIATE} )
+    .append('text')
     .text( function(d) {
-      if (d.dataType === 'root') {
+      if (d.type === graph.ROOT) {
         return 'Root';
-      } else if (d.dataType === 'o') {
+      } else if (d.type === graph.EPSILON) {
         return 'Epsilon'
-      } else if (d.dataType === 'accept') {
+      } else if (d.type === graph.ACCEPT) {
         return 'Accept';
       }
-      return d.text[0];
+      return d.text;
     })
     .attr('opacity', 0)
     .attr('dx', '20px')
     .attr('dy', '4px');
 
-  circle = node.filter(function (d) { return d.dataType !== 'atom'; })
+  circle = node.filter(function (d) { return d.type !== graph.ATOM; })
     .append('circle')
     .attr('fill', function(d) {
-      if (d.text === 'root') {
+      if (d.type === graph.ROOT) {
         return '#ff0008';
-      } else if (d.text === 'accept') {
+      } else if (d.type === graph.ACCEPT) {
         return '#00ff00';
-      } else if (d.text === 'o') {
+      } else if (d.type === graph.EPSILON) {
         return '#ffff00';
+      } else if (d.type === INTERMEDIATE) {
+        return '#55eeff'
       }
     })
-    .attr('title', function(d) {return d.dataType})
-    .attr('r', radius);
+    .attr('title', function(d) {return d.type})
+    .attr('r', function(d) {
+      if (d.type === INTERMEDIATE) {
+        return 0;
+      }
+      return RADIUS;
+    });
 
-  image = node.filter(function(d) { return d.dataType === 'atom'; })
+  image = node.filter(function(d) { return d.type === graph.ATOM; })
     .append('g')
     .attr('transform', 'translate(-15 , -30)')
     .append('svg:image')
     .attr('xlink:href', function(d) {
-      switch (d.text[0]) {
+      switch (d.text) {
         case 'promoter':
         case 'terminator':
         case 'CDS':
@@ -139,7 +156,7 @@ function displayDiagram(stateGraph) {
           return './sbol/' + 'user_defined.svg';
       }
     })
-    .attr('width', imageSize);
+    .attr('width', IMAGESIZE);
 
   svg.call(d3.drag()
     .subject(dragSubject)
@@ -166,8 +183,8 @@ function tick() {
   simulation.force('centre', d3.forceCenter(width / 2, height / 2));
 
   circle.attr('transform', function(d) {
-    d.x = Math.max(radius, Math.min(width - radius, d.x));
-    d.y = Math.max(radius, Math.min(height - radius, d.y));
+    d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
+    d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
     return 'translate(' + d.x + ',' + d.y + ')'
   });
 
@@ -178,12 +195,13 @@ function tick() {
   });
 
   text.attr('transform', function(d) {
-    d.x = Math.max(radius, Math.min(width - radius, d.x));
-    d.y = Math.max(radius, Math.min(height - radius, d.y));
+    d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
+    d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
     return 'translate(' + d.x + ',' + d.y + ')'
   });
 
-  link.attr( 'd', function(d) {return 'M' + d.source.x + ',' + d.source.y + ', ' + d.target.x + ',' + d.target.y});
+  link.attr('d', function(d) { return 'M' + d.source.x + ',' + d.source.y
+    + ' ' + d.target.x + ',' + d.target.y });
 }
 
 function dragSubject() {
