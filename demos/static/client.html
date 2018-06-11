@@ -2,23 +2,23 @@
   <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="codemirror.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="theme/solarized.css">
+    <link rel="stylesheet" href="css/codemirror.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/theme/solarized.css">
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
             crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
             crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
-            crossorigin="anonymous"></script>    
+            crossorigin="anonymous"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/1.8.2/go-debug.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-    <script src="codemirror.js"></script>
-    <script src="scheme.js"></script>
-    <script src="graph.js"></script><!-- For graph module constants. -->
+    <script src="js/codemirror.js"></script>
+    <script src="js/scheme.js"></script>
+    <script src="js/bundle.js"></script> <!-- For graph module constants. -->
 
     <title>Constellation</title>
   </head>
@@ -28,18 +28,15 @@
     <div class="container">
       <div class="row">
         <div class="col-sm">
-          <h5>Specification</h5>
-          <textarea class="codemirror" id="langInput" name="paragraph_text" cols="50" rows="10"></textarea>
-          <h5>Categories</h5>
-          <textarea class="codemirror" name="paragraph_text" id="categories" cols="50" rows="10"></textarea> 
+          <label for="langInput"><h5>Specification</h5></label><textarea class="codemirror" id="langInput" name="paragraph_text" cols="50" rows="10"></textarea>
+          <label for="categories"><h5>Categories</h5></label><textarea class="codemirror" name="paragraph_text" id="categories" cols="50" rows="10"></textarea>
         </div>
         <br/><br/>
         <div class="col-sm">
           <h5>Graph</h5>
           <div id="stateGraph"></div>
-          <h5>Designs</h5>
           <!--div id="designs"></div-->
-          <textarea class="codemirror" name="paragraph_text" id="designs" cols="50" rows="10"></textarea>
+          <label for="designs"><h5>Designs</h5></label><textarea class="codemirror" name="paragraph_text" id="designs" cols="50" rows="10"></textarea>
         </div>
       </div>
       <div class="row">
@@ -57,10 +54,10 @@
       $(document).ready(function() {
         const THEME = "solarized light";
 
-        var editors = {
-          "specEditor": CodeMirror.fromTextArea(document.getElementById('langInput'), { lineNumbers:true }),
-          "catEditor": CodeMirror.fromTextArea(document.getElementById('categories'), { lineNumbers:true }),
-          "designsEditor": CodeMirror.fromTextArea(document.getElementById('designs'), { lineNumbers:true })
+        const editors = {
+          "specEditor": CodeMirror.fromTextArea(document.getElementById('langInput'), {lineNumbers: true}),
+          "catEditor": CodeMirror.fromTextArea(document.getElementById('categories'), {lineNumbers: true}),
+          "designsEditor": CodeMirror.fromTextArea(document.getElementById('designs'), {lineNumbers: true})
         };
 
         editors.specEditor.setOption("theme", THEME);
@@ -68,7 +65,7 @@
         editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"terminator": ["BBa_B0010"]}');
         editors.designsEditor.setOption("theme", THEME);
 
-        var myDiagram = null;
+        let myDiagram = null;
 
         $("#submitBtn").click(function(){
           if (myDiagram) {
@@ -77,8 +74,8 @@
 
           myDiagram = initializeStateGraph();
 
-          var specification = editors.specEditor.getValue();
-          var categories = editors.catEditor.getValue();
+          const specification = editors.specEditor.getValue();
+          const categories = editors.catEditor.getValue();
           // var categories = '{"a":["a1","a2","a3"],"b":["b1","b2","b3"],"c":["c1"],"d":[]}';
 
           $.post('http://localhost:8082/postSpecs', {
@@ -86,7 +83,7 @@
             "categories": categories,
             "number": "2.0",
             "name": "specificationname",
-            "clientid": "userid" 
+            "clientid": "userid"
           }, function(data, status) {
             displayDiagram(data.stateGraph);
             displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
