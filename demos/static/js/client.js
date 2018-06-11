@@ -31,7 +31,7 @@ function displayDiagram(stateGraph) {
 
   updateSvgSize();
   // Create SVG
-  svgPointer = d3.select('#graph')
+  svgPointer = d3.select('#categoryGraph')
     .append('svg')
     .attr('width', width)
     .attr('height', height);
@@ -134,6 +134,7 @@ function drawNodes(nodes) {
   circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
     .append('circle')
     .attr('fill', function(d) {
+      console.log(d.type, graph)
       if (d.type === graph.ROOT) {
         return '#ff0008';
       } else if (d.type === graph.ACCEPT) {
@@ -141,7 +142,9 @@ function drawNodes(nodes) {
       } else if (d.type === graph.EPSILON) {
         return '#ffff00';
       } else if (d.type === INTERMEDIATE) {
-        return '#55eeff'
+        return '#55eeff';
+      } else {
+        return '#ffffff';
       }
     })
     .attr('title', function(d) {return d.type})
@@ -249,7 +252,7 @@ function updateLinks(d) {
  * Gets new size of SVG after divs are resized
  */
 function updateSvgSize() {
-  let g = document.getElementById('graph');
+  let g = document.getElementById('categoryGraph');
   width = g.clientWidth;
   height = g.clientHeight;
 }
