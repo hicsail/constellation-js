@@ -1,9 +1,8 @@
-const express = require('express');
-const app = express();
-const path = require('path');
-const http = require('http');
-const bodyParser = require('body-parser');
-const constellation = require('../lib/constellation');
+let express = require('express');
+let app = express();
+let path = require('path');
+let bodyParser = require('body-parser');
+let constellation = require('../lib/constellation');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
