@@ -374,8 +374,6 @@ $(document).ready(function() {
   editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"terminator": ["BBa_B0010"]}');
   editors.designsEditor.setOption("theme", THEME);
 
-  let myDiagram = null;
-
   $("#submitBtn").click(function(){
     // Reset UI
     resetDiagram();
@@ -391,7 +389,7 @@ $(document).ready(function() {
       "name": "specificationname",
       "clientid": "userid"
     }, function (data) {
-      if (String(data).includes('Error:')) {
+      if (String(data.designs).includes('Error:')) {
         // Undefined design
         if (String(data.designs).includes('is not defined')) {
           displayDesigns(editors, String(data.designs));
