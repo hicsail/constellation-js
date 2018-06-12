@@ -19,6 +19,11 @@ let height;
 /* * * * * * */
 /*  DESIGNS  */
 /* * * * * * */
+/**
+ * Displays designs returned by Constellation
+ * @param editors List of editor text boxes
+ * @param designs Designs object returned by Constellation
+ */
 function displayDesigns(editors, designs) {
   editors.designsEditor.setValue(designs);
 }
@@ -26,6 +31,10 @@ function displayDesigns(editors, designs) {
 /* * * * * */
 /*  GRAPH  */
 /* * * * * */
+/**
+ * Calls functions to display graph returned by Constellation
+ * @param stateGraph Graph object returned by Constellation
+ */
 function displayDiagram(stateGraph) {
   let {nodes, links} = generateGraph(stateGraph);
 
@@ -84,7 +93,12 @@ function generateGraph(stateGraph) {
   return {nodes, links};
 }
 
+/**
+ * Draws links and arrowheads on SVG
+ * @param links D3 links object
+ */
 function drawLinks(links) {
+  // Define arrowhead shape
   svgPointer.append('svg:defs').append('svg:marker')
     .attr('id', 'arrow')
     .attr('viewBox', '0 -5 10 10')
@@ -94,8 +108,9 @@ function drawLinks(links) {
     .attr('orient', 'auto')
     .append('svg:path')
     .style('fill', '#585858')
-    .attr('d', 'M0, -3L3, 0L0,3'); // Define shape
+    .attr('d', 'M0, -3L3, 0L0,3');
 
+  // Add links
   linkPointer = svgPointer.selectAll('line.link')
     .data(links)
     .enter().append('path')
@@ -108,13 +123,19 @@ function drawLinks(links) {
     .attr('marker-end', 'url(#arrow)');
 }
 
+/**
+ * Draws nodes on SVG
+ * @param nodes D3 nodes object
+ */
 function drawNodes(nodes) {
+  // Add g component
   nodePointer = svgPointer.selectAll('.node')
     .data(nodes)
     .enter()
     .append('g')
     .attr('class', 'node');
 
+  // Add tooltip
   textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
     .append('text')
     .text( function(d) {
@@ -131,6 +152,7 @@ function drawNodes(nodes) {
     .attr('dx', '20px')
     .attr('dy', '4px');
 
+  // Add circles
   circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
     .append('circle')
     .attr('fill', function(d) {
@@ -154,6 +176,7 @@ function drawNodes(nodes) {
       return RADIUS;
     });
 
+  // Add images
   imagePointer = nodePointer.filter(function(d) { return d.type === graph.ATOM; })
     .append('g')
     .attr('transform', 'translate(-15 , -30)')
@@ -195,33 +218,43 @@ function drawNodes(nodes) {
 /**
  * Updates sizes and positions of SVG elements
  */
-function tick() {
+function tisck() {
+  // Update SVG size
   updateSvgSize();
   svgPointer.attr('height', height)
     .attr('width', width);
   simulationPointer.force('centre', d3.forceCenter(width / 2, height / 2));
 
+  // Update circle positions
   circlePointer.attr('transform', function(d) {
     d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
     d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
     return 'translate(' + d.x + ',' + d.y + ')'
   });
 
+  // Update image positions
   imagePointer.attr('transform', function(d) {
     d.x = Math.max(20, Math.min(width - 20, d.x));
     d.y = Math.max(25, Math.min(height - 10, d.y));
     return 'translate(' + d.x + ',' + d.y + ')'
   });
 
+  // Update text positions
   textPointer.attr('transform', function(d) {
     d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
     d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
     return 'translate(' + d.x + ',' + d.y + ')'
   });
 
+  // Update link positions
   linkPointer.attr('d', updateLinks);
 }
 
+/**
+ * Updates link positions
+ * @param d Link
+ * @returns {string} Updated link d attribute
+ */
 function updateLinks(d) {
   let deltaX = d.target.x - d.source.x,
     deltaY = d.target.y - d.source.y,
@@ -257,6 +290,9 @@ function updateSvgSize() {
 /* * * * * */
 /*   DRAG  */
 /* * * * * */
+/**
+ * Adds drag handlers to SVG
+ */
 function handleDrag() {
   svgPointer.call(d3.drag()
     .subject(dragSubject)
@@ -276,21 +312,34 @@ function handleDrag() {
     });
 }
 
+/**
+ * Returns object being dragged
+ * @returns {*}
+ */
 function dragSubject() {
   return simulationPointer.find(d3.event.x, d3.event.y);
 }
 
+/**
+ * Handles start of drag event
+ */
 function dragStarted() {
   if (!d3.event.active) simulationPointer.alphaTarget(1).restart();
   d3.event.subject.fx = d3.event.subject.x;
   d3.event.subject.fy = d3.event.subject.y;
 }
 
+/**
+ * Handles middle of drag event
+ */
 function dragged() {
   d3.event.subject.fx = d3.event.x;
   d3.event.subject.fy = d3.event.y;
 }
 
+/**
+ * Handles end of drag event
+ */
 function dragEnded() {
   if (!d3.event.active) simulationPointer.alphaTarget(0.01);
   d3.event.subject.fx = null;
@@ -300,14 +349,15 @@ function dragEnded() {
 /* * * * * * */
 /*  CLEANUP  */
 /* * * * * * */
+/**
+ * Resets graph and removes SVG elements
+ */
 function resetDiagram() {
   d3.selectAll('svg').remove();
 }
 
-
-
 /* * * * * * */
-/*    */
+/*  BROWSER  */
 /* * * * * * */
 $(document).ready(function() {
 
