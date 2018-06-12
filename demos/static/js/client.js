@@ -218,7 +218,7 @@ function drawNodes(nodes) {
 /**
  * Updates sizes and positions of SVG elements
  */
-function tisck() {
+function tick() {
   // Update SVG size
   updateSvgSize();
   svgPointer.attr('height', height)
