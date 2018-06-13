@@ -57,7 +57,6 @@ module.exports = function() {
 
     it('zero-or-more', function() {
       const result = constellation('zero-or-more a', CATEGORIES, 10);
-      console.log(result.designs);
       expect(result.designs.length).to.equal(ACATS + 1);
       expect(result.designs).to.contain('');
       expect(result.designs).to.contain('a1');
@@ -76,7 +75,6 @@ module.exports = function() {
 
     it('Multiple or', function() {
       const result = constellation('a or b or c', CATEGORIES, 10);
-      console.log(result.designs);
       expect(result.designs.length).to.equal(ACATS + BCATS + CCATS);
     });
 
@@ -91,16 +89,16 @@ module.exports = function() {
     });
 
     it('Multiple zero-or-more', function() {
-      //const result = constellation('zero-or-more (zero-or-more a)', CATEGORIES, 10);
-      // expect(result.designs.length).to.equal(ACATS + 1);
-      // expect(result.designs).to.contain('a');
-      // expect(result.designs).to.contain('');
+      const result = constellation('zero-or-more (zero-or-more a)', CATEGORIES, 10);
+      expect(result.designs.length).to.equal(ACATS + 1);
+      expect(result.designs).to.contain('a1');
+      expect(result.designs).to.contain('a2');
+      expect(result.designs).to.contain('');
     });
 
     it('Mixing functions', function() {
-      // const result = constellation('a then (one-or-more b or zero-or-more c)', CATEGORIES, 50); // TODO add and
-      // console.log(result.designs);
-      // expect(result.designs.length).to.equal(ACATS * (BCATS + CCATS + 1));
+      const result = constellation('a then (one-or-more b or zero-or-more c)', CATEGORIES, 50); // TODO add and
+      expect(result.designs.length).to.equal(ACATS * (BCATS + CCATS + 1));
     });
 
   });
