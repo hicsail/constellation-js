@@ -389,18 +389,18 @@ $(document).ready(function() {
       "name": "specificationname",
       "clientid": "userid"
     }, function (data) {
-      if (String(data.designs).includes('Error:')) {
-        // Undefined design
-        if (String(data.designs).includes('is not defined')) {
-          displayDesigns(editors, String(data.designs));
-        }
-        else {
-          alert(data);
-          return;
-        }
+      if (typeof(data) === 'string') {
+        alert(data);
+        return;
+      }
+
+      displayDiagram(data.stateGraph);
+      // Undefined design
+      if (String(data.designs).includes('is not defined')) {
+        displayDesigns(editors, data.designs);
+      } else {
         displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
       }
-      displayDiagram(data.stateGraph);
     })
   });
 });
