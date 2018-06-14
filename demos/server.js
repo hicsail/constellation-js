@@ -35,7 +35,7 @@ app.post('/postSpecs', function(req,res) {
 
   let data;
   try {
-    data = constellation(langText, categories, 40, 2);
+    data = constellation(langText, categories, 40);
     res.status(200).send(data);
   } catch (error) {
     res.send(String(error));
