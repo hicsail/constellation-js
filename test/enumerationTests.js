@@ -6,14 +6,6 @@ const uuidv4 = require('uuidv4');
 
 const ATOM = 'atom';
 
-function generateRoot() {
-  return {'id': 'root',
-    'data': {
-      'text': 'root',
-      'type': 'root',
-      'edges': []}};
-}
-
 function generateAtom(text) {
   return {id: uuidv4(), data: {text: text, type: ATOM, edges: []}};
 }
@@ -22,33 +14,33 @@ module.exports = function() {
   describe('Design enumeration', function() {
     it('Enumerate designs for one atom', function() {
       const categories = {'a': ['a']};
-      const paths = [[generateRoot(), generateAtom('a')]];
+      const paths = [[generateAtom('a')]];
       const designs = enumeration(paths, categories, 1);
       expect(JSON.stringify(designs)).to.contain('a');
     });
 
     it('Handle defined but empty category', function() {
       const categories = {'a': []};
-      const paths = [[generateRoot(), generateAtom('a')]];
+      const paths = [[generateAtom('a')]];
       const designs = enumeration(paths, categories, 1);
       expect(JSON.stringify(designs)).to.equal('[]');
     });
 
     it('Handle empty categories', function() {
       const categories = {};
-      const paths = [[generateRoot(), generateAtom('a')]];
+      const paths = [[generateAtom('a')]];
       expect(() => enumeration(paths, categories, 1)).to.throw('a is not defined in categories');
     });
 
     it('Handle undefined atom', function() {
       const categories = {'b': ['b']};
-      const paths = [[generateRoot(), generateAtom('a')]];
+      const paths = [[generateAtom('a')]];
       expect(() => enumeration(paths, categories, 1)).to.throw('a is not defined in categories');
     });
 
     it('Enumerate all duplicates in category', function() {
       const categories = {'a': ['a1', 'a2']};
-      const path = [generateRoot(), generateAtom('a')];
+      const path = [generateAtom('a')];
       const paths = [path, path];
       const designs = enumeration(paths, categories, 4);
       expect(JSON.stringify(designs)).to.equal(JSON.stringify(categories['a']));
@@ -65,14 +57,14 @@ module.exports = function() {
     describe ('Number of designs chosen', function() {
       it('Select 1 of 2 designs', function () {
         const categories = {'a': ['a1', 'a2']};
-        const paths = [[generateRoot(), generateAtom('a')]];
+        const paths = [[generateAtom('a')]];
         const designs = enumeration(paths, categories, 1);
         expect(designs.length).to.equal(1);
       });
 
       it('Select 0 designs', function () {
         const categories = {'a': ['a1', 'a2']};
-        const paths = [[generateRoot(), generateAtom('a')]];
+        const paths = [[generateAtom('a')]];
         const designs = enumeration(paths, categories, 0);
         expect(designs.length).to.equal(0);
       });
