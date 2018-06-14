@@ -48,22 +48,20 @@ module.exports = function() {
 
     it('one-or-more', function() {
       let result = constellation('one-or-more a', CATEGORIES, 10);
+      expect(result.designs.length).to.equal(ACATS);
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
       expect(result.paths.length).to.equal(1); // Number of paths
-      expect(result.paths[0].length).to.equal(ACATS); // Length of each path, including root
-      expect(result.paths[0][0].type === ATOM);
+      expect(result.paths[0].type === ATOM);
     });
 
     it('zero-or-more', function() {
       const result = constellation('zero-or-more a', CATEGORIES, 10);
-      console.log(result.designs);
-      expect(result.designs.length).to.equal(ACATS + 1);
-      expect(result.designs).to.contain('');
+      expect(result.designs.length).to.equal(ACATS);
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
       expect(result.paths.length).to.equal(2); // Number of paths, including empty path
-      expect(result.paths[0][0].type === ATOM);
+      expect(result.paths[0].type === ATOM);
     });
 
   });
@@ -76,7 +74,6 @@ module.exports = function() {
 
     it('Multiple or', function() {
       const result = constellation('a or b or c', CATEGORIES, 10);
-      console.log(result.designs);
       expect(result.designs.length).to.equal(ACATS + BCATS + CCATS);
     });
 
@@ -91,16 +88,20 @@ module.exports = function() {
     });
 
     it('Multiple zero-or-more', function() {
-      //const result = constellation('zero-or-more (zero-or-more a)', CATEGORIES, 10);
-      // expect(result.designs.length).to.equal(ACATS + 1);
-      // expect(result.designs).to.contain('a');
-      // expect(result.designs).to.contain('');
+      const result = constellation('zero-or-more (zero-or-more a)', CATEGORIES, 10);
+      expect(result.designs.length).to.equal(ACATS);
+      expect(result.designs).to.contain('a1');
+      expect(result.designs).to.contain('a2');
     });
 
     it('Mixing functions', function() {
-      // const result = constellation('a then (one-or-more b or zero-or-more c)', CATEGORIES, 50); // TODO add and
-      // console.log(result.designs);
-      // expect(result.designs.length).to.equal(ACATS * (BCATS + CCATS + 1));
+      const result = constellation('a then (one-or-more b or zero-or-more c)', CATEGORIES, 50); // TODO add and
+      expect(result.designs.length).to.equal(ACATS * (BCATS + CCATS + 1));
+    });
+
+    it('Then downstream from cycle', function() {
+      const result = constellation('zero-or-more a then b', CATEGORIES, 50);
+      expect(result.designs.length).to.equal((ACATS + 1) * BCATS);
     });
 
   });
@@ -127,10 +128,10 @@ module.exports = function() {
         expect(result.designs).to.contain('a2');
       });
 
-      it('$', function () {
-        expect(() => constellation('$a', CATEGORIES, 10)).to.throw('Parsing error!');
-        // TODO shouldn't throw an error. Bug with imparse
-      });
+      // it('$', function () {
+      //   expect(() => constellation('a then $a', CATEGORIES, 10)).to.throw('Parsing error!');
+      // });
+      // TODO turn back on when imparse starts throwing errors
 
       it('_', function () {
         const result = constellation('_a', CATEGORIES, 10);
