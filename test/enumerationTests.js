@@ -7,7 +7,7 @@ const uuidv4 = require('uuidv4');
 const ATOM = 'atom';
 
 function generateAtom(text) {
-  return {id: uuidv4(), data: {text: text, type: ATOM, edges: []}};
+  return {id: uuidv4(), text: text, type: ATOM, edges: []};
 }
 
 module.exports = function() {

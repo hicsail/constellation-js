@@ -71,12 +71,20 @@ function generateGraph(stateGraph) {
   let nodes = [];
   let links = [];
 
-  for (let node in stateGraph) {
-    let text = '';
-    if (stateGraph[node].type === graph.ATOM) {
-      text = stateGraph[node].text;
+  for (let nodeId in stateGraph) {
+    let text;
+    let node = stateGraph[nodeId];
+
+    if (node.type === graph.ROOT) {
+      text = 'Root';
+    } else if (node.type === graph.EPSILON) {
+      text = 'Epsilon'
+    } else if (node.type === graph.ACCEPT) {
+      text =  'Accept';
+    } else if (node.type === graph.ATOM) {
+      text = node.text;
     }
-    nodes.push({id: node, type: stateGraph[node].type, text});
+    nodes.push({id: nodeId, type: node.type, text});
   }
 
   // Get edges from stateGraph
@@ -138,16 +146,7 @@ function drawNodes(nodes) {
   // Add tooltip
   textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
     .append('text')
-    .text( function(d) {
-      if (d.type === graph.ROOT) {
-        return 'Root';
-      } else if (d.type === graph.EPSILON) {
-        return 'Epsilon'
-      } else if (d.type === graph.ACCEPT) {
-        return 'Accept';
-      }
-      return d.text;
-    })
+    .text( function(d) { return d.text; })
     .attr('opacity', 0)
     .attr('dx', '20px')
     .attr('dy', '4px');
@@ -371,7 +370,7 @@ $(document).ready(function() {
 
   editors.specEditor.setOption("theme", THEME);
   editors.catEditor.setOption("theme", THEME);
-  editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"terminator": ["BBa_B0010"]}');
+  editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"CDS": ["BBa_E0040", "BBa_E1010"],\n"terminator": ["BBa_B0010"]}');
   editors.designsEditor.setOption("theme", THEME);
 
   $("#submitBtn").click(function(){

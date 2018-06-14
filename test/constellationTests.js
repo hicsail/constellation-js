@@ -101,7 +101,6 @@ module.exports = function() {
 
     it('Then downstream from cycle', function() {
       const result = constellation('zero-or-more a then b', CATEGORIES, 50);
-      console.log(result.designs);
       expect(result.designs.length).to.equal((ACATS + 1) * BCATS);
     });
 
