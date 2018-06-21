@@ -368,6 +368,9 @@ $(document).ready(function() {
     "designsEditor": CodeMirror.fromTextArea(document.getElementById('designs'), {lineNumbers: true})
   };
 
+  document.getElementById('numDesigns').value = 40;
+  document.getElementById('maxCycles').value = 0;
+
   editors.specEditor.setOption("theme", THEME);
   editors.catEditor.setOption("theme", THEME);
   editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"CDS": ["BBa_E0040", "BBa_E1010"],\n"terminator": ["BBa_B0010"]}');
@@ -380,10 +383,14 @@ $(document).ready(function() {
 
     const specification = editors.specEditor.getValue();
     const categories = editors.catEditor.getValue();
+    const numDesigns = document.getElementById('numDesigns').value;
+    const maxCycles = document.getElementById('maxCycles').value;
 
     $.post('http://localhost:8082/postSpecs', {
       "specification": specification,
       "categories": categories,
+      "numDesigns": numDesigns,
+      "maxCycles": maxCycles,
       "number": "2.0",
       "name": "specificationname",
       "clientid": "userid"
