@@ -183,29 +183,30 @@ function drawNodes(nodes) {
     .attr('xlink:href', function(d) {
       switch (d.text) {
         case 'promoter':
-        case 'terminator':
-        case 'CDS':
-        case 'restriction_enzyme_assembly_scar':
-        case 'restriction_enzyme_recognition_site':
-        case 'protein_stability_element':
-        case 'blunt_end_restriction_enzyme_cleavage_site':
-        case 'ribonuclease_site':
-        case 'restriction_enzyme_five_prime_single_strand_overhang':
-        case 'ribosome_entry_site':
-        case 'five_prime_sticky_end_restriction_enzyme_cleavage_site':
-        case 'RNA_stability_element':
-        case 'ribozyme':
-        case 'insulator':
-        case 'signature':
         case 'operator':
-        case 'origin_of_replication':
-        case 'restriction_enzyme_three_prime_single_strand_overhang':
-        case 'primer_binding_site':
-        case 'three_prime_sticky_end_restriction_enzyme_cleavage_site':
-        case 'protease_site':
+        case 'cds':
+        case 'fivePrimeUtr':
+        case 'terminator':
+        case 'insulator':
+        case 'originOfReplication':
+        case 'primerBindingSite':
+        case 'ribosomeBindingSite':
+        case 'gene':
+        case 'rna':
+        case 'restrictionSite':
+        case 'bluntRestrictionSite':
+        case 'assemblyScar':
+        case 'engineeredGene':
+        case 'engineeredRegion':
+        case 'conservedRegion':
+        case 'dnaRegion':
+        case 'rnaRegion':
+        case 'protein':
+        case 'smallMolecule':
+        case 'effector':
           return './sbol/' + d.text + '.svg';
         default:
-          return './sbol/' + 'user_defined.svg';
+          return './sbol/' + 'engineeredRegion.svg';
       }
     })
     .attr('width', IMAGESIZE);
@@ -392,14 +393,8 @@ $(document).ready(function() {
         alert(data);
         return;
       }
-
       displayDiagram(data.stateGraph);
-      // Undefined design
-      if (String(data.designs).includes('is not defined')) {
-        displayDesigns(editors, data.designs);
-      } else {
-        displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
-      }
+      displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
     })
   });
 });
