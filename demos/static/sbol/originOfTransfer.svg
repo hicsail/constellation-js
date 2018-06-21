@@ -1,0 +1,30 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg viewBox="-4 -28 50 100" style="background-color:#ffffff00" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve"	x="0px" y="0px" width="50px" height="100px" >
+    <defs>
+        <style type="text/css">
+            path,circle,polygon {
+                stroke:#000000;
+                stroke-width: 3;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+                fill: none
+            }
+            marker {
+                overflow: visible
+            }
+        </style>
+        <marker orient="auto" id="TriangleOutS">
+            <path
+                style="stroke-width:1"
+                d="M 1,0 L 0,-0.5 L 0,0.5 L 0,0.5 z"
+            />
+        </marker>
+    </defs>
+
+    <circle cx="21" cy="22" r="12"/>
+    <path
+        style="marker-end:url(#TriangleOutS)"
+        d="M 21,22 35,9"
+    />
+</svg>
