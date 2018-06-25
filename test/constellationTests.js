@@ -188,8 +188,7 @@ module.exports = function() {
 
   describe('Sanitise specification input', function () {
     it('Atom not in categories', function () {
-      const result = constellation('d', CATEGORIES, 10, 0);
-      expect(result.designs).to.contain('d is not a valid SBOL part');
+      expect(() => constellation('d', CATEGORIES, 10, 0)).to.throw('d is not a valid SBOL part');
     });
 
     it('Mismatched brackets', function () {
@@ -214,8 +213,7 @@ module.exports = function() {
       // TODO turn back on when imparse starts throwing errors
 
       it('_', function () {
-        const result = constellation('_a', CATEGORIES, 10, 0);
-        expect(result.designs).to.contain('_a is not a valid SBOL part');
+        expect(() => constellation('_d', CATEGORIES, 10, 0)).to.throw('_d is not a valid SBOL part');
       });
     });
 
@@ -224,8 +222,7 @@ module.exports = function() {
   describe('Sanitise category input', function () {
     it('Empty categories', function () {
       const categories = '{}';
-      const result = constellation('promoter', categories, 10, 0);
-      expect(result.designs).to.contain('promoter is not defined in categories');
+      expect(() => constellation('promoter', categories, 10, 0)).to.throw('promoter is not defined in categories');
     });
 
     it('Handle defined but empty category', function () {
