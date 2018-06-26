@@ -31,13 +31,20 @@ app.get('/', function(req,res) {
 app.post('/postSpecs', function(req,res) {
   let langText = req.body.specification;
   let categories = req.body.categories;
-  console.log('Received new specification', langText, categories);
+  let numDesigns = req.body.numDesigns;
+  let maxCycles = req.body.maxCycles;
+  console.log('---Received new input---');
+  console.log('Specification', langText);
+  console.log('Categories:', categories);
+  console.log('numDesigns:', numDesigns);
+  console.log('maxCycles:', maxCycles);
 
   let data;
   try {
-    data = constellation(langText, categories, 40, 0);
+    data = constellation(langText, categories, numDesigns, maxCycles);
     res.status(200).send(data);
   } catch (error) {
+    console.log('Threw error' + error);
     res.send(String(error));
   }
 });

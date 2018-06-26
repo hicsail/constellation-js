@@ -27,14 +27,14 @@ module.exports = function() {
     });
 
     it('then', function() {
-      const result = constellation('a then c', CATEGORIES, 10);
+      const result = constellation('a then c', CATEGORIES, 10, 0);
       expect(result.designs.length).to.equal(ACATS * CCATS);
       expect(result.designs).to.contain('a1,c1');
       expect(result.designs).to.contain('a2,c1');
     });
 
     it('then as dot', function() {
-      const result = constellation('a . c', CATEGORIES, 10);
+      const result = constellation('a . c', CATEGORIES, 10, 0);
       expect(result.designs.length).to.equal(ACATS * CCATS);
       expect(result.designs).to.contain('a1,c1');
       expect(result.designs).to.contain('a2,c1');
@@ -69,12 +69,12 @@ module.exports = function() {
 
   describe ('Chained expressions', function() {
     it('Multiple then', function() {
-      const result = constellation('a then b then c', CATEGORIES, 10);
+      const result = constellation('a then b then c', CATEGORIES, 10 , 0);
       expect(result.designs.length).to.equal(ACATS * BCATS * CCATS);
     });
 
     it('Multiple or', function() {
-      const result = constellation('a or b or c', CATEGORIES, 10);
+      const result = constellation('a or b or c', CATEGORIES, 10 , 0);
       expect(result.designs.length).to.equal(ACATS + BCATS + CCATS);
     });
 
