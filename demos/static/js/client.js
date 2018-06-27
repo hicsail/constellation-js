@@ -182,30 +182,44 @@ function drawNodes(nodes) {
     .append('svg:image')
     .attr('xlink:href', function(d) {
       switch (d.text) {
-        case 'promoter':
-        case 'terminator':
+        case 'aptamer':
+        case 'assemblyScar':
+        case 'bluntRestrictionSite':
         case 'CDS':
-        case 'restriction_enzyme_assembly_scar':
-        case 'restriction_enzyme_recognition_site':
-        case 'protein_stability_element':
-        case 'blunt_end_restriction_enzyme_cleavage_site':
-        case 'ribonuclease_site':
-        case 'restriction_enzyme_five_prime_single_strand_overhang':
-        case 'ribosome_entry_site':
-        case 'five_prime_sticky_end_restriction_enzyme_cleavage_site':
-        case 'RNA_stability_element':
-        case 'ribozyme':
+        case 'dnaStabilityElement':
+        case 'engineeredRegion':
+        case 'fivePrimeOverhang':
+        case 'fivePrimeStickyRestrictionSite':
+        case 'halfroundRectangle':
         case 'insulator':
-        case 'signature':
+        case 'locationDna':
+        case 'locationProtein':
+        case 'locationRna':
+        case 'noGlyphAssigned':
+        case 'nonCodingRna':
+        case 'omittedDetail':
         case 'operator':
-        case 'origin_of_replication':
-        case 'restriction_enzyme_three_prime_single_strand_overhang':
-        case 'primer_binding_site':
-        case 'three_prime_sticky_end_restriction_enzyme_cleavage_site':
-        case 'protease_site':
+        case 'originOfReplication':
+        case 'originOfTransfer':
+        case 'polyA':
+        case 'primerBindingSite':
+        case 'promoter':
+        case 'proteaseSite':
+        case 'proteinStabilityElement':
+        case 'replacementGlyph':
+        case 'restrictionSite':
+        case 'ribonucleaseSite':
+        case 'ribosomeBindingSite':
+        case 'ribozyme':
+        case 'rnaStabilityElement':
+        case 'signature':
+        case 'specificRecombinationSite':
+        case 'terminator':
+        case 'threePrimeOverhang':
+        case 'threePrimeStickyEndRestrictionSite':
           return './sbol/' + d.text + '.svg';
         default:
-          return './sbol/' + 'user_defined.svg';
+          return './sbol/' + 'engineeredRegion.svg';
       }
     })
     .attr('width', IMAGESIZE);
@@ -392,14 +406,8 @@ $(document).ready(function() {
         alert(data);
         return;
       }
-
       displayDiagram(data.stateGraph);
-      // Undefined design
-      if (String(data.designs).includes('is not defined')) {
-        displayDesigns(editors, data.designs);
-      } else {
-        displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
-      }
+      displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
     })
   });
 });
