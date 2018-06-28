@@ -11,11 +11,12 @@ npm install constellation-js
 
 ```javascript
 const constellation = require('constellation-js');
+var langText = '{a . b}';
 var categories = {'a': ['a1', 'a2'], 'b': ['b1']};
 var numDesigns = 3;
-var langText = '{a . b}';
+var cycleDepth = 1
 
-var result = constellation(langText, categories, numDesigns);
+var result = constellation(langText, categories, numDesigns, cycleDepth);
 ```
 
 ## Demos
