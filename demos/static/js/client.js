@@ -5,16 +5,7 @@ const IMAGESIZE = 30;
 const RADIUS = 7;
 const INTERMEDIATE = 'intermediate';
 
-let nodePointer;
-let linkPointer;
-let simulationPointer;
-let svgPointer;
-let circlePointer;
-let imagePointer;
-let textPointer;
-
-let width;
-let height;
+let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height;
 
 /* * * * * * */
 /*  DESIGNS  */
@@ -110,12 +101,12 @@ function drawLinks(links) {
   svgPointer.append('svg:defs').append('svg:marker')
     .attr('id', 'arrow')
     .attr('viewBox', '0 -5 10 10')
-    .attr('refX', 10) // Move away from line's end
-    .attr('markerWidth', 10)
-    .attr('markerHeight', 10)
+    .attr('refX', 2) // Move away from line's end
+    .attr('markerWidth', 20)
+    .attr('markerHeight', 20)
     .attr('orient', 'auto')
     .append('svg:path')
-    .style('fill', '#585858')
+    .style('fill', 'rgb(200,200,200)')
     .attr('d', 'M0, -3L3, 0L0,3');
 
   // Add links
@@ -123,8 +114,8 @@ function drawLinks(links) {
     .data(links)
     .enter().append('path')
     .attr('class', 'link')
-    .style('stroke', '#585858')
-    .style( 'stroke-width', 2 );
+    .style('stroke', 'rgb(200,200,200)')
+    .style( 'stroke-width', 1);
 
   // Attach arrowhead
   linkPointer.filter( function(d) { return d.source.type  === INTERMEDIATE; } )
@@ -149,16 +140,19 @@ function drawNodes(nodes) {
     .text( function(d) { return d.text; })
     .attr('opacity', 0)
     .attr('dx', '20px')
-    .attr('dy', '4px');
+    .attr('dy', '4px')
+    .style('fill', 'white')
+    .style('font-family', 'monospace');
 
   // Add circles
   circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
     .append('circle')
     .attr('fill', function(d) {
       if (d.type === graph.ROOT) {
-        return '#ff0008';
+        return 'rgb(207,62,130)';
       } else if (d.type === graph.ACCEPT) {
-        return '#00ff00';
+        return 'rgb(133,151,41)';
+        133, 151, 41
       } else if (d.type === graph.EPSILON) {
         return '#ffff00';
       } else if (d.type === INTERMEDIATE) {
@@ -167,6 +161,7 @@ function drawNodes(nodes) {
         return '#ffffff';
       }
     })
+    .attr('stroke', 'white')
     .attr('title', function(d) {return d.type})
     .attr('r', function(d) {
       if (d.type === INTERMEDIATE) {
