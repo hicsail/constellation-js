@@ -1,4 +1,6 @@
 .DS_Store
+.nyc_output/
 .idea/
 *.iml
 node_modules/
+*~
