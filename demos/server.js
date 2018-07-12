@@ -34,17 +34,17 @@ app.post('/postSpecs', function(req,res) {
   let numDesigns = req.body.numDesigns;
   let maxCycles = req.body.maxCycles;
   console.log('---Received new input---');
-  console.log('Specification', langText);
-  console.log('Categories:', categories);
-  console.log('numDesigns:', numDesigns);
-  console.log('maxCycles:', maxCycles);
+  console.log('Specification: ', langText);
+  console.log('Categories: ', categories);
+  console.log('numDesigns: ', numDesigns);
+  console.log('maxCycles: ', maxCycles);
 
   let data;
   try {
     data = constellation(langText, categories, numDesigns, maxCycles);
     res.status(200).send(data);
   } catch (error) {
-    console.log('Threw error' + error);
-    res.send(String(error));
+    console.log(error);
+    res.status().send(String(error));
   }
 });

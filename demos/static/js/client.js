@@ -389,8 +389,8 @@ $(document).ready(function() {
       "number": "2.0",
       "name": "specificationname",
       "clientid": "userid"
-    }, function (data) {
-      if (typeof(data) === 'string') {
+    }, function (data, status) {
+      if (status !== 200) {
         alert(data);
         return;
       }
