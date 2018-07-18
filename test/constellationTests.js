@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const constellation = require('../lib/constellation');
 
 const ATOM = 'atom';
-const CATEGORIES = '{"promoter":["a1","a2"],"cds":["b1","b2","b3"],"assemblyScar":["c1"]}';
+const CATEGORIES = '{"a":["a1","a2"],"b":["b1","b2","b3"],"c":["c1"]}';
 const ACATS = 2;
 const BCATS = 3;
 const CCATS = 1;
@@ -11,13 +11,13 @@ module.exports = function() {
 
   describe('Basic operators', function() {
     it('atom', function() {
-      let result = constellation('assemblyScar', CATEGORIES, 10, 0);
+      let result = constellation('c', CATEGORIES, 10, 0);
       expect(result.designs.length).to.equal(CCATS);
       expect(result.designs).to.contain('c1');
     });
 
     it('or', function() {
-      const result = constellation('promoter or cds', CATEGORIES, 10, 0);
+      const result = constellation('a or b', CATEGORIES, 10, 0);
       expect(result.designs.length).to.equal(ACATS + BCATS);
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
@@ -27,28 +27,28 @@ module.exports = function() {
     });
 
     it('then', function() {
-      const result = constellation('promoter then assemblyScar', CATEGORIES, 10);
+      const result = constellation('a then c', CATEGORIES, 10, 0);
       expect(result.designs.length).to.equal(ACATS * CCATS);
       expect(result.designs).to.contain('a1,c1');
       expect(result.designs).to.contain('a2,c1');
     });
 
     it('then as dot', function() {
-      const result = constellation('promoter . assemblyScar', CATEGORIES, 10);
+      const result = constellation('a . c', CATEGORIES, 10, 0);
       expect(result.designs.length).to.equal(ACATS * CCATS);
       expect(result.designs).to.contain('a1,c1');
       expect(result.designs).to.contain('a2,c1');
     });
 
     // it('and', function() {
-    //   const result = constellation('(promoter or assemblyScar) and promoter', categories, 10);
+    //   const result = constellation('(a or c) and a', categories, 10);
     //   expect(result.designs.length).to.equal(1);
     //   expect(result.designs).to.contain('a1');
     //   expect(result.designs).to.contain('a2');
     // });
 
     it('one-or-more', function() {
-      let result = constellation('one-or-more promoter', CATEGORIES, 10, 0);
+      let result = constellation('one-or-more a', CATEGORIES, 10, 0);
       expect(result.designs.length).to.equal(ACATS);
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
@@ -57,7 +57,7 @@ module.exports = function() {
     });
 
     it('zero-or-more', function() {
-      const result = constellation('zero-or-more promoter', CATEGORIES, 10, 0);
+      const result = constellation('zero-or-more a', CATEGORIES, 10, 0);
       expect(result.designs.length).to.equal(ACATS);
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
@@ -69,22 +69,22 @@ module.exports = function() {
 
   describe ('Chained expressions', function() {
     it('Multiple then', function() {
-      const result = constellation('promoter then cds then assemblyScar', CATEGORIES, 10);
+      const result = constellation('a then b then c', CATEGORIES, 10 , 0);
       expect(result.designs.length).to.equal(ACATS * BCATS * CCATS);
     });
 
     it('Multiple or', function() {
-      const result = constellation('promoter or cds or assemblyScar', CATEGORIES, 10);
+      const result = constellation('a or b or c', CATEGORIES, 10 , 0);
       expect(result.designs.length).to.equal(ACATS + BCATS + CCATS);
     });
 
     // it('Multiple and', function() {
-    //   const result = constellation('promoter and cds and assemblyScar', categories, 10);
+    //   const result = constellation('a and b and c', categories, 10);
     //   expect(result.designs.length).to.equal(0);
     // });
 
     it('Multiple one-or-more', function() {
-      const result = constellation('one-or-more (one-or-more promoter)', CATEGORIES, 10, 0);
+      const result = constellation('one-or-more (one-or-more a)', CATEGORIES, 10, 0);
       expect(result.designs.length).to.equal(ACATS);
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
@@ -93,19 +93,19 @@ module.exports = function() {
     });
 
     it('Multiple zero-or-more', function() {
-      const result = constellation('zero-or-more (zero-or-more promoter)', CATEGORIES, 10, 0);
+      const result = constellation('zero-or-more (zero-or-more a)', CATEGORIES, 10, 0);
       expect(result.designs.length).to.equal(ACATS);
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
     });
 
     it('Mixing functions', function() {
-      const result = constellation('promoter then (one-or-more cds or zero-or-more assemblyScar)', CATEGORIES, 50, 0); // TODO add and
+      const result = constellation('a then (one-or-more b or zero-or-more c)', CATEGORIES, 50, 0); // TODO add and
       expect(result.designs.length).to.equal(ACATS * (BCATS + CCATS + 1));
     });
 
     it('Then downstream from cycle', function() {
-      const result = constellation('zero-or-more promoter then cds', CATEGORIES, 50, 0);
+      const result = constellation('zero-or-more a then b', CATEGORIES, 50, 0);
       expect(result.designs.length).to.equal((ACATS + 1) * BCATS);
     });
 
@@ -113,26 +113,26 @@ module.exports = function() {
 
   describe('Cycles', function () {
     it('Atom', function() {
-      let result = constellation('assemblyScar', CATEGORIES, 10, 2);
+      let result = constellation('c', CATEGORIES, 10, 2);
       expect(result.designs.length).to.equal(CCATS);
     });
 
     it('Linear operators', function() {
-      let result = constellation('promoter or cds', CATEGORIES, 10, 2);
+      let result = constellation('a or b', CATEGORIES, 10, 2);
       expect(result.designs.length).to.equal(ACATS + BCATS);
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
       expect(result.designs).to.contain('b1');
       expect(result.designs).to.contain('b2');
       expect(result.designs).to.contain('b3');
-      result = constellation('promoter then assemblyScar', CATEGORIES, 10, 2);
+      result = constellation('a then c', CATEGORIES, 10, 2);
       expect(result.designs.length).to.equal(ACATS * CCATS);
       expect(result.designs).to.contain('a1,c1');
       expect(result.designs).to.contain('a2,c1');
     });
 
     it('one-or-more', function() {
-      let result = constellation('one-or-more promoter', CATEGORIES, 10, 1);
+      let result = constellation('one-or-more a', CATEGORIES, 10, 1);
       expect(result.designs.length).to.equal(ACATS + ACATS * ACATS);
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
@@ -144,7 +144,7 @@ module.exports = function() {
     });
 
     it('zero-or-more', function() {
-      const result = constellation('zero-or-more promoter', CATEGORIES, 10, 1);
+      const result = constellation('zero-or-more a', CATEGORIES, 10, 1);
       expect(result.designs.length).to.equal(ACATS + ACATS * ACATS);
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
@@ -156,7 +156,7 @@ module.exports = function() {
     });
 
     it('Multiple one-or-more', function() {
-      const result = constellation('one-or-more (one-or-more promoter)', CATEGORIES, 10, 1);
+      const result = constellation('one-or-more (one-or-more a)', CATEGORIES, 10, 1);
       expect(result.designs.length).to.equal(ACATS + ACATS * ACATS);
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
@@ -168,7 +168,7 @@ module.exports = function() {
     });
 
     it('Multiple zero-or-more', function() {
-      const result = constellation('zero-or-more (zero-or-more promoter)', CATEGORIES, 10, 1);
+      const result = constellation('zero-or-more (zero-or-more a)', CATEGORIES, 10, 1);
       expect(result.designs.length).to.equal(ACATS + ACATS * ACATS);
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
@@ -180,7 +180,7 @@ module.exports = function() {
     });
 
     it('Then downstream from cycle', function() {
-      const result = constellation('zero-or-more promoter then cds', CATEGORIES, 50, 1);
+      const result = constellation('zero-or-more a then b', CATEGORIES, 50, 1);
       expect(result.designs.length).to.equal(BCATS + ACATS * BCATS + ACATS * ACATS * BCATS);
     });
 
@@ -188,11 +188,12 @@ module.exports = function() {
 
   describe('Sanitise specification input', function () {
     it('Atom not in categories', function () {
-      expect(() => constellation('d', CATEGORIES, 10, 0)).to.throw('d is not a valid SBOL part');
+      const result = constellation('d', CATEGORIES, 10, 0);
+      expect(result.designs).to.contain('d is not defined in categories');
     });
 
     it('Mismatched brackets', function () {
-      expect(() => constellation('(promoter}', CATEGORIES, 10, 0)).to.throw('Parsing error!');
+      expect(() => constellation('(a}', CATEGORIES, 10, 0)).to.throw('Parsing error!');
     });
 
 
@@ -202,18 +203,19 @@ module.exports = function() {
 
     describe('Invalid characters', function () {
       it('Tabs used should not throw errors', function () {
-        const result = constellation('\tpromoter', CATEGORIES, 10, 0);
+        const result = constellation('\ta', CATEGORIES, 10, 0);
         expect(result.designs).to.contain('a1');
         expect(result.designs).to.contain('a2');
       });
 
       // it('$', function () {
-      //   expect(() => constellation('promoter then $a', CATEGORIES, 10)).to.throw('Parsing error!');
+      //   expect(() => constellation('a then $a', CATEGORIES, 10)).to.throw('Parsing error!');
       // });
       // TODO turn back on when imparse starts throwing errors
 
       it('_', function () {
-        expect(() => constellation('_d', CATEGORIES, 10, 0)).to.throw('_d is not a valid SBOL part');
+        const result = constellation('_a', CATEGORIES, 10, 0);
+        expect(result.designs).to.contain('_a is not defined in categories');
       });
     });
 
@@ -222,30 +224,31 @@ module.exports = function() {
   describe('Sanitise category input', function () {
     it('Empty categories', function () {
       const categories = '{}';
-      expect(() => constellation('promoter', categories, 10, 0)).to.throw('promoter is not defined in categories');
+      const result = constellation('a', categories, 10, 0);
+      expect(result.designs).to.contain('a is not defined in categories');
     });
 
     it('Handle defined but empty category', function () {
-      let categories = '{"promoter": []}';
-      const result = constellation('promoter', categories, 10, 0);
+      let categories = '{"a": []}';
+      const result = constellation('a', categories, 10, 0);
       expect(JSON.stringify(result.designs)).to.equal('[]');
     });
 
     it('Mismatched brackets', function () {
-      expect(() => constellation('(promoter}', CATEGORIES, 10, 0)).to.throw('Parsing error!');
+      expect(() => constellation('(a}', CATEGORIES, 10, 0)).to.throw('Parsing error!');
     });
 
     describe('Invalid characters', function () {
       it('Whitespace should not be included in designs', function () {
-        let categories = '{"promoter":["\ta1", " a2"]}';
-        const result = constellation('promoter', categories, 10, 0);
+        let categories = '{"a":["\ta1", " a2"]}';
+        const result = constellation('a', categories, 10, 0);
         expect(JSON.stringify(result.designs)).to.contain('a1');
         expect(JSON.stringify(result.designs)).to.contain('a2');
       });
 
       it('Other symbols should be parsed into category', function () {
-        let categories = '{"promoter":["$a1", "a2"]}';
-        const result = constellation('promoter', categories, 10, 0);
+        let categories = '{"a":["$a1", "a2"]}';
+        const result = constellation('a', categories, 10, 0);
         expect(JSON.stringify(result.designs)).to.contain('a1');
         expect(JSON.stringify(result.designs)).to.contain('a2');
       });

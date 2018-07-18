@@ -47,13 +47,22 @@
           <label for="designs"><h5>Designs</h5></label><textarea class="codemirror" name="paragraph_text" id="designs" cols="50" rows="10"></textarea>
         </div>
       </div>
+      <br/>
+      <div class="row">
+        <div class="col-sm">
+          <label><h5>Number of designs:</h5></label>
+          <input id="numDesigns" type="number" min="0" max="10000">
+        </div>
+        <div class="col-sm">
+            <label><h5>Depth of cycles:</h5></label>
+            <input id="maxCycles" type="number" min="0" max="1000">
+        </div>
+      </div>
       <div class="row">
         <br/><br/><br/>
         <input id="submitBtn" class="btn" type="button" value="Submit">
       </div>
       <br/>
     </div>
-    <script>
-    </script>
   </body>
 </html>
