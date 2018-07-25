@@ -389,12 +389,8 @@ $(document).ready(function() {
       "number": "2.0",
       "name": "specificationname",
       "clientid": "userid"
-    }, function (data, status) {
-      if (status !== 200) {
-        alert(data);
-        return;
-      }
-
+    }, function (data) {
+      console.log('here');
       displayDiagram(data.stateGraph);
       // Undefined design
       if (String(data.designs).includes('is not defined')) {
@@ -402,6 +398,8 @@ $(document).ready(function() {
       } else {
         displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
       }
-    })
+    }).fail((response) => {
+      alert(response.responseText);
+    });
   });
 });

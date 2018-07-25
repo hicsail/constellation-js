@@ -45,6 +45,6 @@ app.post('/postSpecs', function(req,res) {
     res.status(200).send(data);
   } catch (error) {
     console.log(error);
-    res.status().send(String(error));
+    res.status(405).send(String(error));
   }
 });
