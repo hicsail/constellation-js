@@ -1,11 +1,14 @@
 body {
     padding: 5%;
-    background-color: rgb(146, 146, 146);
+    /* background: url("https://www.toptal.com/designers/subtlepatterns/patterns/agsquare.png");  */
+    /* background: url("https://www.toptal.com/designers/subtlepatterns/patterns/subtlenet2.png") */
+
+    background: url("https://www.toptal.com/designers/subtlepatterns/patterns/cubes.png");
 }
 
 h3 {
-    color: white;
-    font-family: monospace;
+    color: rgb(120, 120, 120);
+    font-family: 'Montserrat', 'monospace';
     text-align: center;
     font-size: 54px;
 }
@@ -16,7 +19,7 @@ h3 {
 
 #categories{
     height:110px;
-    font-family: monospace;
+    font-family: 'Montserrat', 'monospace';
 }
 
 textarea {
@@ -25,13 +28,14 @@ textarea {
 
 #submitBtn {
     margin: auto;
+    background-color: white;
     display: block;
     font-size: 20px;
 }
 
 h5 {
-    color: white;
-    font-family: monospace;
+    color: rgb(120, 120, 120);
+    font-family: 'Montserrat', 'monospace';
     text-align: left;
     font-size:28px;
 }
@@ -39,18 +43,19 @@ h5 {
 
 input[type="button"]{
     margin-top: 5px;
-    font-family: monospace;
+    font-family: 'Montserrat', 'monospace';
     background-color: rgba(0,0,0,0);
-    border-color: white;
-    color: white;
+    border-color: rgb(120, 120, 120);
+    color: rgb(120, 120, 120);
     cursor: pointer;
 }
 
 #categoryGraph {
-    border: 1px solid white;
+    border: 1px solid rgb(120, 120, 120);
     width: 100%;
     height: 250px;
     max-height: 250px;
+    background-color: rgba(240,240,240,0.5);
 }
 
 .link line {

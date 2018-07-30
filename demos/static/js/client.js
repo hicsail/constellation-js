@@ -106,7 +106,7 @@ function drawLinks(links) {
     .attr('markerHeight', 20)
     .attr('orient', 'auto')
     .append('svg:path')
-    .style('fill', 'rgb(200,200,200)')
+    .style('fill', 'rgb(150,150,150)')
     .attr('d', 'M0, -3L3, 0L0,3');
 
   // Add links
@@ -114,7 +114,7 @@ function drawLinks(links) {
     .data(links)
     .enter().append('path')
     .attr('class', 'link')
-    .style('stroke', 'rgb(200,200,200)')
+    .style('stroke', 'rgb(150,150,150)')
     .style( 'stroke-width', 1);
 
   // Attach arrowhead
@@ -141,22 +141,22 @@ function drawNodes(nodes) {
     .attr('opacity', 0)
     .attr('dx', '20px')
     .attr('dy', '4px')
-    .style('fill', 'white')
-    .style('font-family', 'monospace');
+    .style('fill', 'rgb(100,)')
+    .style('font-family', 'Montserrat');
 
   // Add circles
   circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
     .append('circle')
     .attr('fill', function(d) {
       if (d.type === graph.ROOT) {
-        return 'rgb(207,62,130)';
+        return 'rgb(33,168,174)';
       } else if (d.type === graph.ACCEPT) {
         return 'rgb(133,151,41)';
         133, 151, 41
       } else if (d.type === graph.EPSILON) {
-        return '#ffff00';
+        return 'rgb(253,183,152)';
       } else if (d.type === INTERMEDIATE) {
-        return '#55eeff';
+        return 'rgb(253,183,152)';
       } else {
         return '#ffffff';
       }
@@ -355,7 +355,7 @@ function resetDiagram() {
 /* * * * * * */
 $(document).ready(function() {
 
-  const THEME = "solarized light";
+  const THEME = 'ambiance';
 
   const editors = {
     "specEditor": CodeMirror.fromTextArea(document.getElementById('langInput'), {lineNumbers: true}),
