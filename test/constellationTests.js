@@ -188,8 +188,7 @@ module.exports = function() {
 
   describe('Sanitise specification input', function () {
     it('Atom not in categories', function () {
-      const result = constellation('d', CATEGORIES, 10, 0);
-      expect(result.designs).to.contain('d is not defined in categories');
+      expect(() => constellation('d', CATEGORIES, 10, 0)).to.throw('d is not defined in categories');
     });
 
     it('Mismatched brackets', function () {
@@ -214,8 +213,7 @@ module.exports = function() {
       // TODO turn back on when imparse starts throwing errors
 
       it('_', function () {
-        const result = constellation('_a', CATEGORIES, 10, 0);
-        expect(result.designs).to.contain('_a is not defined in categories');
+        expect(() => constellation('_a', CATEGORIES, 10, 0)).to.throw('_a is not defined in categories');
       });
     });
 
@@ -224,8 +222,7 @@ module.exports = function() {
   describe('Sanitise category input', function () {
     it('Empty categories', function () {
       const categories = '{}';
-      const result = constellation('a', categories, 10, 0);
-      expect(result.designs).to.contain('a is not defined in categories');
+      expect(() => constellation('a', categories, 10, 0)).to.throw('a is not defined in categories');
     });
 
     it('Handle defined but empty category', function () {
