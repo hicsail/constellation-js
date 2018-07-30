@@ -152,7 +152,6 @@ function drawNodes(nodes) {
         return 'rgb(33,168,174)';
       } else if (d.type === graph.ACCEPT) {
         return 'rgb(133,151,41)';
-        133, 151, 41
       } else if (d.type === graph.EPSILON) {
         return 'rgb(253,183,152)';
       } else if (d.type === INTERMEDIATE) {
@@ -161,7 +160,7 @@ function drawNodes(nodes) {
         return '#ffffff';
       }
     })
-    .attr('stroke', 'white')
+    .attr('stroke', 'rgb(200,200,200)')
     .attr('title', function(d) {return d.type})
     .attr('r', function(d) {
       if (d.type === INTERMEDIATE) {
