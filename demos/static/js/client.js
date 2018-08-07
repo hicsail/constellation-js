@@ -367,8 +367,13 @@ $(document).ready(function() {
 
   editors.specEditor.setOption("theme", THEME);
   editors.catEditor.setOption("theme", THEME);
-  editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"CDS": ["BBa_E0040", "BBa_E1010"],\n"terminator": ["BBa_B0010"]}');
+  editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"spacer": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
   editors.designsEditor.setOption("theme", THEME);
+
+  $('#demo-option').on('click', function() {
+    editors.specEditor.setValue('one-or-more(one-or-more(promoter then spacer)then cds then \n (zero-or-more \n (spacer or (one-or-more \n (spacer then promoter then spacer) then cds)) then \n (terminator or (terminator then spacer) or (spacer then terminator)))))')
+  });
+  
 
   $("#submitBtn").click(function(){
     // Reset UI
@@ -389,7 +394,6 @@ $(document).ready(function() {
       "name": "specificationname",
       "clientid": "userid"
     }, function (data) {
-      console.log('here');
       displayDiagram(data.stateGraph);
       // Undefined design
       if (String(data.designs).includes('is not defined')) {

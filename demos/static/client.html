@@ -41,7 +41,26 @@
     <div class="container">
       <div class="row">
         <div class="col-sm">
-          <label for="langInput"><h5>Specification</h5></label><textarea class="codemirror" id="langInput" name="paragraph_text" cols="50" rows="10"></textarea>
+          <col-sm-8>
+            <label for="langInput"><h5>Specification</h5></label>
+          </col-sm-8>
+          <col-sm-4>
+            <label for="examples">
+
+              <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Examples
+                  </button>
+                  <div id="examples-list" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a id='demo-option' class="dropdown-item" href="#">Demo</a>
+
+                  </div>
+                </div>
+
+
+            </label>
+          </col-sm-4>
+          <textarea class="codemirror" id="langInput" name="paragraph_text" cols="50" rows="10"></textarea>
           <br/>
           <label for="categories"><h5>Categories</h5></label><textarea class="codemirror" name="paragraph_text" id="categories" cols="50" rows="10"></textarea>
         </div>
