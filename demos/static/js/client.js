@@ -75,7 +75,7 @@ function generateGraph(stateGraph) {
     } else if (node.type === graph.ATOM) {
       text = node.text;
     }
-    nodes.push({id: nodeId, type: node.type, text});
+    nodes.push({id: nodeId, type: node.type, text, operator: node.operator});
   }
 
   // Get edges from stateGraph
@@ -137,7 +137,7 @@ function drawNodes(nodes) {
   // Add tooltip
   textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
     .append('text')
-    .text( function(d) { return d.text; })
+    .text( function(d) { console.log(d); return d.operator; })
     .attr('opacity', 0)
     .attr('dx', '20px')
     .attr('dy', '4px')
