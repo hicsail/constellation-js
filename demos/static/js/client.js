@@ -75,7 +75,7 @@ function generateGraph(stateGraph) {
     } else if (node.type === graph.ATOM) {
       text = node.text;
     }
-    nodes.push({id: nodeId, type: node.type, text});
+    nodes.push({id: nodeId, type: node.type, text, operator: node.operator});
   }
 
   // Get edges from stateGraph
@@ -106,7 +106,7 @@ function drawLinks(links) {
     .attr('markerHeight', 20)
     .attr('orient', 'auto')
     .append('svg:path')
-    .style('fill', 'rgb(200,200,200)')
+    .style('fill', 'rgb(150,150,150)')
     .attr('d', 'M0, -3L3, 0L0,3');
 
   // Add links
@@ -114,7 +114,7 @@ function drawLinks(links) {
     .data(links)
     .enter().append('path')
     .attr('class', 'link')
-    .style('stroke', 'rgb(200,200,200)')
+    .style('stroke', 'rgb(150,150,150)')
     .style( 'stroke-width', 1);
 
   // Attach arrowhead
@@ -137,31 +137,30 @@ function drawNodes(nodes) {
   // Add tooltip
   textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
     .append('text')
-    .text( function(d) { return d.text; })
+    .text( function(d) { console.log(d); return d.operator; })
     .attr('opacity', 0)
     .attr('dx', '20px')
     .attr('dy', '4px')
-    .style('fill', 'white')
-    .style('font-family', 'monospace');
+    .style('fill', 'rgb(100,)')
+    .style('font-family', 'Montserrat');
 
   // Add circles
   circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
     .append('circle')
     .attr('fill', function(d) {
       if (d.type === graph.ROOT) {
-        return 'rgb(207,62,130)';
+        return 'rgb(33,168,174)';
       } else if (d.type === graph.ACCEPT) {
         return 'rgb(133,151,41)';
-        133, 151, 41
       } else if (d.type === graph.EPSILON) {
-        return '#ffff00';
+        return 'rgb(253,183,152)';
       } else if (d.type === INTERMEDIATE) {
-        return '#55eeff';
+        return 'rgb(253,183,152)';
       } else {
         return '#ffffff';
       }
     })
-    .attr('stroke', 'white')
+    .attr('stroke', 'rgb(200,200,200)')
     .attr('title', function(d) {return d.type})
     .attr('r', function(d) {
       if (d.type === INTERMEDIATE) {
@@ -177,44 +176,30 @@ function drawNodes(nodes) {
     .append('svg:image')
     .attr('xlink:href', function(d) {
       switch (d.text) {
-        case 'aptamer':
-        case 'assemblyScar':
-        case 'bluntRestrictionSite':
-        case 'CDS':
-        case 'dnaStabilityElement':
-        case 'engineeredRegion':
-        case 'fivePrimeOverhang':
-        case 'fivePrimeStickyRestrictionSite':
-        case 'halfroundRectangle':
-        case 'insulator':
-        case 'locationDna':
-        case 'locationProtein':
-        case 'locationRna':
-        case 'noGlyphAssigned':
-        case 'nonCodingRna':
-        case 'omittedDetail':
-        case 'operator':
-        case 'originOfReplication':
-        case 'originOfTransfer':
-        case 'polyA':
-        case 'primerBindingSite':
         case 'promoter':
-        case 'proteaseSite':
-        case 'proteinStabilityElement':
-        case 'replacementGlyph':
-        case 'restrictionSite':
-        case 'ribonucleaseSite':
-        case 'ribosomeBindingSite':
-        case 'ribozyme':
-        case 'rnaStabilityElement':
-        case 'signature':
-        case 'specificRecombinationSite':
         case 'terminator':
-        case 'threePrimeOverhang':
-        case 'threePrimeStickyEndRestrictionSite':
+        case 'CDS':
+        case 'restriction_enzyme_assembly_scar':
+        case 'restriction_enzyme_recognition_site':
+        case 'protein_stability_element':
+        case 'blunt_end_restriction_enzyme_cleavage_site':
+        case 'ribonuclease_site':
+        case 'restriction_enzyme_five_prime_single_strand_overhang':
+        case 'ribosome_entry_site':
+        case 'five_prime_sticky_end_restriction_enzyme_cleavage_site':
+        case 'RNA_stability_element':
+        case 'ribozyme':
+        case 'insulator':
+        case 'signature':
+        case 'operator':
+        case 'origin_of_replication':
+        case 'restriction_enzyme_three_prime_single_strand_overhang':
+        case 'primer_binding_site':
+        case 'three_prime_sticky_end_restriction_enzyme_cleavage_site':
+        case 'protease_site':
           return './sbol/' + d.text + '.svg';
         default:
-          return './sbol/' + 'engineeredRegion.svg';
+          return './sbol/' + 'user_defined.svg';
       }
     })
     .attr('width', IMAGESIZE);
@@ -369,7 +354,7 @@ function resetDiagram() {
 /* * * * * * */
 $(document).ready(function() {
 
-  const THEME = "solarized light";
+  const THEME = 'ambiance';
 
   const editors = {
     "specEditor": CodeMirror.fromTextArea(document.getElementById('langInput'), {lineNumbers: true}),
@@ -382,8 +367,13 @@ $(document).ready(function() {
 
   editors.specEditor.setOption("theme", THEME);
   editors.catEditor.setOption("theme", THEME);
-  editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"CDS": ["BBa_E0040", "BBa_E1010"],\n"terminator": ["BBa_B0010"]}');
+  editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"spacer": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
   editors.designsEditor.setOption("theme", THEME);
+
+  $('#demo-option').on('click', function() {
+    editors.specEditor.setValue('one-or-more(one-or-more(promoter then spacer)then cds then \n (zero-or-more \n (spacer or (one-or-more \n (spacer then promoter then spacer) then cds)) then \n (terminator or (terminator then spacer) or (spacer then terminator)))))')
+  });
+
 
   $("#submitBtn").click(function(){
     // Reset UI
@@ -404,12 +394,15 @@ $(document).ready(function() {
       "name": "specificationname",
       "clientid": "userid"
     }, function (data) {
-      if (typeof(data) === 'string') {
-        alert(data);
-        return;
-      }
       displayDiagram(data.stateGraph);
-      displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
-    })
+      // Undefined design
+      if (String(data.designs).includes('is not defined')) {
+        displayDesigns(editors, data.designs);
+      } else {
+        displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+      }
+    }).fail((response) => {
+      alert(response.responseText);
+    });
   });
 });
