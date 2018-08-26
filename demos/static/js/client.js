@@ -176,9 +176,10 @@ function drawNodes(nodes) {
     .append('svg:image')
     .attr('xlink:href', function(d) {
       switch (d.text) {
+        case 'ribosomeBindingSite':
         case 'promoter':
         case 'terminator':
-        case 'CDS':
+        case 'cds':
         case 'restriction_enzyme_assembly_scar':
         case 'restriction_enzyme_recognition_site':
         case 'protein_stability_element':
@@ -367,11 +368,11 @@ $(document).ready(function() {
 
   editors.specEditor.setOption("theme", THEME);
   editors.catEditor.setOption("theme", THEME);
-  editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"spacer": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
+  editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
   editors.designsEditor.setOption("theme", THEME);
 
   $('#demo-option').on('click', function() {
-    editors.specEditor.setValue('one-or-more(one-or-more(promoter then spacer)then cds then \n (zero-or-more \n (spacer or (one-or-more \n (spacer then promoter then spacer) then cds)) then \n (terminator or (terminator then spacer) or (spacer then terminator)))))')
+    editors.specEditor.setValue('one-or-more(one-or-more(promoter then nonCodingRna)then cds then \n (zero-or-more \n (nonCodingRna or (one-or-more \n (nonCodingRna then promoter then nonCodingRna) then cds)) then \n (terminator or (terminator then nonCodingRna) or (nonCodingRna then terminator)))))')
   });
 
 
