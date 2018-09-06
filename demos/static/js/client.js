@@ -137,7 +137,7 @@ function drawNodes(nodes) {
   // Add tooltip
   textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
     .append('text')
-    .text( function(d) { console.log(d); return d.operator; })
+    .text( function(d) {return d.operator; })
     .attr('opacity', 0)
     .attr('dx', '20px')
     .attr('dy', '4px')
@@ -367,7 +367,7 @@ $(document).ready(function() {
 
   editors.specEditor.setOption("theme", THEME);
   editors.catEditor.setOption("theme", THEME);
-  editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "rbs": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"spacer": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
+  editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"spacer": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
   editors.designsEditor.setOption("theme", THEME);
 
   $('#demo-option').on('click', function() {
@@ -375,6 +375,11 @@ $(document).ready(function() {
   });
   
 
+  $('#debug-option').on('click', function() {
+    editors.specEditor.setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
+  });
+
+  
   $("#submitBtn").click(function(){
     // Reset UI
     resetDiagram();
