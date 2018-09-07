@@ -137,7 +137,7 @@ function drawNodes(nodes) {
   // Add tooltip
   textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
     .append('text')
-    .text( function(d) { console.log(d); return d.operator; })
+    .text( function(d) {return d.operator; })
     .attr('opacity', 0)
     .attr('dx', '20px')
     .attr('dy', '4px')
@@ -373,6 +373,11 @@ $(document).ready(function() {
 
   $('#demo-option').on('click', function() {
     editors.specEditor.setValue('one-or-more(one-or-more(promoter then nonCodingRna)then cds then \n (zero-or-more \n (nonCodingRna or (one-or-more \n (nonCodingRna then promoter then nonCodingRna) then cds)) then \n (terminator or (terminator then nonCodingRna) or (nonCodingRna then terminator)))))')
+  });
+
+
+  $('#debug-option').on('click', function() {
+    editors.specEditor.setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
   });
 
 
