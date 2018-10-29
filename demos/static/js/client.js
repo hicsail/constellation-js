@@ -384,13 +384,19 @@ $(document).ready(function() {
     // Reset UI
     resetDiagram();
     displayDesigns(editors, '');
+    let designName = 'Constellation';
+    let maxCycles = 0;
+    let numDesigns = 10;
 
     const specification = editors.specEditor.getValue();
     const categories = editors.catEditor.getValue();
-    const numDesigns = document.getElementById('numDesigns').value;
-    const maxCycles = document.getElementById('maxCycles').value;
+
+    numDesigns = document.getElementById('numDesigns').value;
+    maxCycles = document.getElementById('maxCycles').value;
+    designName = document.getElementById('designName').value;
 
     $.post('http://localhost:8082/postSpecs', {
+      "designName": designName,
       "specification": specification,
       "categories": categories,
       "numDesigns": numDesigns,
