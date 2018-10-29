@@ -29,11 +29,13 @@ app.get('/', function(req,res) {
 });
 
 app.post('/postSpecs', function(req,res) {
+  let designName = req.body.designName;
   let langText = req.body.specification;
   let categories = req.body.categories;
   let numDesigns = req.body.numDesigns;
   let maxCycles = req.body.maxCycles;
   console.log('---Received new input---');
+  console.log('Design Name: ', designName);
   console.log('Specification: ', langText);
   console.log('Categories: ', categories);
   console.log('numDesigns: ', numDesigns);
@@ -41,7 +43,7 @@ app.post('/postSpecs', function(req,res) {
 
   let data;
   try {
-    data = constellation(langText, categories, numDesigns, maxCycles);
+    data = constellation(designName, langText, categories, numDesigns, maxCycles);
     res.status(200).send(data);
   } catch (error) {
     console.log(error);
