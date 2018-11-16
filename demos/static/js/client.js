@@ -406,6 +406,7 @@ $(document).ready(function() {
       "name": "specificationname",
       "clientid": "userid"
     }, function (data) {
+      console.log(data)
       displayDiagram(data.stateGraph);
       // Undefined design
       if (String(data.designs).includes('is not defined')) {

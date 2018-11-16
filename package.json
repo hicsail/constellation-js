@@ -4,7 +4,7 @@
   "description": "Constellation is a tool for parsing a language specifying genetic parts and their relationships",
   "main": "constellation.js",
   "scripts": {
-    "test": "nyc mocha",
+    "test": "nyc mocha --timeout 200000",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
