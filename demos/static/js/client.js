@@ -5,7 +5,8 @@ const IMAGESIZE = 30;
 const RADIUS = 7;
 const INTERMEDIATE = 'intermediate';
 
-let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height;
+let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDocs;
+let designName = 'Constellation';
 
 /* * * * * * */
 /*  DESIGNS  */
@@ -380,12 +381,22 @@ $(document).ready(function() {
     editors.specEditor.setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
   });
 
+  $("#knoxBtn").prop("disabled",true);
+
+  $('#knoxBtn').on('click', function() {
+    $.post('http://localhost:8082/sendToKnox', {
+      'designName': designName,
+      'sbolDocs[]': JSON.stringify(sbolDocs)})
+      .fail((response) => {
+      alert(response.responseText);
+    });
+  });
+
 
   $("#submitBtn").click(function(){
     // Reset UI
     resetDiagram();
     displayDesigns(editors, '');
-    let designName = 'Constellation';
     let maxCycles = 0;
     let numDesigns = 10;
 
@@ -406,7 +417,6 @@ $(document).ready(function() {
       "name": "specificationname",
       "clientid": "userid"
     }, function (data) {
-      console.log(data)
       displayDiagram(data.stateGraph);
       // Undefined design
       if (String(data.designs).includes('is not defined')) {
@@ -414,8 +424,14 @@ $(document).ready(function() {
       } else {
         displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
       }
+      sbolDocs = data.sbols;
+      $("#knoxBtn").prop("disabled",false);
     }).fail((response) => {
       alert(response.responseText);
     });
   });
+
+
 });
+
+
