@@ -42,13 +42,6 @@ module.exports = function() {
       expect(result.designs).to.contain('a2,c1');
     });
 
-    // it('and', function() {
-    //   const result = constellation(DESIGN_NAME, '(a or c) and a', categories, 10);
-    //   expect(result.designs.length).to.equal(1);
-    //   expect(result.designs).to.contain('a1');
-    //   expect(result.designs).to.contain('a2');
-    // });
-
     it('one-or-more', function() {
       let result = constellation(DESIGN_NAME, 'one-or-more a', CATEGORIES, 10, 0);
       expect(result.designs.length).to.equal(ACATS);
