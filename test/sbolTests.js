@@ -18,7 +18,6 @@ function readModuleFile(path, callback) {
       var filename = require.resolve(path);
       fs.readFile(filename, 'utf8', callback);
   } catch (e) {
-    console.log('error?', e);
       callback(e);
   }
 }
