@@ -177,31 +177,31 @@ function drawNodes(nodes) {
     .append('svg:image')
     .attr('xlink:href', function(d) {
       switch (d.text) {
-        case 'ribosomeBindingSite':
-        case 'promoter':
-        case 'terminator':
+        // KEEP IN ALPHABETICAL ORDER
+        case 'aptamer':
+        case 'assemblyScar':
+        case 'bluntRestrictionSite':
         case 'cds':
-        case 'restriction_enzyme_assembly_scar':
-        case 'restriction_enzyme_recognition_site':
-        case 'protein_stability_element':
-        case 'blunt_end_restriction_enzyme_cleavage_site':
-        case 'ribonuclease_site':
-        case 'restriction_enzyme_five_prime_single_strand_overhang':
-        case 'ribosome_entry_site':
-        case 'five_prime_sticky_end_restriction_enzyme_cleavage_site':
-        case 'RNA_stability_element':
-        case 'ribozyme':
+        case 'dnaStabilityElement':
+        case 'engineeredRegion':
+        case 'fivePrimeOverhang':
+        case 'fivePrimeStickyRestrictionSite':
         case 'insulator':
-        case 'signature':
+        case 'nonCodingRna':
         case 'operator':
-        case 'origin_of_replication':
-        case 'restriction_enzyme_three_prime_single_strand_overhang':
-        case 'primer_binding_site':
-        case 'three_prime_sticky_end_restriction_enzyme_cleavage_site':
-        case 'protease_site':
+        case 'originOfReplication':
+        case 'originOfTrasnfer':
+        case 'polyA':
+        case 'promoter':
+        case 'proteaseSite':
+        case 'proteinStabilityElement':
+        case 'ribosomeBindingSite':
+        case 'ribozyme':
+        case 'signature':
+        case 'terminator':
           return './sbol/' + d.text + '.svg';
         default:
-          return './sbol/' + 'user_defined.svg';
+          return './sbol/' + 'noGlyphAssigned.svg';
       }
     })
     .attr('width', IMAGESIZE);
