@@ -35,7 +35,7 @@ module.exports = function() {
       });
     });
 
-    it('Spec for paper', function() {
+    it('Spec for paper', function(done) {
       let result = constellation(DESIGN_NAME, 'one-or-more(one-or-more(promoter then cds)then cds then (zero-or-more (cds or (one-or-more (cds then promoter then cds) then cds)) then (terminator or (terminator then cds) or (cds then terminator)))))', CATEGORIES, 10, 0);
 
       readModuleFile('./sbolResults/paperEx.txt', function (err, words) {
