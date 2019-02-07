@@ -4,52 +4,57 @@
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/generic_definition/promoter"/>
     <sbol:displayId>promoter</sbol:displayId>
     <sbol:version>1</sbol:version>
-    <sbol:type rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
     <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
   </sbol:ComponentDefinition>
   <sbol:ComponentDefinition rdf:about="http://constellationcad.org/generic_definition/c1/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/generic_definition/c1"/>
     <sbol:displayId>c1</sbol:displayId>
     <sbol:version>1</sbol:version>
-    <sbol:type rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
   </sbol:ComponentDefinition>
   <sbol:ComponentDefinition rdf:about="http://constellationcad.org/generic_definition/cds/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/generic_definition/cds"/>
     <sbol:displayId>cds</sbol:displayId>
     <sbol:version>1</sbol:version>
-    <sbol:type rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
     <sbol:role rdf:resource="http://identifiers.org/so/SO:0000316"/>
   </sbol:ComponentDefinition>
   <sbol:ComponentDefinition rdf:about="http://constellationcad.org/generic_definition/b1/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/generic_definition/b1"/>
     <sbol:displayId>b1</sbol:displayId>
     <sbol:version>1</sbol:version>
-    <sbol:type rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000316"/>
   </sbol:ComponentDefinition>
   <sbol:ComponentDefinition rdf:about="http://constellationcad.org/generic_definition/b2/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/generic_definition/b2"/>
     <sbol:displayId>b2</sbol:displayId>
     <sbol:version>1</sbol:version>
-    <sbol:type rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000316"/>
   </sbol:ComponentDefinition>
   <sbol:ComponentDefinition rdf:about="http://constellationcad.org/generic_definition/b3/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/generic_definition/b3"/>
     <sbol:displayId>b3</sbol:displayId>
     <sbol:version>1</sbol:version>
-    <sbol:type rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000316"/>
   </sbol:ComponentDefinition>
   <sbol:ComponentDefinition rdf:about="http://constellationcad.org/generic_definition/terminator/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/generic_definition/terminator"/>
     <sbol:displayId>terminator</sbol:displayId>
     <sbol:version>1</sbol:version>
-    <sbol:type rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
     <sbol:role rdf:resource="http://identifiers.org/so/SO:0000141"/>
   </sbol:ComponentDefinition>
   <sbol:ComponentDefinition rdf:about="http://constellationcad.org/generic_definition/t/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/generic_definition/t"/>
     <sbol:displayId>t</sbol:displayId>
     <sbol:version>1</sbol:version>
-    <sbol:type rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000141"/>
   </sbol:ComponentDefinition>
   <sbol:ComponentDefinition rdf:about="http://constellationcad.org/design/combinatorial_template/cyclical_unit1/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/design/combinatorial_template/cyclical_unit1"/>

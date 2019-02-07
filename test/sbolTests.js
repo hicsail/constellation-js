@@ -1,10 +1,10 @@
 
 const constellation = require('../lib/constellation');
 const expect = require('chai').expect;
-var fs = require('fs');
+let fs = require('fs');
 
 
-var DESIGN_NAME = 'design';
+let DESIGN_NAME = 'design';
 const CATEGORIES = '{"rbs":["a1","a2"],"cds":["b1","b2","b3"],"promoter":["c1"], "terminator": ["t"]}';
 
 function trimX(str) {
@@ -15,7 +15,7 @@ function trimX(str) {
 
 function readModuleFile(path, callback) {
   try {
-      var filename = require.resolve(path);
+      let filename = require.resolve(path);
       fs.readFile(filename, 'utf8', callback);
   } catch (e) {
       callback(e);
@@ -23,7 +23,7 @@ function readModuleFile(path, callback) {
 }
 
 module.exports = function() {
-  //
+
   describe('SBOL Generation', function() {
     it('atom', function(done) {
       let result = constellation.constellationGOLDBAR(DESIGN_NAME, 'rbs', CATEGORIES, 10, 0);
