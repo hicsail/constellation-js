@@ -67,13 +67,13 @@ function generateGraph(stateGraph) {
     let text;
     let node = stateGraph[nodeId];
 
-    if (node.type === graph.ROOT) {
+    if (node.type === ROOT) {
       text = 'Root';
-    } else if (node.type === graph.EPSILON) {
+    } else if (node.type === EPSILON) {
       text = 'Epsilon'
-    } else if (node.type === graph.ACCEPT) {
+    } else if (node.type === ACCEPT) {
       text =  'Accept';
-    } else if (node.type === graph.ATOM) {
+    } else if (node.type === ATOM) {
       text = node.text;
     }
     nodes.push({id: nodeId, type: node.type, text, operator: node.operator});
@@ -146,14 +146,14 @@ function drawNodes(nodes) {
     .style('font-family', 'Montserrat');
 
   // Add circles
-  circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
+  circlePointer = nodePointer.filter(function (d) { return d.type !== ATOM; })
     .append('circle')
     .attr('fill', function(d) {
-      if (d.type === graph.ROOT) {
+      if (d.type === ROOT) {
         return 'rgb(33,168,174)';
-      } else if (d.type === graph.ACCEPT) {
+      } else if (d.type === ACCEPT) {
         return 'rgb(133,151,41)';
-      } else if (d.type === graph.EPSILON) {
+      } else if (d.type === EPSILON) {
         return 'rgb(253,183,152)';
       } else if (d.type === INTERMEDIATE) {
         return 'rgb(253,183,152)';
@@ -171,7 +171,7 @@ function drawNodes(nodes) {
     });
 
   // Add images
-  imagePointer = nodePointer.filter(function(d) { return d.type === graph.ATOM; })
+  imagePointer = nodePointer.filter(function(d) { return d.type === ATOM; })
     .append('g')
     .attr('transform', 'translate(-15 , -30)')
     .append('svg:image')
@@ -388,8 +388,11 @@ $(document).ready(function() {
       'designName': designName,
       'sbolDocs[]': JSON.stringify(sbolDocs)})
       .fail((response) => {
-      alert(response.responseText);
-    });
+        alert(response.responseText);
+      })
+      .done(() => {
+        alert('Design successfully stored in Knox')
+      });
   });
 
 
