@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:prov="http://www.w3.org/ns/prov#" xmlns:sbol="http://sbols.org/v2#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#dateTime/">
+  <sbol:Collection rdf:about="http://constellationcad.org/promoter_collection/1">
+    <sbol:persistentIdentity rdf:resource="http://constellationcad.org/promoter_collection"/>
+    <sbol:displayId>promoter</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <sbol:member rdf:resource="http://constellationcad.org/generic_definition/c1/1"/>
+  </sbol:Collection>
+  <sbol:Collection rdf:about="http://constellationcad.org/cds_collection/1">
+    <sbol:persistentIdentity rdf:resource="http://constellationcad.org/cds_collection"/>
+    <sbol:displayId>cds</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <sbol:member rdf:resource="http://constellationcad.org/generic_definition/b1/1"/>
+    <sbol:member rdf:resource="http://constellationcad.org/generic_definition/b2/1"/>
+    <sbol:member rdf:resource="http://constellationcad.org/generic_definition/b3/1"/>
+  </sbol:Collection>
+  <sbol:Collection rdf:about="http://constellationcad.org/terminator_collection/1">
+    <sbol:persistentIdentity rdf:resource="http://constellationcad.org/terminator_collection"/>
+    <sbol:displayId>terminator</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <sbol:member rdf:resource="http://constellationcad.org/generic_definition/t/1"/>
+  </sbol:Collection>
   <sbol:ComponentDefinition rdf:about="http://constellationcad.org/generic_definition/promoter/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/generic_definition/promoter"/>
     <sbol:displayId>promoter</sbol:displayId>
@@ -405,9 +425,7 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/design/combinatorial_template/cyclical_unit1/cds_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b1/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b2/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b3/1"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/cds_collection/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
     <sbol:variableComponent>
@@ -427,7 +445,7 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/design/combinatorial_template/cyclical_unit1/or_unit2_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/t/1"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/terminator_collection/1"/>
         <sbol:variantDerivation rdf:resource="http://constellationcad.org/design/combinatorial_template/or_unit2_or_subunit1/or_unit2_or_subunit1_combinatorial_derivation/1"/>
         <sbol:variantDerivation rdf:resource="http://constellationcad.org/design/combinatorial_template/or_unit2_or_subunit2/or_unit2_or_subunit2_combinatorial_derivation/1"/>
       </sbol:VariableComponent>
@@ -445,7 +463,7 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/design/combinatorial_template/cyclical_unit2/promoter_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/c1/1"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/promoter_collection/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
     <sbol:variableComponent>
@@ -455,9 +473,7 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/design/combinatorial_template/cyclical_unit2/cds_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b1/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b2/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b3/1"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/cds_collection/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
   </sbol:CombinatorialDerivation>
@@ -473,9 +489,7 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/design/combinatorial_template/cyclical_unit3/or_unit1_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b1/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b2/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b3/1"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/cds_collection/1"/>
         <sbol:variantDerivation rdf:resource="http://constellationcad.org/design/combinatorial_template/or_unit1_or_subunit1/or_unit1_or_subunit1_combinatorial_derivation/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
@@ -492,9 +506,7 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/design/combinatorial_template/cyclical_unit4/cds_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b1/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b2/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b3/1"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/cds_collection/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
     <sbol:variableComponent>
@@ -504,7 +516,7 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/design/combinatorial_template/cyclical_unit4/promoter_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/c1/1"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/promoter_collection/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
     <sbol:variableComponent>
@@ -514,9 +526,7 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/design/combinatorial_template/cyclical_unit4/cds_component2/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b1/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b2/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b3/1"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/cds_collection/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
   </sbol:CombinatorialDerivation>
@@ -542,9 +552,7 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/design/combinatorial_template/or_unit1_or_subunit1/cds_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b1/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b2/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b3/1"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/cds_collection/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
   </sbol:CombinatorialDerivation>
@@ -560,9 +568,7 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/design/combinatorial_template/or_unit2_or_subunit1/cds_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b1/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b2/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b3/1"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/cds_collection/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
     <sbol:variableComponent>
@@ -572,7 +578,7 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/design/combinatorial_template/or_unit2_or_subunit1/terminator_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/t/1"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/terminator_collection/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
   </sbol:CombinatorialDerivation>
@@ -588,7 +594,7 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/design/combinatorial_template/or_unit2_or_subunit2/terminator_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/t/1"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/terminator_collection/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
     <sbol:variableComponent>
@@ -598,9 +604,7 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/design/combinatorial_template/or_unit2_or_subunit2/cds_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b1/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b2/1"/>
-        <sbol:variant rdf:resource="http://constellationcad.org/generic_definition/b3/1"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/cds_collection/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
   </sbol:CombinatorialDerivation>
