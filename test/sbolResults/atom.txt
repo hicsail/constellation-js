@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:prov="http://www.w3.org/ns/prov#" xmlns:sbol="http://sbols.org/v2#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#dateTime/">
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:prov="http://www.w3.org/ns/prov#" xmlns:sbol="http://sbols.org/v2#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#dateTime/" xmlns:ns0="https://github.com/hicsail/constellation-js/">
   <sbol:Collection rdf:about="http://constellationcad.org/rbs_collection/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/rbs_collection"/>
     <sbol:displayId>rbs</sbol:displayId>
@@ -47,6 +47,8 @@
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/design/root_template/design/design_combinatorial_derivation"/>
     <sbol:displayId>design_combinatorial_derivation</sbol:displayId>
     <sbol:version>1</sbol:version>
+    <ns0:numDesigns>10</ns0:numDesigns>
+    <ns0:maxCycles>0</ns0:maxCycles>
     <sbol:template rdf:resource="http://constellationcad.org/design/root_template/design/1"/>
     <sbol:variableComponent>
       <sbol:VariableComponent rdf:about="http://constellationcad.org/design/root_template/design/design_combinatorial_derivation/rbs_component1_variable/1">
