@@ -27,7 +27,7 @@ module.exports = function() {
 
   describe('SBOL Generation', function() {
     it('atom', function(done) {
-      let result = constellation.constellationGOLDBAR(DESIGN_NAME, 'rbs', CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
+      let result = constellation.goldbar(DESIGN_NAME, 'rbs', CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
 
       readModuleFile('./sbolResults/atom.txt', function (err, words) {
         expect(err).to.be.a('null');
@@ -38,7 +38,7 @@ module.exports = function() {
 
     it('Spec for paper', function(done) {
       const spec = 'one-or-more(one-or-more(promoter then cds)then cds then (zero-or-more (cds or (one-or-more (cds then promoter then cds) then cds)) then (terminator or (terminator then cds) or (cds then terminator)))))';
-      let result = constellation.constellationGOLDBAR(DESIGN_NAME, spec, CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
+      let result = constellation.goldbar(DESIGN_NAME, spec, CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
 
       readModuleFile('./sbolResults/paperEx.txt', function (err, words) {
         expect(err).to.be.a('null');
