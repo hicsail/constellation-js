@@ -45,7 +45,7 @@ app.post('/postSpecs', function(req,res) {
 
   let data;
   try {
-    data = constellation(designName, langText, categories, numDesigns, maxCycles);
+    data = constellation.goldbar(designName, langText, categories, numDesigns, maxCycles);
     res.status(200).send(data);
   } catch (error) {
     console.log(error);

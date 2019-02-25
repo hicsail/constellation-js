@@ -15,34 +15,34 @@ module.exports = function() {
     it('Enumerate designs for one atom', function() {
       const categories = {'a': ['a']};
       const paths = [[generateAtom('a')]];
-      const designs = enumeration(paths, categories, 1);
+      const designs = enumeration.enumerateDesigns(paths, categories, 1);
       expect(JSON.stringify(designs)).to.contain('a');
     });
 
     it('Handle defined but empty category', function() {
       const categories = {'a': []};
       const paths = [[generateAtom('a')]];
-      const designs = enumeration(paths, categories, 1);
+      const designs = enumeration.enumerateDesigns(paths, categories, 1);
       expect(JSON.stringify(designs)).to.equal('[]');
     });
 
     it('Handle empty categories', function() {
       const categories = {};
       const paths = [[generateAtom('a')]];
-      expect(() => enumeration(paths, categories, 1)).to.throw('a is not defined in categories');
+      expect(() => enumeration.enumerateDesigns(paths, categories, 1)).to.throw('a is not defined in categories');
     });
 
     it('Handle undefined atom', function() {
       const categories = {'b': ['b']};
       const paths = [[generateAtom('a')]];
-      expect(() => enumeration(paths, categories, 1)).to.throw('a is not defined in categories');
+      expect(() => enumeration.enumerateDesigns(paths, categories, 1)).to.throw('a is not defined in categories');
     });
 
     it('Enumerate all duplicates in category', function() {
       const categories = {'a': ['a1', 'a2']};
       const path = [generateAtom('a')];
       const paths = [path, path];
-      const designs = enumeration(paths, categories, 4);
+      const designs = enumeration.enumerateDesigns(paths, categories, 4);
       expect(JSON.stringify(designs)).to.equal(JSON.stringify(categories['a']));
     });
 
@@ -58,14 +58,14 @@ module.exports = function() {
       it('Select 1 of 2 designs', function () {
         const categories = {'a': ['a1', 'a2']};
         const paths = [[generateAtom('a')]];
-        const designs = enumeration(paths, categories, 1);
+        const designs = enumeration.enumerateDesigns(paths, categories, 1);
         expect(designs.length).to.equal(1);
       });
 
       it('Select 0 designs', function () {
         const categories = {'a': ['a1', 'a2']};
         const paths = [[generateAtom('a')]];
-        const designs = enumeration(paths, categories, 0);
+        const designs = enumeration.enumerateDesigns(paths, categories, 0);
         expect(designs.length).to.equal(0);
       });
     });

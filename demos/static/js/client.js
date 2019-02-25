@@ -67,13 +67,13 @@ function generateGraph(stateGraph) {
     let text;
     let node = stateGraph[nodeId];
 
-    if (node.type === graph.ROOT) {
+    if (node.type === ROOT) {
       text = 'Root';
-    } else if (node.type === graph.EPSILON) {
+    } else if (node.type === EPSILON) {
       text = 'Epsilon'
-    } else if (node.type === graph.ACCEPT) {
+    } else if (node.type === ACCEPT) {
       text =  'Accept';
-    } else if (node.type === graph.ATOM) {
+    } else if (node.type === ATOM) {
       text = node.text;
     }
     nodes.push({id: nodeId, type: node.type, text, operator: node.operator});
@@ -146,14 +146,14 @@ function drawNodes(nodes) {
     .style('font-family', 'Montserrat');
 
   // Add circles
-  circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
+  circlePointer = nodePointer.filter(function (d) { return d.type !== ATOM; })
     .append('circle')
     .attr('fill', function(d) {
-      if (d.type === graph.ROOT) {
+      if (d.type === ROOT) {
         return 'rgb(33,168,174)';
-      } else if (d.type === graph.ACCEPT) {
+      } else if (d.type === ACCEPT) {
         return 'rgb(133,151,41)';
-      } else if (d.type === graph.EPSILON) {
+      } else if (d.type === EPSILON) {
         return 'rgb(253,183,152)';
       } else if (d.type === INTERMEDIATE) {
         return 'rgb(253,183,152)';
@@ -171,37 +171,37 @@ function drawNodes(nodes) {
     });
 
   // Add images
-  imagePointer = nodePointer.filter(function(d) { return d.type === graph.ATOM; })
+  imagePointer = nodePointer.filter(function(d) { return d.type === ATOM; })
     .append('g')
     .attr('transform', 'translate(-15 , -30)')
     .append('svg:image')
     .attr('xlink:href', function(d) {
       switch (d.text) {
-        case 'ribosomeBindingSite':
-        case 'promoter':
-        case 'terminator':
+        // KEEP IN ALPHABETICAL ORDER
+        case 'aptamer':
+        case 'assemblyScar':
+        case 'bluntRestrictionSite':
         case 'cds':
-        case 'restriction_enzyme_assembly_scar':
-        case 'restriction_enzyme_recognition_site':
-        case 'protein_stability_element':
-        case 'blunt_end_restriction_enzyme_cleavage_site':
-        case 'ribonuclease_site':
-        case 'restriction_enzyme_five_prime_single_strand_overhang':
-        case 'ribosome_entry_site':
-        case 'five_prime_sticky_end_restriction_enzyme_cleavage_site':
-        case 'RNA_stability_element':
-        case 'ribozyme':
+        case 'dnaStabilityElement':
+        case 'engineeredRegion':
+        case 'fivePrimeOverhang':
+        case 'fivePrimeStickyRestrictionSite':
         case 'insulator':
-        case 'signature':
+        case 'nonCodingRna':
         case 'operator':
-        case 'origin_of_replication':
-        case 'restriction_enzyme_three_prime_single_strand_overhang':
-        case 'primer_binding_site':
-        case 'three_prime_sticky_end_restriction_enzyme_cleavage_site':
-        case 'protease_site':
+        case 'originOfReplication':
+        case 'originOfTrasnfer':
+        case 'polyA':
+        case 'promoter':
+        case 'proteaseSite':
+        case 'proteinStabilityElement':
+        case 'ribosomeBindingSite':
+        case 'ribozyme':
+        case 'signature':
+        case 'terminator':
           return './sbol/' + d.text + '.svg';
         default:
-          return './sbol/' + 'user_defined.svg';
+          return './sbol/' + 'noGlyphAssigned.svg';
       }
     })
     .attr('width', IMAGESIZE);
@@ -388,8 +388,11 @@ $(document).ready(function() {
       'designName': designName,
       'sbolDocs[]': JSON.stringify(sbolDocs)})
       .fail((response) => {
-      alert(response.responseText);
-    });
+        alert(response.responseText);
+      })
+      .done(() => {
+        alert('Design successfully stored in Knox')
+      });
   });
 
 
