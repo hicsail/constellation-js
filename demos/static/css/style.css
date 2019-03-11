@@ -1,5 +1,7 @@
 body {
-    padding: 5%;
+    padding-right: 5%;
+    padding-left: 5%;
+    padding-top: 5%;
     background: url("https://www.toptal.com/designers/subtlepatterns/patterns/cubes.png");
 }
 
@@ -85,6 +87,18 @@ input[type="button"]{
 
     font-family: 'Montserrat', 'monospace';
 }
+
+.logo {
+    width: auto;
+    height: 50px;
+    padding: 5px;
+}
+
+footer {
+    padding-top: 20px;
+}
+
+
 /* DROPDOWN */
 /* Dropdown Button */
 /* .dropbtn {
