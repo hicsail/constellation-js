@@ -395,6 +395,51 @@ $(document).ready(function() {
       });
   });
 
+  function processSBOLFile(file) {
+    return new Promise((resolve) => {
+      // Parse file into XML object
+      let parser = new DOMParser();
+      let reader = new FileReader();
+      reader.readAsText(file, "UTF-8");
+      reader.onload = function (evt) {
+        let data = parser.parseFromString(evt.target.result, "application/xml");
+        resolve(data);
+      };
+    });
+  }
+
+  $('#importSBOLBtn').on('change', async function() {
+    // Reset UI
+    resetDiagram();
+    displayDesigns(editors, '');
+
+    //read SBOL file
+    let sbolXML = await processSBOLFile(this.files[0]);
+
+    // Parse SBOL and display results
+    $.ajax({
+      url: 'http://localhost:8082/importSBOL',
+      type: 'POST',
+      data: sbolXML,
+      contentType: "text/xml",
+      dataType: "text",
+      processData: false,
+      success: function(data){
+        data = JSON.parse(data);
+        displayDiagram(data.stateGraph);
+        // Undefined design
+        if (String(data.designs).includes('is not defined')) {
+          displayDesigns(editors, data.designs);
+        } else {
+          displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+        }
+      }
+    })
+    .fail((response) => {
+      alert(response.responseText);
+    });
+  });
+
 
   $("#submitBtn").click(function(){
     // Reset UI

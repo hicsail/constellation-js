@@ -47,4 +47,38 @@ module.exports = function() {
       });
     });
   });
-}
+
+  describe('SBOL Parsing', function() {
+
+    it('Parse SBOL or', async function(){
+      let result = constellation.constellationGOLDBAR(DESIGN_NAME, 'promoter or cds', CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
+      result = await constellation.constellationSBOL(result.sbols[0]);
+      let atomTexts = Object.values(result.stateGraph).map(obj => obj.text).sort();
+      expect(atomTexts).to.be.an('array').that.includes('promoter');
+      expect(atomTexts).to.be.an('array').that.includes('cds');
+
+      let operators = [];
+      for (let value of Object.values(result.stateGraph)){
+        operators.push(...value.operator);
+      }
+      expect(operators).to.deep.eql(['Or']);
+    });
+
+    it('Parse SBOL repeat', async function(){
+      let result = constellation.constellationGOLDBAR(DESIGN_NAME, 'promoter then zero-or-more cds then rbs', CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
+      result = await constellation.constellationSBOL(result.sbols[0]);
+      let atomTexts = Object.values(result.stateGraph).map(obj => obj.text).sort();
+      expect(atomTexts).to.be.an('array').that.includes('promoter');
+      expect(atomTexts).to.be.an('array').that.includes('rbs');
+      expect(atomTexts).to.be.an('array').that.includes('cds');
+
+        let operators = [];
+        for (let value of Object.values(result.stateGraph)){
+          operators.push(...value.operator);
+        }
+        operators.sort();
+        expect(operators).to.deep.eql(['Then', 'Then', 'ZeroOrMore']);
+    });
+  });
+
+};

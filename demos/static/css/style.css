@@ -38,6 +38,11 @@ textarea {
   font-size: 20px;
 }
 
+#importSBOLBtn {
+  display: block;
+  font-size: 20px;
+}
+
 h5 {
     color: rgb(120, 120, 120);
     font-family: 'Montserrat', 'monospace';
