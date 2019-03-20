@@ -455,6 +455,9 @@ $(document).ready(function() {
     maxCycles = document.getElementById('maxCycles').value;
     designName = document.getElementById('designName').value;
 
+    //replace all spaces and special characters for SBOL
+    designName = designName.replace(/[^A-Z0-9]/ig, "_");
+
     $.post('http://localhost:8082/postSpecs', {
       "designName": designName,
       "specification": specification,
