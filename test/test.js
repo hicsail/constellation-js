@@ -6,6 +6,5 @@ const constellationTests = require('./constellationTests');
 const sbolTests = require('./sbolTests');
 
 constellationTests();
-enumerationTests();
-// graphTests();
-sbolTests();
+// enumerationTests();
+// sbolTests();

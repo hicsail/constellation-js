@@ -18,6 +18,16 @@ module.exports = function() {
       expect(result.designs).to.contain('c1');
     });
 
+    it('and', function() {
+      let result = constellation.goldbar(DESIGN_NAME, 'c and c', CATEGORIES, 10, 0);
+      expect(result.designs.length).to.equal(CCATS);
+      expect(result.designs).to.contain('c1');
+
+      result = constellation.goldbar(DESIGN_NAME, 'a and b', CATEGORIES, 10, 0);
+      expect(result.designs.length).to.equal(0);
+    });
+
+
     it('or', function() {
       const result = constellation.goldbar(DESIGN_NAME, 'a or b', CATEGORIES, 10, 0);
       expect(result.designs.length).to.equal(ACATS + BCATS);
