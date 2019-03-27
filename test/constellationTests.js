@@ -13,27 +13,29 @@ const f = (a, b) => [].concat(...a.map(d => b.map(e => d.concat(',').concat(e)))
 const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a);
 
 module.exports = function() {
+  describe('Operator unit tests, base cases', function() {
 
-  describe('Unary expressions', function() {
-    it('atom', function() {
-      let result = constellation.goldbar(DESIGN_NAME, 'a', CATSTR, 10, 0);
-      expect(result.designs.length).to.equal(ALEN);
-      expect(result.designs).to.have.members(CATEGORIES.a);
-    });
+    describe('Unary expressions', function() {
+      it('atom', function() {
+        let result = constellation.goldbar(DESIGN_NAME, 'a', CATSTR, 10, 0);
+        expect(result.designs.length).to.equal(ALEN);
+        expect(result.designs).to.have.members(CATEGORIES.a);
+      });
 
-    it('one-or-more', function() {
-      let result = constellation.goldbar(DESIGN_NAME, 'one-or-more a', CATSTR, 10, 0);
-      expect(result.designs.length).to.equal(ALEN);
-      expect(result.designs).to.have.members(CATEGORIES.a);
-      expect(result.paths.length).to.equal(1);
-      // expect(result.paths[0].type === ATOM);
-    });
+      it('one-or-more', function() {
+        let result = constellation.goldbar(DESIGN_NAME, 'one-or-more a', CATSTR, 10, 0);
+        expect(result.designs.length).to.equal(ALEN);
+        expect(result.designs).to.have.members(CATEGORIES.a);
+        expect(result.paths.length).to.equal(1);
+        // expect(result.paths[0].type === ATOM);
+      });
 
-    it('zero-or-more', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more a', CATSTR, 10, 0);
-      expect(result.designs.length).to.equal(ALEN);
-      expect(result.designs).to.have.members(CATEGORIES.a);
-      // TODO: state that empty string is not an option as an explicit design choice
+      it('zero-or-more', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more a', CATSTR, 10, 0);
+        expect(result.designs.length).to.equal(ALEN);
+        expect(result.designs).to.have.members(CATEGORIES.a);
+        // TODO: state that empty string is not an option as an explicit design choice
+      });
     });
 
     describe('Binary expressions', function() {
@@ -68,6 +70,7 @@ module.exports = function() {
       });
     });
   });
+
 
   describe('unary op (unary exp)', function() {
     it('one-or-more (one-or-more atom)', function() {
@@ -154,22 +157,31 @@ module.exports = function() {
     });
 
     it('(atom or atom) then atom', function() {
-      let result = constellation.goldbar(DESIGN_NAME, '(a or b) then c', CATSTR, 10 , 0);
+      const result = constellation.goldbar(DESIGN_NAME, '(a or b) then c', CATSTR, 10 , 0);
       expect(result.designs.length).to.equal((ALEN * CLEN) + (BLEN * CLEN));
       expect(result.designs).to.have.members((cartesian(CATEGORIES.b, CATEGORIES.c)).concat(cartesian(CATEGORIES.a, CATEGORIES.c)));
     });
 
     // And
-    it('(a and b) or c', function() {
-
+    it('(atom and atom) or atom', function() {
+      const result = constellation.goldbar(DESIGN_NAME, '(a or b) then c', CATSTR, 10 , 0);
+      expect(result.designs.length).to.equal((ALEN * CLEN) + (BLEN * CLEN));
+      expect(result.designs).to.have.members((cartesian(CATEGORIES.b, CATEGORIES.c)).concat(cartesian(CATEGORIES.a, CATEGORIES.c)));
     });
 
-    it('(a and b) and c', function() {
+    it('(atom and atom) and atom', function() {
+      let result = constellation.goldbar(DESIGN_NAME, '(a and a) and a', CATSTR, 10 , 0);
+      expect(result.designs.length).to.equal(ALEN);
+      expect(result.designs).to.have.members(CATEGORIES.a);
 
+      result = constellation.goldbar(DESIGN_NAME, '(a and a) and b', CATSTR, 10 , 0);
+      expect(result.designs.length).to.equal(0);
     });
 
-    it('(a and b) then c', function() {
-
+    it('(atom and atom) then atom', function() {
+      let result = constellation.goldbar(DESIGN_NAME, '(a and a) then b', CATSTR, 10 , 0);
+      expect(result.designs.length).to.equal(ALEN * BLEN);
+      expect(result.designs).to.have.members(cartesian(CATEGORIES.a, CATEGORIES.b));
     });
 
     // Then
