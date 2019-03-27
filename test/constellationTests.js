@@ -179,25 +179,32 @@ module.exports = function() {
     });
 
     it('(atom and atom) then atom', function() {
-      let result = constellation.goldbar(DESIGN_NAME, '(a and a) then b', CATSTR, 10 , 0);
+      const result = constellation.goldbar(DESIGN_NAME, '(a and a) then b', CATSTR, 10 , 0);
       expect(result.designs.length).to.equal(ALEN * BLEN);
       expect(result.designs).to.have.members(cartesian(CATEGORIES.a, CATEGORIES.b));
     });
 
     // Then
-    it('(a then b) or c', function() {
-
+    it('(atom then atom) or atom', function() {
+      const result = constellation.goldbar(DESIGN_NAME, '(a then b) or c', CATSTR, 10 , 0);
+      expect(result.designs.length).to.equal((ALEN * BLEN) + CLEN);
+      expect(result.designs).to.have.members((CATEGORIES.c).concat(cartesian(CATEGORIES.a, CATEGORIES.b)));
     });
 
-    it('(a then b) then c', function() {
-
+    it('(atom then atom) then atom', function() {
+      const result = constellation.goldbar(DESIGN_NAME, '(a then b) then c', CATSTR, 10 , 0);
+      expect(result.designs.length).to.equal(ALEN * BLEN * CLEN);
+      expect(result.designs).to.have.members(cartesian(CATEGORIES.a, CATEGORIES.b, CATEGORIES.c));
     });
 
-    it('(a then b) and c', function() {
-
+    it('(atom then atom) and atom', function() {
+      const result = constellation.goldbar(DESIGN_NAME, '(a then b) and a', CATSTR, 10 , 0);
+      expect(result.designs.length).to.equal(ALEN);
+      expect(result.designs).to.have.members(CATEGORIES.a);
     });
+  });
 
-  })
+  
   // describe ('Chained expressions', function() {
   //   it('Multiple then', function() {
   //     const result = constellation.goldbar(DESIGN_NAME, 'a then b then c', CATSTR, 10 , 0);
