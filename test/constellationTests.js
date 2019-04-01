@@ -1,156 +1,249 @@
 const expect = require('chai').expect;
 const constellation = require('../lib/constellation');
 
-const ATOM = 'atom';
-const CATEGORIES = '{"a":["a1","a2"],"b":["b1","b2","b3"],"c":["c1"]}';
-const ACATS = 2;
-const BCATS = 3;
-const CCATS = 1;
+const CATEGORIES = {"a":["a1","a2"],"b":["b1","b2","b3"],"c":["c1"]};
+const ALEN = CATEGORIES.a.length;
+const BLEN = CATEGORIES.b.length;
+const CLEN = CATEGORIES.c.length;
 
+const CATSTR = JSON.stringify(CATEGORIES);
 const DESIGN_NAME = 'design';
 
+const f = (a, b) => [].concat(...a.map(d => b.map(e => d.concat(',').concat(e))));
+const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a);
+
+function expectA(result) {
+  expect(result.designs.length).to.equal(ALEN);
+  expect(result.designs).to.have.members(CATEGORIES.a);
+}
+
+function expectAConcatB(result) {
+  expect(result.designs.length).to.equal(ALEN + BLEN);
+  expect(result.designs).to.have.members((CATEGORIES.a).concat(CATEGORIES.b));
+}
+
+function expectACartesianB(result) {
+  expect(result.designs.length).to.equal(ALEN * BLEN);
+  expect(result.designs).to.have.members(cartesian(CATEGORIES.a, CATEGORIES.b));
+}
+
 module.exports = function() {
+  describe('Operator unit tests, base cases', function() {
 
-  describe('Basic operators', function() {
-    it('atom', function() {
-      let result = constellation.goldbar(DESIGN_NAME, 'c', CATEGORIES, 10, 0);
-      expect(result.designs.length).to.equal(CCATS);
-      expect(result.designs).to.contain('c1');
+    describe('Unary expressions', function() {
+      it('atom', function() {
+        let result = constellation.goldbar(DESIGN_NAME, 'a', CATSTR, 10, 0);
+        expectA(result);
+      });
+
+      it('one-or-more', function() {
+        let result = constellation.goldbar(DESIGN_NAME, 'one-or-more a', CATSTR, 10, 0);
+        expectA(result);
+        expect(result.paths.length).to.equal(1);
+        // expect(result.paths[0].type === ATOM);
+      });
+
+      it('zero-or-more', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more a', CATSTR, 10, 0);
+        expectA(result);
+        // TODO: state that empty string is not an option as an explicit design choice
+      });
     });
 
-    it('and', function() {
-      let result = constellation.goldbar(DESIGN_NAME, 'c and c', CATEGORIES, 10, 0);
-      expect(result.designs.length).to.equal(CCATS);
-      expect(result.designs).to.contain('c1');
+    describe('Binary expressions', function() {
+      it('and', function() {
+        let result = constellation.goldbar(DESIGN_NAME, 'a and a', CATSTR, 10, 0);
+        expectA(result);
 
-      result = constellation.goldbar(DESIGN_NAME, 'a and b', CATEGORIES, 10, 0);
-      expect(result.designs.length).to.equal(0);
+        result = constellation.goldbar(DESIGN_NAME, 'a and b', CATSTR, 10, 0);
+        expect(result.designs.length).to.equal(0);
+      });
+
+      it('or', function() {
+        let result = constellation.goldbar(DESIGN_NAME, 'b or a', CATSTR, 10, 0);
+        expectAConcatB(result);
+
+        result = constellation.goldbar(DESIGN_NAME, 'a or a', CATSTR, 10, 0);
+        expectA(result);
+        // TODO: what should the graph be?
+      });
+
+      it('then', function() {
+        let result = constellation.goldbar(DESIGN_NAME, 'a then b', CATSTR, 10, 0);
+        expectACartesianB(result);
+        
+        result = constellation.goldbar(DESIGN_NAME, 'a . b', CATSTR, 10, 0);
+        expectACartesianB(result);
+      });
     });
-
-
-    it('or', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'a or b', CATEGORIES, 10, 0);
-      expect(result.designs.length).to.equal(ACATS + BCATS);
-      expect(result.designs).to.contain('a1');
-      expect(result.designs).to.contain('a2');
-      expect(result.designs).to.contain('b1');
-      expect(result.designs).to.contain('b2');
-      expect(result.designs).to.contain('b3');
-    });
-
-    it('then', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'a then c', CATEGORIES, 10, 0);
-      expect(result.designs.length).to.equal(ACATS * CCATS);
-      expect(result.designs).to.contain('a1,c1');
-      expect(result.designs).to.contain('a2,c1');
-    });
-
-    it('then as dot', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'a . c', CATEGORIES, 10, 0);
-      expect(result.designs.length).to.equal(ACATS * CCATS);
-      expect(result.designs).to.contain('a1,c1');
-      expect(result.designs).to.contain('a2,c1');
-    });
-
-    it('one-or-more', function() {
-      let result = constellation.goldbar(DESIGN_NAME, 'one-or-more a', CATEGORIES, 10, 0);
-      expect(result.designs.length).to.equal(ACATS);
-      expect(result.designs).to.contain('a1');
-      expect(result.designs).to.contain('a2');
-      expect(result.paths.length).to.equal(1);
-      expect(result.paths[0].type === ATOM);
-    });
-
-    it('zero-or-more', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more a', CATEGORIES, 10, 0);
-      expect(result.designs.length).to.equal(ACATS);
-      expect(result.designs).to.contain('a1');
-      expect(result.designs).to.contain('a2');
-      expect(result.paths.length).to.equal(1);
-      expect(result.paths[0].type === ATOM);
-    });
-
   });
 
-  describe ('Chained expressions', function() {
-    it('Multiple then', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'a then b then c', CATEGORIES, 10 , 0);
-      expect(result.designs.length).to.equal(ACATS * BCATS * CCATS);
+  describe('Operator compositions', function() {
+    describe('unary op (unary exp)', function() {
+      it('one-or-more (one-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (one-or-more a)', CATSTR, 10 , 0);
+        expectA(result);
+      });
+
+      // TODO: this graph looks wrong
+      it('one-or-more (zero-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (zero-or-more a)', CATSTR, 10 , 0);
+        expectA(result); 
+      });
+
+      it('zero-or-more (zero-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (zero-or-more a)', CATSTR, 10 , 0);
+        expectA(result);  
+      });
+
+      it('zero-or-more (one-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (one-or-more a)', CATSTR, 10 , 0);
+        expectA(result);       
+      });
     });
 
-    it('Multiple or', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'a or b or c', CATEGORIES, 10 , 0);
-      expect(result.designs.length).to.equal(ACATS + BCATS + CCATS);
+
+    describe('unary-op (binary-exp)', function() {
+      // zero-or-more
+      it('zero-or-more (atom or atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (a or b)', CATSTR, 10 , 0);
+        expectAConcatB(result);
+      });
+
+      it('zero-or-more (atom and atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (a and a)', CATSTR, 10 , 0);
+        expectA(result);
+      });
+
+      it('zero-or-more (atom then atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (a then b)', CATSTR, 10 , 0);
+        expectACartesianB(result);
+      });
+
+      // one-or-more
+      it('one-or-more (atom or atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (a or c)', CATSTR, 10 , 0);
+        expect(result.designs.length).to.equal(((ALEN * CLEN) * 2) + ALEN + CLEN);
+      });
+
+      it('one-or-more (atom and atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (a and a)', CATSTR, 10 , 0);
+        expectA(result);
+      });
+
+      it('one-or-more (atom then atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (a then b)', CATSTR, 10 , 0);
+        expectACartesianB(result)
+      });
     });
 
-    // it('Multiple and', function() {
-    //   const result = constellation.goldbar(DESIGN_NAME, 'a and b and c', categories, 10);
-    //   expect(result.designs.length).to.equal(0);
-    // });
+    describe('(binary-exp) binary-op (atom)', function() {
+      // Or
+      it('(atom or atom) or atom', function() {
+        let result = constellation.goldbar(DESIGN_NAME, 'a or b or c', CATSTR, 10 , 0);
+        expect(result.designs.length).to.equal(ALEN + BLEN + CLEN);
+        expect(result.designs).to.have.members((CATEGORIES.c).concat(CATEGORIES.b).concat(CATEGORIES.a));
 
-    it('Multiple one-or-more', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (one-or-more a)', CATEGORIES, 10, 0);
-      expect(result.designs.length).to.equal(ACATS);
-      expect(result.designs).to.contain('a1');
-      expect(result.designs).to.contain('a2');
-      expect(result.paths.length).to.equal(1);
-      expect(result.paths[0].type === ATOM);
+        result = constellation.goldbar(DESIGN_NAME, 'a or a or b', CATSTR, 10 , 0);
+        expectAConcatB(result);
+      });
+
+      it('(atom or atom) and atom', function() {
+        const result = constellation.goldbar(DESIGN_NAME, '(a or c) and a', CATSTR, 10 , 0);
+        expectA(result);
+      });
+
+      it('(atom or atom) then atom', function() {
+        const result = constellation.goldbar(DESIGN_NAME, '(a or b) then c', CATSTR, 10 , 0);
+        expect(result.designs.length).to.equal((ALEN * CLEN) + (BLEN * CLEN));
+        expect(result.designs).to.have.members((cartesian(CATEGORIES.b, CATEGORIES.c)).concat(cartesian(CATEGORIES.a, CATEGORIES.c)));
+      });
+
+      // And
+      it('(atom and atom) or atom', function() {
+        const result = constellation.goldbar(DESIGN_NAME, '(a or b) then c', CATSTR, 10 , 0);
+        expect(result.designs.length).to.equal((ALEN * CLEN) + (BLEN * CLEN));
+        expect(result.designs).to.have.members((cartesian(CATEGORIES.b, CATEGORIES.c)).concat(cartesian(CATEGORIES.a, CATEGORIES.c)));
+      });
+
+      it('(atom and atom) and atom', function() {
+        let result = constellation.goldbar(DESIGN_NAME, '(a and a) and a', CATSTR, 10 , 0);
+        expectA(result);
+
+        result = constellation.goldbar(DESIGN_NAME, '(a and a) and b', CATSTR, 10 , 0);
+        expect(result.designs.length).to.equal(0);
+      });
+
+      it('(atom and atom) then atom', function() {
+        const result = constellation.goldbar(DESIGN_NAME, '(a and a) then b', CATSTR, 10 , 0);
+        expectACartesianB(result);
+      });
+
+      // Then
+      it('(atom then atom) or atom', function() {
+        const result = constellation.goldbar(DESIGN_NAME, '(a then b) or c', CATSTR, 10 , 0);
+        expect(result.designs.length).to.equal((ALEN * BLEN) + CLEN);
+        expect(result.designs).to.have.members((CATEGORIES.c).concat(cartesian(CATEGORIES.a, CATEGORIES.b)));
+      });
+
+      it('(atom then atom) then atom', function() {
+        const result = constellation.goldbar(DESIGN_NAME, '(a then b) then c', CATSTR, 10 , 0);
+        expect(result.designs.length).to.equal(ALEN * BLEN * CLEN);
+        expect(result.designs).to.have.members(cartesian(CATEGORIES.a, CATEGORIES.b, CATEGORIES.c));
+      });
+
+      it('(atom then atom) and atom', function() {
+        const result = constellation.goldbar(DESIGN_NAME, '(a then b) and a', CATSTR, 10 , 0);
+        expectA(result);
+      });
     });
 
-    it('Multiple zero-or-more', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (zero-or-more a)', CATEGORIES, 10, 0);
-      expect(result.designs.length).to.equal(ACATS);
-      expect(result.designs).to.contain('a1');
-      expect(result.designs).to.contain('a2');
-    });
+    describe('(atom) binary-op (unary-exp)', function() {
+      // OR
+      it('atom or (one-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'a or (one-or-more b)', CATSTR, 10 , 0);
+        expectAConcatB(result);
+      });
+  
+      it('atom or (zero-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'a or (zero-or-more b)', CATSTR, 10 , 0);
+        expectAConcatB(result);
+      });
 
-    it('Mixing functions', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'a then (one-or-more b or zero-or-more c)', CATEGORIES, 50, 0); // TODO add and
-      expect(result.designs.length).to.equal(ACATS * (BCATS + CCATS + 1));
-    });
+      // AND
+      it('atom and (zero-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'a and (zero-or-more a)', CATSTR, 10 , 0);
+        expectA(result);
+      });
 
-    it('Then downstream from cycle', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more a then b', CATEGORIES, 50, 0);
-      expect(result.designs.length).to.equal((ACATS + 1) * BCATS);
-    });
+      it('atom and (zero-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'a and (one-or-more a)', CATSTR, 10 , 0);
+        expectA(result);
+      });
 
+      // THEN
+      it('atom then (zero-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'a then (one-or-more b)', CATSTR, 10 , 0);
+        expectACartesianB(result);
+      });
+
+      it('atom then (zero-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'a then (one-or-more b)', CATSTR, 10 , 0);
+        expectACartesianB(result);
+      });
+    });
   });
 
+  
   describe('Cycles', function () {
-    it('Atom', function() {
-      let result = constellation.goldbar(DESIGN_NAME, 'c', CATEGORIES, 10, 2);
-      expect(result.designs.length).to.equal(CCATS);
-    });
-
-    it('Linear operators', function() {
-      let result = constellation.goldbar(DESIGN_NAME, 'a or b', CATEGORIES, 10, 2);
-      expect(result.designs.length).to.equal(ACATS + BCATS);
-      expect(result.designs).to.contain('a1');
-      expect(result.designs).to.contain('a2');
-      expect(result.designs).to.contain('b1');
-      expect(result.designs).to.contain('b2');
-      expect(result.designs).to.contain('b3');
-      result = constellation.goldbar(DESIGN_NAME, 'a then c', CATEGORIES, 10, 2);
-      expect(result.designs.length).to.equal(ACATS * CCATS);
-      expect(result.designs).to.contain('a1,c1');
-      expect(result.designs).to.contain('a2,c1');
-    });
-
-    it('one-or-more', function() {
-      let result = constellation.goldbar(DESIGN_NAME, 'one-or-more a', CATEGORIES, 10, 1);
-      expect(result.designs.length).to.equal(ACATS + ACATS * ACATS);
-      expect(result.designs).to.contain('a1');
-      expect(result.designs).to.contain('a2');
-      expect(result.designs).to.contain('a1,a1');
-      expect(result.designs).to.contain('a1,a2');
-      expect(result.designs).to.contain('a2,a1');
-      expect(result.designs).to.contain('a2,a2');
-      expect(result.paths.length).to.equal(2);
+    it('atom', function() {
+      let result = constellation.goldbar(DESIGN_NAME, 'c', CATSTR, 10, 2);
+      expect(result.designs.length).to.equal(CLEN);
     });
 
     it('zero-or-more', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more a', CATEGORIES, 10, 1);
-      expect(result.designs.length).to.equal(ACATS + ACATS * ACATS);
+      const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more a', CATSTR, 10, 1);
+      expect(result.designs.length).to.equal(ALEN + ALEN * ALEN);
       expect(result.designs).to.contain('a1');
       expect(result.designs).to.contain('a2');
       expect(result.designs).to.contain('a1,a1');
@@ -159,102 +252,102 @@ module.exports = function() {
       expect(result.designs).to.contain('a2,a2');
       expect(result.paths.length).to.equal(2);
     });
-
-    it('Multiple one-or-more', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (one-or-more a)', CATEGORIES, 10, 1);
-      expect(result.designs.length).to.equal(ACATS + ACATS * ACATS);
-      expect(result.designs).to.contain('a1');
-      expect(result.designs).to.contain('a2');
-      expect(result.designs).to.contain('a1,a1');
-      expect(result.designs).to.contain('a1,a2');
-      expect(result.designs).to.contain('a2,a1');
-      expect(result.designs).to.contain('a2,a2');
-      expect(result.paths.length).to.equal(2);
-    });
-
-    it('Multiple zero-or-more', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (zero-or-more a)', CATEGORIES, 10, 1);
-      expect(result.designs.length).to.equal(ACATS + ACATS * ACATS);
-      expect(result.designs).to.contain('a1');
-      expect(result.designs).to.contain('a2');
-      expect(result.designs).to.contain('a1,a1');
-      expect(result.designs).to.contain('a1,a2');
-      expect(result.designs).to.contain('a2,a1');
-      expect(result.designs).to.contain('a2,a2');
-      expect(result.paths.length).to.equal(2);
-    });
-
-    it('Then downstream from cycle', function() {
-      const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more a then b', CATEGORIES, 50, 1);
-      expect(result.designs.length).to.equal(BCATS + ACATS * BCATS + ACATS * ACATS * BCATS);
-    });
-
   });
+
+  describe('Sanitise category input', function () {
+    it('empty categories', function () {
+      expect(() => constellation.goldbar(DESIGN_NAME, 'a', '{}', 10, 0)).to.throw('a is not defined in categories');
+    });
+
+    it('handle defined but empty category', function () {
+      const result = constellation.goldbar(DESIGN_NAME, 'a', '{"a": []}', 10, 0);
+      expect(JSON.stringify(result.designs)).to.equal('[]');
+    });
+
+    it('mismatched brackets', function () {
+      expect(() => constellation.goldbar(DESIGN_NAME, '(a}', '{}', 10, 0)).to.throw('Parsing error!');
+    });
+  });
+
+  describe('Invalid characters', function () {
+    it('Whitespace should not be included in designs', function () {
+      const result = constellation.goldbar(DESIGN_NAME, 'a', '{"a":["\ta1", " a2"]}', 10, 0);
+      
+      expect(JSON.stringify(result.designs)).to.contain('a1');
+      expect(JSON.stringify(result.designs)).to.contain('a2');
+    });
+
+    it('Other symbols should be parsed into category', function () {
+      const result = constellation.goldbar(DESIGN_NAME, 'a', '{"a":["$a1", "a2"]}', 10, 0);
+      expect(JSON.stringify(result.designs)).to.contain('a1');
+      expect(JSON.stringify(result.designs)).to.contain('a2');
+    });
+  });
+
 
   describe('Sanitise specification input', function () {
     it('Atom not in categories', function () {
-      expect(() => constellation.goldbar(DESIGN_NAME, 'd', CATEGORIES, 10, 0)).to.throw('d is not defined in categories');
+      expect(() => constellation.goldbar(DESIGN_NAME, 'd', CATSTR, 10, 0)).to.throw('d is not defined in categories');
     });
 
     it('Mismatched brackets', function () {
-      expect(() => constellation.goldbar(DESIGN_NAME, '(a}', CATEGORIES, 10, 0)).to.throw('Parsing error!');
+      expect(() => constellation.goldbar(DESIGN_NAME, '(a}', CATSTR, 10, 0)).to.throw('Parsing error!');
     });
 
 
     it('Empty specification', function () {
-      expect(() => constellation.goldbar(DESIGN_NAME, '', CATEGORIES, 10, 0)).to.throw('No input received')
+      expect(() => constellation.goldbar(DESIGN_NAME, '', CATSTR, 10, 0)).to.throw('No input received')
     });
 
     describe('Invalid characters', function () {
       it('Tabs used should not throw errors', function () {
-        const result = constellation.goldbar(DESIGN_NAME, '\ta', CATEGORIES, 10, 0);
+        const result = constellation.goldbar(DESIGN_NAME, '\ta', CATSTR, 10, 0);
         expect(result.designs).to.contain('a1');
         expect(result.designs).to.contain('a2');
       });
 
       // it('$', function () {
-      //   expect(() => constellation.goldbar(DESIGN_NAME, 'a then $a', CATEGORIES, 10)).to.throw('Parsing error!');
+      //   expect(() => constellation.goldbar(DESIGN_NAME, 'a then $a', CATSTR, 10)).to.throw('Parsing error!');
       // });
       // TODO turn back on when imparse starts throwing errors
 
       it('_', function () {
-        expect(() => constellation.goldbar(DESIGN_NAME, '_a', CATEGORIES, 10, 0)).to.throw('_a is not defined in categories');
+        expect(() => constellation.goldbar(DESIGN_NAME, '_a', CATSTR, 10, 0)).to.throw('_a is not defined in categories');
       });
     });
 
   });
 
-  describe('Sanitise category input', function () {
-    it('Empty categories', function () {
-      const categories = '{}';
-      expect(() => constellation.goldbar(DESIGN_NAME, 'a', categories, 10, 0)).to.throw('a is not defined in categories');
-    });
 
-    it('Handle defined but empty category', function () {
-      let categories = '{"a": []}';
-      const result = constellation.goldbar(DESIGN_NAME, 'a', categories, 10, 0);
-      expect(JSON.stringify(result.designs)).to.equal('[]');
-    });
 
-    it('Mismatched brackets', function () {
-      expect(() => constellation.goldbar(DESIGN_NAME, '(a}', CATEGORIES, 10, 0)).to.throw('Parsing error!');
-    });
+  //   it('Multiple one-or-more', function() {
+  //     const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (one-or-more a)', CATSTR, 10, 1);
+  //     expect(result.designs.length).to.equal(ALEN + ALEN * ALEN);
+  //     expect(result.designs).to.contain('a1');
+  //     expect(result.designs).to.contain('a2');
+  //     expect(result.designs).to.contain('a1,a1');
+  //     expect(result.designs).to.contain('a1,a2');
+  //     expect(result.designs).to.contain('a2,a1');
+  //     expect(result.designs).to.contain('a2,a2');
+  //     expect(result.paths.length).to.equal(2);
+  //   });
 
-    describe('Invalid characters', function () {
-      it('Whitespace should not be included in designs', function () {
-        let categories = '{"a":["\ta1", " a2"]}';
-        const result = constellation.goldbar(DESIGN_NAME, 'a', categories, 10, 0);
-        expect(JSON.stringify(result.designs)).to.contain('a1');
-        expect(JSON.stringify(result.designs)).to.contain('a2');
-      });
+  //   it('Multiple zero-or-more', function() {
+  //     const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (zero-or-more a)', CATSTR, 10, 1);
+  //     expect(result.designs.length).to.equal(ALEN + ALEN * ALEN);
+  //     expect(result.designs).to.contain('a1');
+  //     expect(result.designs).to.contain('a2');
+  //     expect(result.designs).to.contain('a1,a1');
+  //     expect(result.designs).to.contain('a1,a2');
+  //     expect(result.designs).to.contain('a2,a1');
+  //     expect(result.designs).to.contain('a2,a2');
+  //     expect(result.paths.length).to.equal(2);
+  //   });
 
-      it('Other symbols should be parsed into category', function () {
-        let categories = '{"a":["$a1", "a2"]}';
-        const result = constellation.goldbar(DESIGN_NAME, 'a', categories, 10, 0);
-        expect(JSON.stringify(result.designs)).to.contain('a1');
-        expect(JSON.stringify(result.designs)).to.contain('a2');
-      });
-    });
-  });
+  //   it('Then downstream from cycle', function() {
+  //     const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more a then b', CATSTR, 50, 1);
+  //     expect(result.designs.length).to.equal(BLEN + ALEN * BLEN + ALEN * ALEN * BLEN);
+  //   });
 
+  // });
 };
