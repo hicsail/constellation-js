@@ -11,10 +11,6 @@ body {
   font-size: 20px;
 }
 
-.modal-content {
-  display: flex;
-}
-
 /* always have some space below the content so that we can scroll properly*/
 .main-content {
   margin-bottom: 10%;
@@ -107,6 +103,18 @@ textarea {
   font-size: 16px;
 }
 
+/*
+About section
+ */
+.modal-content {
+  display: flex;
+}
+
+.logo {
+  width: auto;
+  height: 50px;
+  padding: 5px;
+}
 
 /*.link line {*/
   /*stroke: #585858;*/
