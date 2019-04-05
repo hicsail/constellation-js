@@ -64,8 +64,10 @@ Buttons
 */
 
 .navBtn{
-  width: 150px;
   cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  background-color: transparent;
+  border: transparent;
 }
 
 #importSBOLBtn {
@@ -80,6 +82,10 @@ Buttons
 
 .pull-right {
   float: right !important;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
 
 /*
