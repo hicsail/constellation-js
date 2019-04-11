@@ -110,6 +110,13 @@ textarea {
 }
 
 /*
+spacing in the designs box
+ */
+.CodeMirror-wrap pre {
+  white-space: normal;
+}
+
+/*
 About section
  */
 .modal-content {

@@ -348,6 +348,9 @@ function dragEnded() {
  * Resets graph and removes SVG elements
  */
 function resetDiagram() {
+  if(simulationPointer){
+    simulationPointer.stop();
+  }
   d3.selectAll('svg').remove();
 }
 
@@ -397,10 +400,6 @@ $(document).ready(function() {
   /*    SBOL   */
   /* * * * * * */
   async function processSBOL(file) {
-    // Reset UI
-    resetDiagram();
-    displayDesigns(editors, '');
-
     //read SBOL file
     let sbolXML = await processSBOLFile(file);
 
@@ -429,19 +428,21 @@ $(document).ready(function() {
   };
 
   $('#demo-option').on('click', function() {
+    document.getElementById('designName').value = "demo-example";
     editors.specEditor.setValue('one-or-more(one-or-more(promoter then nonCodingRna)then cds then \n (zero-or-more \n (nonCodingRna or (one-or-more \n (nonCodingRna then promoter then nonCodingRna) then cds)) then \n (terminator or (terminator then nonCodingRna) or (nonCodingRna then terminator)))))')
     editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
   });
 
 
   $('#debug-option').on('click', function() {
+    document.getElementById('designName').value = "debug-example";
     editors.specEditor.setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
     editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
   });
 
 
   $('#exportSBOLBtn').on('click', function() {
-    downloadSBOL(sbolDoc, 'constellation_' + designName + 'sbol.xml');
+    downloadSBOL(sbolDoc, 'constellation_' + designName + '_sbol.xml');
   });
 
   $('[data-toggle="tooltip"]').tooltip();
@@ -451,6 +452,7 @@ $(document).ready(function() {
     // Reset UI
     resetDiagram();
     displayDesigns(editors, '');
+    $("#exportSBOLBtn").addClass('hidden');
     $('#goldbarSpinner').removeClass('hidden'); // show spinner
 
     let maxCycles = 0;
@@ -566,6 +568,7 @@ $(document).ready(function() {
 });
 
 function resetStepOne(){
+  $("#importSBOLBtn").val("");
   $("#nextBtn").attr("disabled", true);
   $('#sbolSpinner').addClass('hidden');
   $("#specification-sbol").prop("checked", false);
