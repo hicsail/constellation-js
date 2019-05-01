@@ -26,33 +26,73 @@ function readModuleFile(path, callback) {
 module.exports = function() {
 
   describe('SBOL Generation', function() {
-    it('atom', function(done) {
-      let result = constellation.goldbar(DESIGN_NAME, 'rbs', CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
 
-      readModuleFile('./sbolResults/atom.txt', function (err, words) {
-        expect(err).to.be.a('null');
-        expect(trimX(result.sbols[0].trim())).to.eql(trimX(words.trim()));
-        done();
+    describe('Unary expressions', function() {
+      it('atom', function(done) {
+        let result = constellation.goldbar(DESIGN_NAME, 'rbs', CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
+
+        readModuleFile('./sbolResults/atom.txt', function (err, words) {
+          expect(err).to.be.a('null');
+          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
+          done();
+        });
+      });
+
+      it('one-or-more', function(done) {
+        const spec = 'one-or-more rbs';
+        let result = constellation.goldbar(DESIGN_NAME, spec, CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
+
+        readModuleFile('./sbolResults/one-or-more.txt', function (err, words) {
+          expect(err).to.be.a('null');
+          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
+          done();
+        });
+      });
+
+      it('zero-or-more', function(done) {
+        const spec = 'zero-or-more rbs';
+        let result = constellation.goldbar(DESIGN_NAME, spec, CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
+
+        readModuleFile('./sbolResults/zero-or-more.txt', function (err, words) {
+          expect(err).to.be.a('null');
+          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
+          done();
+        });
       });
     });
 
-    it('Spec for paper', function(done) {
-      const spec = 'one-or-more(one-or-more(promoter then cds)then cds then (zero-or-more (cds or (one-or-more (cds then promoter then cds) then cds)) then (terminator or (terminator then cds) or (cds then terminator)))))';
-      let result = constellation.goldbar(DESIGN_NAME, spec, CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
+    describe('Binary expressions', function() {
 
-      readModuleFile('./sbolResults/paperEx.txt', function (err, words) {
-        expect(err).to.be.a('null');
-        expect(trimX(result.sbols[0].trim())).to.eql(trimX(words.trim()));
-        done();
+      it('or', function(done) {
+        const spec = 'promoter or rbs';
+        let result = constellation.goldbar(DESIGN_NAME, spec, CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
+
+        readModuleFile('./sbolResults/or.txt', function (err, words) {
+          expect(err).to.be.a('null');
+          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
+          done();
+        });
+      });
+
+      it('then', function(done) {
+        const spec = 'promoter then rbs';
+        let result = constellation.goldbar(DESIGN_NAME, spec, CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
+
+        readModuleFile('./sbolResults/then.txt', function (err, words) {
+          expect(err).to.be.a('null');
+          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
+          done();
+        });
       });
     });
+    
   });
 
   describe('SBOL Parsing', function() {
 
     it('Parse SBOL or', async function(){
       let result = constellation.goldbar(DESIGN_NAME, 'promoter or cds', CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
-      result = await constellation.sbol(result.sbols[0]);
+      result = await constellation.sbol(result.sbol);
       let atomTexts = Object.values(result.stateGraph).map(obj => obj.text).sort();
       expect(atomTexts).to.be.an('array').that.includes('promoter');
       expect(atomTexts).to.be.an('array').that.includes('cds');
@@ -66,7 +106,7 @@ module.exports = function() {
 
     it('Parse SBOL repeat', async function(){
       let result = constellation.goldbar(DESIGN_NAME, 'promoter then zero-or-more rbs then cds', CATEGORIES, NUM_DESIGNS, MAX_CYCLES);
-      result = await constellation.sbol(result.sbols[0]);
+      result = await constellation.sbol(result.sbol);
       let atomTexts = Object.values(result.stateGraph).map(obj => obj.text).sort();
       expect(atomTexts).to.be.an('array').that.includes('promoter');
       expect(atomTexts).to.be.an('array').that.includes('rbs');

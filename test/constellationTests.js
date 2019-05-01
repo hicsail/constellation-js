@@ -28,6 +28,28 @@ function expectACartesianB(result) {
 }
 
 module.exports = function() {
+  describe('Missing input errors', function() {
+    it('Missing num designs', function () {
+      expect(() => constellation.goldbar(DESIGN_NAME, '(a}', '{}', null, 0)).to.throw('Invalid number of designs');
+    });
+
+    it('Invalid num designs', function () {
+      expect(() => constellation.goldbar(DESIGN_NAME, '(a}', '{}', 0, 0)).to.throw('Invalid number of designs');
+    });
+
+    it('Invalid cycle depth', function () {
+      expect(() => constellation.goldbar(DESIGN_NAME, '(a}', '{}', 10, -1)).to.throw('Invalid cycle depth');
+    });
+
+    it('Missing specification', function () {
+      expect(() => constellation.goldbar(DESIGN_NAME, null, '{}', 10, 0)).to.throw('No input received')
+    });
+
+    it('Missing design name', function () {
+      expect(() => constellation.goldbar(null, '(a}', '{}', 10, 0)).to.throw('No design name is specified');
+    });
+  });
+
   describe('Operator unit tests, base cases', function() {
 
     describe('Unary expressions', function() {
@@ -71,7 +93,7 @@ module.exports = function() {
       it('then', function() {
         let result = constellation.goldbar(DESIGN_NAME, 'a then b', CATSTR, 10, 0);
         expectACartesianB(result);
-        
+
         result = constellation.goldbar(DESIGN_NAME, 'a . b', CATSTR, 10, 0);
         expectACartesianB(result);
       });
@@ -88,17 +110,17 @@ module.exports = function() {
       // TODO: this graph looks wrong
       it('one-or-more (zero-or-more atom)', function() {
         const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (zero-or-more a)', CATSTR, 10 , 0);
-        expectA(result); 
+        expectA(result);
       });
 
       it('zero-or-more (zero-or-more atom)', function() {
         const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (zero-or-more a)', CATSTR, 10 , 0);
-        expectA(result);  
+        expectA(result);
       });
 
       it('zero-or-more (one-or-more atom)', function() {
         const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (one-or-more a)', CATSTR, 10 , 0);
-        expectA(result);       
+        expectA(result);
       });
     });
 
@@ -204,7 +226,7 @@ module.exports = function() {
         const result = constellation.goldbar(DESIGN_NAME, 'a or (one-or-more b)', CATSTR, 10 , 0);
         expectAConcatB(result);
       });
-  
+
       it('atom or (zero-or-more atom)', function() {
         const result = constellation.goldbar(DESIGN_NAME, 'a or (zero-or-more b)', CATSTR, 10 , 0);
         expectAConcatB(result);
@@ -234,7 +256,7 @@ module.exports = function() {
     });
   });
 
-  
+
   describe('Cycles', function () {
     it('atom', function() {
       let result = constellation.goldbar(DESIGN_NAME, 'c', CATSTR, 10, 2);
@@ -272,7 +294,7 @@ module.exports = function() {
   describe('Invalid characters', function () {
     it('Whitespace should not be included in designs', function () {
       const result = constellation.goldbar(DESIGN_NAME, 'a', '{"a":["\ta1", " a2"]}', 10, 0);
-      
+
       expect(JSON.stringify(result.designs)).to.contain('a1');
       expect(JSON.stringify(result.designs)).to.contain('a2');
     });
@@ -292,11 +314,6 @@ module.exports = function() {
 
     it('Mismatched brackets', function () {
       expect(() => constellation.goldbar(DESIGN_NAME, '(a}', CATSTR, 10, 0)).to.throw('Parsing error!');
-    });
-
-
-    it('Empty specification', function () {
-      expect(() => constellation.goldbar(DESIGN_NAME, '', CATSTR, 10, 0)).to.throw('No input received')
     });
 
     describe('Invalid characters', function () {
