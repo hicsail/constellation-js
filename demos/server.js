@@ -4,6 +4,8 @@ let path = require('path');
 let bodyParser = require('body-parser');
 let FormData = require('form-data');
 const Readable = require('stream').Readable;
+const xmlparser = require('express-xml-bodyparser');
+
 let constellation = require('../lib/constellation');
 
 app.use(bodyParser.json());
@@ -50,6 +52,17 @@ app.post('/postSpecs', function(req,res) {
   } catch (error) {
     console.log(error);
     res.status(405).send(String(error));
+  }
+});
+
+app.post('/importSBOL', xmlparser(), async function(req,res) {
+  let data;
+  try {
+    data = await constellation.sbol(req.rawBody);
+    res.status(200).send(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(String(error));
   }
 });
 

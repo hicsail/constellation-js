@@ -5,7 +5,7 @@ const IMAGESIZE = 30;
 const RADIUS = 7;
 const INTERMEDIATE = 'intermediate';
 
-let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDocs;
+let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDoc, sbolFile;
 let designName = 'Constellation';
 
 /* * * * * * */
@@ -32,7 +32,7 @@ function displayDiagram(stateGraph) {
 
   updateSvgSize();
   // Create SVG
-  svgPointer = d3.select('#categoryGraph')
+  svgPointer = d3.select('#graph')
     .append('svg')
     .attr('width', width)
     .attr('height', height);
@@ -277,7 +277,7 @@ function updateLinks(d) {
  * Gets new size of SVG after divs are resized
  */
 function updateSvgSize() {
-  let g = document.getElementById('categoryGraph');
+  let g = document.getElementById('graph');
   width = g.clientWidth;
   height = g.clientHeight;
 }
@@ -348,7 +348,23 @@ function dragEnded() {
  * Resets graph and removes SVG elements
  */
 function resetDiagram() {
+  if(simulationPointer){
+    simulationPointer.stop();
+  }
   d3.selectAll('svg').remove();
+}
+
+function processSBOLFile(file) {
+  return new Promise((resolve) => {
+    // Parse file into XML object
+    let parser = new DOMParser();
+    let reader = new FileReader();
+    reader.readAsText(file, "UTF-8");
+    reader.onload = function (evt) {
+      let data = parser.parseFromString(evt.target.result, "application/xml");
+      resolve(data);
+    };
+  });
 }
 
 /* * * * * * */
@@ -359,9 +375,18 @@ $(document).ready(function() {
   const THEME = 'ambiance';
 
   const editors = {
-    "specEditor": CodeMirror.fromTextArea(document.getElementById('langInput'), {lineNumbers: true}),
-    "catEditor": CodeMirror.fromTextArea(document.getElementById('categories'), {lineNumbers: true}),
-    "designsEditor": CodeMirror.fromTextArea(document.getElementById('designs'), {lineNumbers: true})
+    "specEditor": CodeMirror.fromTextArea(document.getElementById('goldbar-input'), {
+      lineNumbers: true,
+      lineWrapping:true
+    }),
+    "catEditor": CodeMirror.fromTextArea(document.getElementById('categories'), {
+      lineNumbers: true,
+      lineWrapping:true
+    }),
+    "designsEditor": CodeMirror.fromTextArea(document.getElementById('designs'), {
+      lineNumbers: true,
+      lineWrapping:true,
+      readOnly: true})
   };
 
   document.getElementById('numDesigns').value = 40;
@@ -369,37 +394,67 @@ $(document).ready(function() {
 
   editors.specEditor.setOption("theme", THEME);
   editors.catEditor.setOption("theme", THEME);
-  editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
   editors.designsEditor.setOption("theme", THEME);
 
+  /* * * * * * */
+  /*    SBOL   */
+  /* * * * * * */
+  async function processSBOL(file) {
+    //read SBOL file
+    let sbolXML = await processSBOLFile(file);
+
+    // Parse SBOL and display results
+    $.ajax({
+      url: 'http://localhost:8082/importSBOL',
+      type: 'POST',
+      data: sbolXML,
+      contentType: "text/xml",
+      dataType: "text",
+      processData: false,
+      success: function(data){
+        data = JSON.parse(data);
+        displayDiagram(data.stateGraph);
+        // Undefined design
+        if (String(data.designs).includes('is not defined')) {
+          displayDesigns(editors, data.designs);
+        } else {
+          displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+        }
+      }
+    })
+      .fail((response) => {
+        alert(response.responseText);
+      });
+  };
+
   $('#demo-option').on('click', function() {
+    document.getElementById('designName').value = "demo-example";
     editors.specEditor.setValue('one-or-more(one-or-more(promoter then nonCodingRna)then cds then \n (zero-or-more \n (nonCodingRna or (one-or-more \n (nonCodingRna then promoter then nonCodingRna) then cds)) then \n (terminator or (terminator then nonCodingRna) or (nonCodingRna then terminator)))))')
+    editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
   });
 
 
   $('#debug-option').on('click', function() {
+    document.getElementById('designName').value = "debug-example";
     editors.specEditor.setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
+    editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
   });
 
-  $("#knoxBtn").prop("disabled",true);
 
-  $('#knoxBtn').on('click', function() {
-    $.post('http://localhost:8082/sendToKnox', {
-      'designName': designName,
-      'sbolDocs[]': JSON.stringify(sbolDocs)})
-      .fail((response) => {
-        alert(response.responseText);
-      })
-      .done(() => {
-        alert('Design successfully stored in Knox')
-      });
+  $('#exportSBOLBtn').on('click', function() {
+    downloadSBOL(sbolDoc, 'constellation_' + designName + '_sbol.xml');
   });
+
+  $('[data-toggle="tooltip"]').tooltip();
 
 
   $("#submitBtn").click(function(){
     // Reset UI
     resetDiagram();
     displayDesigns(editors, '');
+    $("#exportSBOLBtn").addClass('hidden');
+    $('#goldbarSpinner').removeClass('hidden'); // show spinner
+
     let maxCycles = 0;
     let numDesigns = 10;
 
@@ -409,6 +464,9 @@ $(document).ready(function() {
     numDesigns = document.getElementById('numDesigns').value;
     maxCycles = document.getElementById('maxCycles').value;
     designName = document.getElementById('designName').value;
+
+    //replace all spaces and special characters for SBOL
+    designName = designName.replace(/[^A-Z0-9]/ig, "_");
 
     $.post('http://localhost:8082/postSpecs', {
       "designName": designName,
@@ -427,14 +485,116 @@ $(document).ready(function() {
       } else {
         displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
       }
-      sbolDocs = data.sbols;
-      $("#knoxBtn").prop("disabled",false);
+      sbolDoc = data.sbol;
+
+      $("#exportSBOLBtn").removeClass('hidden'); //show export button
+      $("#goldbarSpinner").addClass('hidden');
+
     }).fail((response) => {
       alert(response.responseText);
+      $("#goldbarSpinner").addClass('hidden');
     });
+
   });
 
+  /*
+  Auto check the SBOL radio button when SBOL file is uploaded
+   */
+  $('#importSBOLBtn').on('change', function() {
+    $("#specification-sbol").prop("checked", true).change(); //trigger change
+    sbolFile = this.files[0];
+  });
+
+  /*
+  Enable Next button when a radio selection is made
+   */
+  $('input[type=radio][name=spec-method]').change(function() {
+    $("#nextBtn").attr("disabled", false);
+  });
+
+  /*
+   Next button shows the step 2 content
+   depending on user selection
+   */
+  $("#nextBtn").click(async function(){
+    $('#sbolSpinner').removeClass('hidden'); // show spinner
+
+    let specMethod = $("input[name='spec-method']:checked").val();
+    if (specMethod === 'goldbar'){
+      showGoldBarStepTwo();
+    }
+
+    if(specMethod === 'sbol'){
+      if(!sbolFile){
+        alert('No file uploaded!');
+        resetStepOne();
+      }
+      await processSBOL(sbolFile);
+      showSBOLStepTwo();
+    }
+
+    $('#step1-content').addClass('hidden');
+  });
+
+  /*
+  Back button & Constellation on navbar goes back to step 1 and clears everything
+   */
+  $("#backBtn").click(function(){
+    resetAll();
+  });
+
+  $("#navbarBrand").click(function(){
+    resetAll();
+  });
+
+  function resetAll(){
+    resetStepOne();
+    resetStepTwo();
+    $('#step1-content').removeClass('hidden'); //show step 1
+  }
+
+  function resetStepTwo(){
+    resetDiagram();
+    displayDesigns(editors, '');
+    $('#goldbarSpinner').addClass('hidden');
+    $("#exportSBOLBtn").addClass('hidden');
+    $('#step2-content').addClass('hidden');
+    $('#graph-designs-col').addClass('hidden');
+    $('#spec-categories-col').addClass('hidden');
+    $('#goldbar-parameters').addClass('hidden');
+    $('#goldbar-btns').addClass('hidden');
+  }
 
 });
 
+function resetStepOne(){
+  $("#importSBOLBtn").val("");
+  $("#nextBtn").attr("disabled", true);
+  $('#sbolSpinner').addClass('hidden');
+  $("#specification-sbol").prop("checked", false);
+  $("#specification-goldbar").prop("checked", false);
+}
+
+function showSBOLStepTwo(){
+  $('#step2-content').removeClass('hidden');
+  $('#graph-designs-col').removeClass('hidden'); //show only graph and designs
+}
+
+function showGoldBarStepTwo(){
+  $('#step2-content').removeClass('hidden');
+  $('#graph-designs-col').removeClass('hidden');
+  $('#spec-categories-col').removeClass('hidden');
+  $('#goldbar-parameters').removeClass('hidden');
+  $('#goldbar-btns').removeClass('hidden');
+}
+
+function downloadSBOL(text, filename) {
+  let element = document.createElement('a');
+  element.setAttribute('href', 'data:application/xml,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+  element.style.display = 'none';
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+}
 
