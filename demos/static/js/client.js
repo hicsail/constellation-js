@@ -84,8 +84,8 @@ function generateGraph(stateGraph) {
   for (let node in stateGraph) {
     for (let edge of stateGraph[node].edges) {
       nodes.push({id, type: INTERMEDIATE});
-      links.push({source: node, target: id});
-      links.push({source: id, target: edge});
+      links.push({source: edge.src, target: edge.dest});
+      // links.push({source: id, target: edge});
       id++;
     }
   }
@@ -98,6 +98,7 @@ function generateGraph(stateGraph) {
  * @param links D3 links object
  */
 function drawLinks(links) {
+  console.log('links',links);
   // Define arrowhead shape
   svgPointer.append('svg:defs').append('svg:marker')
     .attr('id', 'arrow')
