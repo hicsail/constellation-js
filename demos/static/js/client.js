@@ -84,8 +84,7 @@ function generateGraph(stateGraph) {
   for (let node in stateGraph) {
     for (let edge of stateGraph[node].edges) {
       nodes.push({id, type: INTERMEDIATE});
-      links.push({source: edge.src, target: edge.dest});
-      // links.push({source: id, target: edge});
+      links.push({source: edge.src, type: edge.type, text: edge.text, target: edge.dest});
       id++;
     }
   }
@@ -98,7 +97,6 @@ function generateGraph(stateGraph) {
  * @param links D3 links object
  */
 function drawLinks(links) {
-  console.log('links',links);
   // Define arrowhead shape
   svgPointer.append('svg:defs').append('svg:marker')
     .attr('id', 'arrow')
@@ -117,11 +115,18 @@ function drawLinks(links) {
     .enter().append('path')
     .attr('class', 'link')
     .style('stroke', 'rgb(150,150,150)')
-    .style( 'stroke-width', 1);
-
-  // Attach arrowhead
-  linkPointer.filter( function(d) { return d.source.type  === INTERMEDIATE; } )
+    .style( 'stroke-width', 1)
     .attr('marker-end', 'url(#arrow)');
+
+  textPointer = svgPointer.append('text')
+    .data(links)
+    .text(function(d) {return d.text;})
+    .attr('text-anchor', 'middle')
+    .attr('dx', '20px')
+    .attr('dy', '4px')
+    .style('fill', 'black')
+    .style('font-family', 'Montserrat')
+    .style('font-size', '12px');
 }
 
 /**
@@ -135,16 +140,6 @@ function drawNodes(nodes) {
     .enter()
     .append('g')
     .attr('class', 'node');
-
-  // Add tooltip
-  textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
-    .append('text')
-    .text( function(d) {return d.operator; })
-    .attr('opacity', 0)
-    .attr('dx', '20px')
-    .attr('dy', '4px')
-    .style('fill', 'rgb(100,)')
-    .style('font-family', 'Montserrat');
 
   // Add circles
   circlePointer = nodePointer.filter(function (d) { return d.type !== ATOM; })
@@ -171,41 +166,41 @@ function drawNodes(nodes) {
       return RADIUS;
     });
 
-  // Add images
-  imagePointer = nodePointer.filter(function(d) { return d.type === ATOM; })
-    .append('g')
-    .attr('transform', 'translate(-15 , -30)')
-    .append('svg:image')
-    .attr('xlink:href', function(d) {
-      switch (d.text) {
-        // KEEP IN ALPHABETICAL ORDER
-        case 'aptamer':
-        case 'assemblyScar':
-        case 'bluntRestrictionSite':
-        case 'cds':
-        case 'dnaStabilityElement':
-        case 'engineeredRegion':
-        case 'fivePrimeOverhang':
-        case 'fivePrimeStickyRestrictionSite':
-        case 'insulator':
-        case 'nonCodingRna':
-        case 'operator':
-        case 'originOfReplication':
-        case 'originOfTrasnfer':
-        case 'polyA':
-        case 'promoter':
-        case 'proteaseSite':
-        case 'proteinStabilityElement':
-        case 'ribosomeBindingSite':
-        case 'ribozyme':
-        case 'signature':
-        case 'terminator':
-          return './sbol/' + d.text + '.svg';
-        default:
-          return './sbol/' + 'noGlyphAssigned.svg';
-      }
-    })
-    .attr('width', IMAGESIZE);
+  // // Add images
+  // imagePointer = nodePointer.filter(function(d) { return d.type === ATOM; })
+  //   .append('g')
+  //   .attr('transform', 'translate(-15 , -30)')
+  //   .append('svg:image')
+  //   .attr('xlink:href', function(d) {
+  //     switch (d.text) {
+  //       // KEEP IN ALPHABETICAL ORDER
+  //       case 'aptamer':
+  //       case 'assemblyScar':
+  //       case 'bluntRestrictionSite':
+  //       case 'cds':
+  //       case 'dnaStabilityElement':
+  //       case 'engineeredRegion':
+  //       case 'fivePrimeOverhang':
+  //       case 'fivePrimeStickyRestrictionSite':
+  //       case 'insulator':
+  //       case 'nonCodingRna':
+  //       case 'operator':
+  //       case 'originOfReplication':
+  //       case 'originOfTrasnfer':
+  //       case 'polyA':
+  //       case 'promoter':
+  //       case 'proteaseSite':
+  //       case 'proteinStabilityElement':
+  //       case 'ribosomeBindingSite':
+  //       case 'ribozyme':
+  //       case 'signature':
+  //       case 'terminator':
+  //         return './sbol/' + d.text + '.svg';
+  //       default:
+  //         return './sbol/' + 'noGlyphAssigned.svg';
+  //     }
+  //   })
+  //   .attr('width', IMAGESIZE);
 }
 
 /* * * * * * * */
@@ -229,19 +224,28 @@ function tick() {
   });
 
   // Update image positions
-  imagePointer.attr('transform', function(d) {
-    d.x = Math.max(20, Math.min(width - 20, d.x));
-    d.y = Math.max(25, Math.min(height - 10, d.y));
-    return 'translate(' + d.x + ',' + d.y + ')'
-  });
-
-  // Update text positions
+  // imagePointer.attr('transform', function(d) {
+  //   console.log('d', d)
+  //   // d.x = Math.max(20, Math.min(width - 20, d.x));
+  //   // d.y = Math.max(25, Math.min(height - 10, d.y));
+  //   // return 'translate(' + d.x + ',' + d.y + ')'
+  // });
   textPointer.attr('transform', function(d) {
-    d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
-    d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
-    return 'translate(' + d.x + ',' + d.y + ')'
-  });
+    let deltaX = d.target.x - d.source.x,
+    deltaY = d.target.y - d.source.y,
+    dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
+    normX = deltaX / dist,
+    normY = deltaY / dist;
 
+  let sourcePadding = 10,
+    targetPadding = 10;
+
+  let sourceX = d.source.x + normX * sourcePadding,
+    sourceY = d.source.y + normY * sourcePadding,
+    targetX = d.target.x - normX * targetPadding,
+    targetY = d.target.y - normY * targetPadding;
+  return 'translate(' + (sourceX + targetX)/2 + ',' + ((sourceY + targetY)/2 - 10) + ')';
+  });
   // Update link positions
   linkPointer.attr('d', updateLinks);
 }
@@ -427,6 +431,10 @@ $(document).ready(function() {
         alert(response.responseText);
       });
   };
+
+  document.getElementById('designName').value = 'test';
+  editors.specEditor.setValue('promoter');
+  editors.catEditor.setValue('{"promoter": ["a"],"b": ["b"]}');
 
   $('#demo-option').on('click', function() {
     document.getElementById('designName').value = "demo-example";
