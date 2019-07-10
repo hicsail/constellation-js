@@ -63,6 +63,7 @@ function generateGraph(stateGraph) {
   let nodes = [];
   let links = [];
 
+  console.log("stateGraph", stateGraph);
   for (let nodeId in stateGraph) {
     let text;
     let node = stateGraph[nodeId];
@@ -159,7 +160,7 @@ function drawLinks(links) {
         case 'signature':
         case 'terminator':
           return './sbol/' + d.text + '.svg';
-        case EPISILON:
+        case EPSILON:
           return;
         default:
           return './sbol/' + 'noGlyphAssigned.svg';
