@@ -9,6 +9,9 @@ const CLEN = CATEGORIES.c.length;
 const CATSTR = JSON.stringify(CATEGORIES);
 const DESIGN_NAME = 'design';
 
+const NODE = 'NODE';
+const EDGE = 'EDGE';
+
 const f = (a, b) => [].concat(...a.map(d => b.map(e => d.concat(',').concat(e))));
 const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a);
 
@@ -28,48 +31,53 @@ function expectACartesianB(result) {
 }
 
 module.exports = function() {
-  // describe('Missing input errors', function() {
-  //   it('Missing num designs', function () {
-  //     expect(() => constellation.goldbar(DESIGN_NAME, '(a}', '{}', null, 0)).to.throw('Invalid number of designs');
-  //   });
+  describe('Missing input errors', function() {
+    it('Missing num designs', function () {
+      expect(() => constellation.goldbar(DESIGN_NAME, '(a}', '{}', null, 0, NODE)).to.throw('Invalid number of designs');
+    });
 
-  //   it('Invalid num designs', function () {
-  //     expect(() => constellation.goldbar(DESIGN_NAME, '(a}', '{}', 0, 0)).to.throw('Invalid number of designs');
-  //   });
+    it('Invalid num designs', function () {
+      expect(() => constellation.goldbar(DESIGN_NAME, '(a}', '{}', 0, 0, NODE)).to.throw('Invalid number of designs');
+    });
 
-  //   it('Invalid cycle depth', function () {
-  //     expect(() => constellation.goldbar(DESIGN_NAME, '(a}', '{}', 10, -1)).to.throw('Invalid cycle depth');
-  //   });
+    it('Invalid cycle depth', function () {
+      expect(() => constellation.goldbar(DESIGN_NAME, '(a}', '{}', 10, -1, NODE)).to.throw('Invalid cycle depth');
+    });
 
-  //   it('Missing specification', function () {
-  //     expect(() => constellation.goldbar(DESIGN_NAME, null, '{}', 10, 0)).to.throw('No input received')
-  //   });
+    it('Missing specification', function () {
+      expect(() => constellation.goldbar(DESIGN_NAME, null, '{}', 10, 0, NODE)).to.throw('No input received')
+    });
 
-  //   it('Missing design name', function () {
-  //     expect(() => constellation.goldbar(null, '(a}', '{}', 10, 0)).to.throw('No design name is specified');
-  //   });
-  // });
+    it('Missing design name', function () {
+      expect(() => constellation.goldbar(null, '(a}', '{}', 10, 0, NODE)).to.throw('No design name is specified');
+    });
+
+    it('Missing representation', function () {
+      expect(() => constellation.goldbar(DESIGN_NAME, 'a', '{"a": ["a"]}', 10, 0)).to.throw('Invalid graph representation');
+    });
+  });
 
   describe('Operator unit tests, base cases', function() {
 
     describe('Unary expressions', function() {
       it('atom', function() {
-        let result = constellation.goldbar(DESIGN_NAME, 'a', CATSTR, 10, 0);
+        let result = constellation.goldbar(DESIGN_NAME, 'a', CATSTR, 10, 0, NODE);
+        console.log('result', result)
         expectA(result);
       });
 
-      // it('one-or-more', function() {
-      //   let result = constellation.goldbar(DESIGN_NAME, 'one-or-more a', CATSTR, 10, 0);
-      //   expectA(result);
-      //   expect(result.paths.length).to.equal(1);
-      //   // expect(result.paths[0].type === ATOM);
-      // });
+      it('one-or-more', function() {
+        let result = constellation.goldbar(DESIGN_NAME, 'one-or-more a', CATSTR, 10, 0, NODE);
+        expectA(result);
+        expect(result.paths.length).to.equal(1);
+        // expect(result.paths[0].type === ATOM);
+      });
 
-      // it('zero-or-more', function() {
-      //   const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more a', CATSTR, 10, 0);
-      //   expectA(result);
-      //   // TODO: state that empty string is not an option as an explicit design choice
-      // });
+      it('zero-or-more', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more a', CATSTR, 10, 0, NODE);
+        expectA(result);
+        // TODO: state that empty string is not an option as an explicit design choice
+      });
     });
 
     describe('Binary expressions', function() {
