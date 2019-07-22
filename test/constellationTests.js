@@ -58,79 +58,79 @@ module.exports = function() {
         expectA(result);
       });
 
-      // it('one-or-more', function() {
-      //   let result = constellation.goldbar(DESIGN_NAME, 'one-or-more a', CATSTR, 10, 0);
-      //   expectA(result);
-      //   expect(result.paths.length).to.equal(1);
-      //   // expect(result.paths[0].type === ATOM);
-      // });
+      it('one-or-more', function() {
+        let result = constellation.goldbar(DESIGN_NAME, 'one-or-more a', CATSTR, 10, 0);
+        expectA(result);
+        expect(result.paths.length).to.equal(1);
+        // expect(result.paths[0].type === ATOM);
+      });
 
-      // it('zero-or-more', function() {
-      //   const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more a', CATSTR, 10, 0);
-      //   expectA(result);
-      //   // TODO: state that empty string is not an option as an explicit design choice
-      // });
+      it('zero-or-more', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more a', CATSTR, 10, 0);
+        expectA(result);
+        // TODO: state that empty string is not an option as an explicit design choice
+      });
     });
 
     describe('Binary expressions', function() {
-    //   it('and', function() {
-    //     let result = constellation.goldbar(DESIGN_NAME, 'a and a', CATSTR, 10, 0);
-    //     expectA(result);
-
-    //     result = constellation.goldbar(DESIGN_NAME, 'a and b', CATSTR, 10, 0);
-    //     expect(result.designs.length).to.equal(0);
-    //   });
-
-      // it('or', function() {
-      //   let result = constellation.goldbar(DESIGN_NAME, 'b or a', CATSTR, 10, 0);
-      //   expectAConcatB(result);
-
-      //   result = constellation.goldbar(DESIGN_NAME, 'a or a', CATSTR, 10, 0);
+      // it('and', function() {
+      //   let result = constellation.goldbar(DESIGN_NAME, 'a and a', CATSTR, 10, 0);
       //   expectA(result);
-      //   // TODO: what should the graph be?
+      //
+      //   result = constellation.goldbar(DESIGN_NAME, 'a and b', CATSTR, 10, 0);
+      //   expect(result.designs.length).to.equal(0);
       // });
 
-    //   it('then', function() {
-    //     let result = constellation.goldbar(DESIGN_NAME, 'a then b', CATSTR, 10, 0);
-    //     expectACartesianB(result);
+      it('or', function() {
+        let result = constellation.goldbar(DESIGN_NAME, 'b or a', CATSTR, 10, 0);
+        expectAConcatB(result);
 
-    //     result = constellation.goldbar(DESIGN_NAME, 'a . b', CATSTR, 10, 0);
-    //     expectACartesianB(result);
-    //   });
+        result = constellation.goldbar(DESIGN_NAME, 'a or a', CATSTR, 10, 0);
+        expectA(result);
+        // TODO: what should the graph be?
+      });
+
+      it('then', function() {
+        let result = constellation.goldbar(DESIGN_NAME, 'a then b', CATSTR, 10, 0);
+        expectACartesianB(result);
+
+        result = constellation.goldbar(DESIGN_NAME, 'a . b', CATSTR, 10, 0);
+        expectACartesianB(result);
+      });
     });
   });
 
-  // describe('Operator compositions', function() {
-  //   describe('unary op (unary exp)', function() {
-  //     it('one-or-more (one-or-more atom)', function() {
-  //       const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (one-or-more a)', CATSTR, 10 , 0);
-  //       expectA(result);
-  //     });
+  describe('Operator compositions', function() {
+    describe('unary op (unary exp)', function() {
+      it('one-or-more (one-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (one-or-more a)', CATSTR, 10 , 0);
+        expectA(result);
+      });
 
-  //     // TODO: this graph looks wrong
-  //     it('one-or-more (zero-or-more atom)', function() {
-  //       const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (zero-or-more a)', CATSTR, 10 , 0);
-  //       expectA(result);
-  //     });
+      // TODO: this graph looks wrong
+      it('one-or-more (zero-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (zero-or-more a)', CATSTR, 10 , 0);
+        expectA(result);
+      });
 
-  //     it('zero-or-more (zero-or-more atom)', function() {
-  //       const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (zero-or-more a)', CATSTR, 10 , 0);
-  //       expectA(result);
-  //     });
+      it('zero-or-more (zero-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (zero-or-more a)', CATSTR, 10 , 0);
+        expectA(result);
+      });
 
-  //     it('zero-or-more (one-or-more atom)', function() {
-  //       const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (one-or-more a)', CATSTR, 10 , 0);
-  //       expectA(result);
-  //     });
-  //   });
+      it('zero-or-more (one-or-more atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (one-or-more a)', CATSTR, 10 , 0);
+        expectA(result);
+      });
+    });
 
 
-  //   describe('unary-op (binary-exp)', function() {
-  //     // zero-or-more
-  //     it('zero-or-more (atom or atom)', function() {
-  //       const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (a or b)', CATSTR, 10 , 0);
-  //       expectAConcatB(result);
-  //     });
+    describe('unary-op (binary-exp)', function() {
+      // zero-or-more
+      it('zero-or-more (atom or atom)', function() {
+        const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (a or b)', CATSTR, 10 , 0);
+        expectAConcatB(result);
+      });
 
   //     it('zero-or-more (atom and atom)', function() {
   //       const result = constellation.goldbar(DESIGN_NAME, 'zero-or-more (a and a)', CATSTR, 10 , 0);
@@ -157,7 +157,7 @@ module.exports = function() {
   //       const result = constellation.goldbar(DESIGN_NAME, 'one-or-more (a then b)', CATSTR, 10 , 0);
   //       expectACartesianB(result)
   //     });
-  //   });
+    });
 
   //   describe('(binary-exp) binary-op (atom)', function() {
   //     // Or
@@ -254,7 +254,7 @@ module.exports = function() {
   //       expectACartesianB(result);
   //     });
   //   });
-  // });
+  });
 
 
   // describe('Cycles', function () {
