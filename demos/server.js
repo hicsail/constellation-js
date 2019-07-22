@@ -38,16 +38,18 @@ app.post('/postSpecs', function(req,res) {
   let categories = req.body.categories;
   let numDesigns = req.body.numDesigns;
   let maxCycles = req.body.maxCycles;
+  let representation = req.body.representation;
   console.log('---Received new input---');
   console.log('Design Name: ', designName);
   console.log('Specification: ', langText);
   console.log('Categories: ', categories);
   console.log('numDesigns: ', numDesigns);
   console.log('maxCycles: ', maxCycles);
+  console.log('Representation:', representation)
 
   let data;
   try {
-    data = constellation.goldbar(designName, langText, categories, numDesigns, maxCycles);
+    data = constellation.goldbar(designName, langText, categories, numDesigns, maxCycles, representation);
     res.status(200).send(data);
   } catch (error) {
     console.log(error);

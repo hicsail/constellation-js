@@ -8,6 +8,11 @@ const INTERMEDIATE = 'intermediate';
 let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDoc, sbolFile;
 let designName = 'Constellation';
 
+const ROOT = 'root';
+const EPSILON = 'epsilon';
+const ACCEPT = 'accept';
+const ATOM = 'atom';
+
 /* * * * * * */
 /*  DESIGNS  */
 /* * * * * * */
@@ -63,7 +68,6 @@ function generateGraph(stateGraph) {
   let nodes = [];
   let links = [];
 
-  console.log("stateGraph", stateGraph);
   for (let nodeId in stateGraph) {
     let text;
     let node = stateGraph[nodeId];
@@ -479,7 +483,8 @@ $(document).ready(function() {
       "maxCycles": maxCycles,
       "number": "2.0",
       "name": "specificationname",
-      "clientid": "userid"
+      "clientid": "userid",
+      "representation": "EDGE"
     }, function (data) {
       displayDiagram(data.stateGraph);
       // Undefined design
