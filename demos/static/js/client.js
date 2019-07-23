@@ -12,7 +12,7 @@ const ROOT = 'root';
 const EPSILON = 'epsilon';
 const ACCEPT = 'accept';
 const ATOM = 'atom';
-
+const OR_MORE = "OrMore";
 /* * * * * * */
 /*  DESIGNS  */
 /* * * * * * */
@@ -88,8 +88,9 @@ function generateGraph(stateGraph) {
   let id = 0;
   for (let node in stateGraph) {
     for (let edge of stateGraph[node].edges) {
-      nodes.push({id, type: INTERMEDIATE});
-      links.push({source: edge.src, type: edge.type, text: edge.text, target: edge.dest});
+      nodes.push({id, type: INTERMEDIATE, text: edge.text});
+      links.push({source: edge.src, type: edge.type, text: EPSILON, target: id});
+      links.push({source: id, type: edge.type, text: edge.text, target: edge.dest});
       id++;
     }
   }
@@ -120,57 +121,10 @@ function drawLinks(links) {
     .enter().append('path')
     .attr('class', 'link')
     .style('stroke', 'rgb(150,150,150)')
-    .style( 'stroke-width', 1)
+    .style( 'stroke-width', 1);
+
+  linkPointer.filter( function(d) { return d.source.type  === INTERMEDIATE; } )
     .attr('marker-end', 'url(#arrow)');
-  
-  
-  // Don't display epsilons
-  var atoms = [];
-
-  for (l of links) {
-    if (l.type === ATOM) {
-      atoms.push(l);
-    }
-  }
-
-  imagePointer = svgPointer.selectAll('line.link')
-    .data(atoms)
-    .enter().append('g')
-    .attr('transform', 'translate(-15 , -30)')
-    .append('svg:image')
-    .attr('xlink:href', function(d) {
-  
-      switch (d.text) {
-        // KEEP IN ALPHABETICAL ORDER
-        case 'aptamer':
-        case 'assemblyScar':
-        case 'bluntRestrictionSite':
-        case 'cds':
-        case 'dnaStabilityElement':
-        case 'engineeredRegion':
-        case 'fivePrimeOverhang':
-        case 'fivePrimeStickyRestrictionSite':
-        case 'insulator':
-        case 'nonCodingRna':
-        case 'operator':
-        case 'originOfReplication':
-        case 'originOfTrasnfer':
-        case 'polyA':
-        case 'promoter':
-        case 'proteaseSite':
-        case 'proteinStabilityElement':
-        case 'ribosomeBindingSite':
-        case 'ribozyme':
-        case 'signature':
-        case 'terminator':
-          return './sbol/' + d.text + '.svg';
-        case EPSILON:
-          return;
-        default:
-          return './sbol/' + 'noGlyphAssigned.svg';
-      }
-    })
-    .attr('width', IMAGESIZE);
 }
 
 /**
@@ -209,6 +163,46 @@ function drawNodes(nodes) {
       }
       return RADIUS;
     });
+
+  // Add images
+  imagePointer = nodePointer.filter(function(d) { return d.type === INTERMEDIATE; })
+    .append('g')
+    .attr('transform', 'translate(-15 , -30)')
+    .append('svg:image')
+    .attr('xlink:href', function(d) {
+      switch (d.text) {
+        // KEEP IN ALPHABETICAL ORDER
+        case 'aptamer':
+        case 'assemblyScar':
+        case 'bluntRestrictionSite':
+        case 'cds':
+        case 'dnaStabilityElement':
+        case 'engineeredRegion':
+        case 'fivePrimeOverhang':
+        case 'fivePrimeStickyRestrictionSite':
+        case 'insulator':
+        case 'nonCodingRna':
+        case 'operator':
+        case 'originOfReplication':
+        case 'originOfTrasnfer':
+        case 'polyA':
+        case 'promoter':
+        case 'proteaseSite':
+        case 'proteinStabilityElement':
+        case 'ribosomeBindingSite':
+        case 'ribozyme':
+        case 'signature':
+        case 'terminator':
+          return './sbol/' + d.text + '.svg';
+        case EPSILON:
+        case OR_MORE:
+        case 'ZERO':
+          return;
+        default:
+          return './sbol/' + 'noGlyphAssigned.svg';
+      }
+    })
+    .attr('width', IMAGESIZE);
 }
 
 /* * * * * * * */
@@ -231,22 +225,11 @@ function tick() {
     return 'translate(' + d.x + ',' + d.y + ')'
   });
 
-  // Update image positions
+  // update image positions
   imagePointer.attr('transform', function(d) {
-    let deltaX = d.target.x - d.source.x,
-    deltaY = d.target.y - d.source.y,
-    dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
-    normX = deltaX / dist,
-    normY = deltaY / dist;
-
-  let sourcePadding = 10,
-    targetPadding = 10;
-
-  let sourceX = d.source.x + normX * sourcePadding,
-    sourceY = d.source.y + normY * sourcePadding,
-    targetX = d.target.x - normX * targetPadding,
-    targetY = d.target.y - normY * targetPadding;
-  return 'translate(' + ((sourceX + targetX)/2 - 5)+ ',' + ((sourceY + targetY)/2 - 10) + ')';
+    d.x = Math.max(20, Math.min(width - 20, d.x));
+    d.y = Math.max(25, Math.min(height - 10, d.y));
+    return 'translate(' + d.x + ',' + d.y + ')'
   });
   // Update link positions
   linkPointer.attr('d', updateLinks);
@@ -277,7 +260,8 @@ function updateLinks(d) {
     sourceY = d.source.y + normY * sourcePadding,
     targetX = d.target.x - normX * targetPadding,
     targetY = d.target.y - normY * targetPadding;
-  return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
+
+  return 'M' + sourceX + ',' + sourceY + ' L' + targetX + ',' + targetY;
 }
 
 /**
