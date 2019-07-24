@@ -144,18 +144,27 @@ function drawNodes(nodes) {
     .append('circle')
     .attr('fill', function(d) {
       if (d.type === ROOT) {
-        return 'rgb(33,168,174)';
+        return '#ffffff';
       } else if (d.type === ACCEPT) {
-        return 'rgb(133,151,41)';
+        return '#ffffff';
       } else if (d.type === EPSILON) {
-        return 'rgb(253,183,152)';
-      } else if (d.type === INTERMEDIATE) {
-        return 'rgb(253,183,152)';
+        return 'rgb(240,95,64)';
       } else {
         return '#ffffff';
       }
     })
-    .attr('stroke', 'rgb(200,200,200)')
+    .attr('stroke', function(d) {
+      if (d.type === ROOT) {
+        return 'rgb(5,168,170)';
+      } else if (d.type === ACCEPT) {
+        return 'rgb(231,29,54)';
+      } else if (d.type === EPSILON) {
+        return '#ffffff';
+      } else {
+        return '#ffffff';
+      }
+    })
+    .style( 'stroke-width', 2)
     .attr('title', function(d) {return d.type})
     .attr('r', function(d) {
       if (d.type === INTERMEDIATE) {
