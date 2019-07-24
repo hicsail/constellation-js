@@ -4,6 +4,7 @@ const MAXDISTANCE = 100;
 const IMAGESIZE = 30;
 const RADIUS = 7;
 const INTERMEDIATE = 'intermediate';
+const REPRESENTATION = 'NODE';  // 'NODE' or 'EDGE'
 
 let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDoc, sbolFile;
 let designName = 'Constellation';
@@ -34,7 +35,6 @@ function displayDesigns(editors, designs) {
  */
 function displayDiagram(stateGraph) {
   let {nodes, links} = generateGraph(stateGraph);
-
   updateSvgSize();
   // Create SVG
   svgPointer = d3.select('#graph')
@@ -88,9 +88,16 @@ function generateGraph(stateGraph) {
   let id = 0;
   for (let node in stateGraph) {
     for (let edge of stateGraph[node].edges) {
-      nodes.push({id, type: INTERMEDIATE, text: edge.text});
-      links.push({source: edge.src, type: edge.type, text: EPSILON, target: id});
-      links.push({source: id, type: edge.type, text: edge.text, target: edge.dest});
+      // check if is edge representation
+      if (REPRESENTATION === 'NODE') {
+        nodes.push({id, type: INTERMEDIATE});
+        links.push({source: node, target: id});
+        links.push({source: id, target: edge});
+      } else {
+        nodes.push({id, type: INTERMEDIATE, text: edge.text});
+        links.push({source: edge.src, type: edge.type, text: EPSILON, target: id});
+        links.push({source: id, type: edge.type, text: edge.text, target: edge.dest});
+      }
       id++;
     }
   }
@@ -139,15 +146,23 @@ function drawNodes(nodes) {
     .append('g')
     .attr('class', 'node');
 
+  // Add tooltip for node representation
+  if (REPRESENTATION === "NODE") {
+    textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
+      .append('text')
+      .text( function(d) {return d.operator; })
+      .attr('opacity', 0)
+      .attr('dx', '20px')
+      .attr('dy', '4px')
+      .style('fill', 'rgb(100,)')
+      .style('font-family', 'Montserrat');
+  }
+
   // Add circles
   circlePointer = nodePointer.filter(function (d) { return d.type !== ATOM; })
     .append('circle')
     .attr('fill', function(d) {
-      if (d.type === ROOT) {
-        return '#ffffff';
-      } else if (d.type === ACCEPT) {
-        return '#ffffff';
-      } else if (d.type === EPSILON) {
+      if (d.type === EPSILON) {
         return 'rgb(240,95,64)';
       } else {
         return '#ffffff';
@@ -174,7 +189,8 @@ function drawNodes(nodes) {
     });
 
   // Add images
-  imagePointer = nodePointer.filter(function(d) { return d.type === INTERMEDIATE; })
+
+  imagePointer = nodePointer.filter(filterByRep)
     .append('g')
     .attr('transform', 'translate(-15 , -30)')
     .append('svg:image')
@@ -214,6 +230,13 @@ function drawNodes(nodes) {
     .attr('width', IMAGESIZE);
 }
 
+function filterByRep(d) {
+  if (REPRESENTATION === 'NODE') {
+    return d.type === ATOM;
+  } else {
+    return d.type === INTERMEDIATE;
+  }
+}
 /* * * * * * * */
 /*   UPDATES   */
 /* * * * * * * */
@@ -240,6 +263,16 @@ function tick() {
     d.y = Math.max(25, Math.min(height - 10, d.y));
     return 'translate(' + d.x + ',' + d.y + ')'
   });
+
+  // update tooltip positions for node representation
+  if (REPRESENTATION === 'NODE') {
+    textPointer.attr('transform', function(d) {
+      d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
+      d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
+      return 'translate(' + d.x + ',' + d.y + ')'
+    });
+  }
+
   // Update link positions
   linkPointer.attr('d', updateLinks);
 }
@@ -477,7 +510,7 @@ $(document).ready(function() {
       "number": "2.0",
       "name": "specificationname",
       "clientid": "userid",
-      "representation": "EDGE"
+      "representation": REPRESENTATION
     }, function (data) {
       displayDiagram(data.stateGraph);
       // Undefined design
