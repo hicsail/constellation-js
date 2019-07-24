@@ -36,6 +36,7 @@ function displayDesigns(editors, designs) {
 function displayDiagram(stateGraph) {
   let {nodes, links} = generateGraph(stateGraph);
   updateSvgSize();
+  console.log("stateGraph", stateGraph);
   // Create SVG
   svgPointer = d3.select('#graph')
     .append('svg')
@@ -90,9 +91,14 @@ function generateGraph(stateGraph) {
     for (let edge of stateGraph[node].edges) {
       // check if is edge representation
       if (REPRESENTATION === 'NODE') {
-        nodes.push({id, type: INTERMEDIATE});
-        links.push({source: node, target: id});
-        links.push({source: id, target: edge});
+        // handle case of self-loop
+        if (edge === node) {
+          links.push({source: node, target: edge});
+        } else {
+          nodes.push({id, type: INTERMEDIATE});
+          links.push({source: node, target: id});
+          links.push({source: id, target: edge});
+        }
       } else {
         nodes.push({id, type: INTERMEDIATE, text: edge.text});
         links.push({source: edge.src, type: edge.type, text: EPSILON, target: id});
@@ -128,9 +134,10 @@ function drawLinks(links) {
     .enter().append('path')
     .attr('class', 'link')
     .style('stroke', 'rgb(150,150,150)')
-    .style( 'stroke-width', 1);
+    .style( 'stroke-width', 1)
+    .style('fill', 'transparent');
 
-  linkPointer.filter( function(d) { return d.source.type  === INTERMEDIATE; } )
+  linkPointer.filter( function(d) { return d.source.type  === INTERMEDIATE || d.source === d.target; } )
     .attr('marker-end', 'url(#arrow)');
 }
 
@@ -286,8 +293,12 @@ function updateLinks(d) {
   let deltaX = d.target.x - d.source.x,
     deltaY = d.target.y - d.source.y,
     dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
-    normX = deltaX / dist,
+    normX = 0,
+    normY = 0;
+  if (dist !== 0) {
+    normX = deltaX / dist;
     normY = deltaY / dist;
+  }
 
   let sourcePadding = 10,
     targetPadding = 10;
@@ -297,13 +308,26 @@ function updateLinks(d) {
   } else if (d.target.type === INTERMEDIATE) {
     targetPadding = 0;
   }
-
   let sourceX = d.source.x + normX * sourcePadding,
     sourceY = d.source.y + normY * sourcePadding,
     targetX = d.target.x - normX * targetPadding,
-    targetY = d.target.y - normY * targetPadding;
+    targetY = d.target.y - normY * targetPadding,
+    drx = 0,
+    dry = 0,
+    xRotation = 0,
+    largeArc = 0,
+    sweep = 1;
+  if (sourceX === targetX && sourceY === targetY) {
+      xRotation = -45;
+      largeArc = 1;
+      drx = 30;
+      dry = 20;
+      targetX+=5;
+      targetY+=10;
+    }
 
-  return 'M' + sourceX + ',' + sourceY + ' L' + targetX + ',' + targetY;
+  return 'M' + sourceX + ',' + sourceY + 'A' + drx + ',' + dry + ' ' +
+    xRotation + ',' + largeArc + ',' + sweep + ' ' + targetX + ',' + targetY;
 }
 
 /**
