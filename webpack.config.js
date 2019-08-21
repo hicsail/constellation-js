@@ -3,7 +3,7 @@ var path = require('path');
 module.exports = {
   entry: './lib/constellation.js',
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'demos/static/js'),
     filename: 'constellation.js',
     library: 'constellation',
   },
