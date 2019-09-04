@@ -30,6 +30,12 @@ function expectACartesianB(result) {
   expect(result.designs).to.have.members(cartesian(CATEGORIES.a, CATEGORIES.b));
 }
 
+function expectACartBAndEmpty(result) {
+  const emptiesAndCart = CATEGORIES.a.concat(cartesian(CATEGORIES.a, CATEGORIES.b));
+  expect(result.designs.length).to.equal(emptiesAndCart.length);
+  expect(result.designs).to.have.members(emptiesAndCart);
+}
+
 module.exports = function() {
   describe('Missing input errors', function() {
     it('Missing num designs', function () {
@@ -91,6 +97,14 @@ module.exports = function() {
         expectA(resultEdge);
         // TODO: state that empty string is not an option as an explicit design choice
       });
+
+      it('zero-or-one', function() {
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'zero-or-one a', CATSTR, 10, 0, NODE);
+        expectA(resultNode);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'zero-or-one a', CATSTR, 10, 0, EDGE);
+        expectA(resultEdge);
+        // TODO: state that empty string is not an option as an explicit design choice
+      });
     });
 
     describe('Binary expressions', function() {
@@ -146,10 +160,10 @@ module.exports = function() {
         expectA(resultEdge);
       });
 
-      it('zero-or-more (zero-or-more atom)', function() {
-        const resultNode = constellation.goldbar(DESIGN_NAME, 'zero-or-more (zero-or-more a)', CATSTR, 10 , 0, NODE);
+      it('one-or-more (zero-or-one atom)', function() {
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'one-or-more (zero-or-one a)', CATSTR, 10 , 0, NODE);
         expectA(resultNode);
-        const resultEdge = constellation.goldbar(DESIGN_NAME, 'zero-or-more (zero-or-more a)', CATSTR, 10 , 0, EDGE);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'one-or-more (zero-or-one a)', CATSTR, 10 , 0, EDGE);
         expectA(resultEdge);
       });
 
@@ -159,10 +173,68 @@ module.exports = function() {
         const resultEdge = constellation.goldbar(DESIGN_NAME, 'zero-or-more (one-or-more a)', CATSTR, 10 , 0, EDGE);
         expectA(resultEdge);
       });
+
+      it('zero-or-more (zero-or-more atom)', function() {
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'zero-or-more (zero-or-more a)', CATSTR, 10 , 0, NODE);
+        expectA(resultNode);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'zero-or-more (zero-or-more a)', CATSTR, 10 , 0, EDGE);
+        expectA(resultEdge);
+      });
+
+      it('zero-or-more (zero-or-one atom)', function() {
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'zero-or-more (zero-or-one a)', CATSTR, 10 , 0, NODE);
+        expectA(resultNode);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'zero-or-more (zero-or-one a)', CATSTR, 10 , 0, EDGE);
+        expectA(resultEdge);
+      });
+
+      it('zero-or-one (one-or-more atom)', function() {
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'zero-or-one (one-or-more a)', CATSTR, 10 , 0, NODE);
+        expectA(resultNode);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'zero-or-one (one-or-more a)', CATSTR, 10 , 0, EDGE);
+        expectA(resultEdge);
+      });
+
+      it('zero-or-one (zero-or-more atom)', function() {
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'zero-or-one (zero-or-more a)', CATSTR, 10 , 0, NODE);
+        expectA(resultNode);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'zero-or-one (zero-or-more a)', CATSTR, 10 , 0, EDGE);
+        expectA(resultEdge);
+      });
+
+      it('zero-or-one (zero-or-one atom)', function() {
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'zero-or-one (zero-or-one a)', CATSTR, 10 , 0, NODE);
+        expectA(resultNode);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'zero-or-one (zero-or-one a)', CATSTR, 10 , 0, EDGE);
+        expectA(resultEdge);
+      });
+
     });
 
 
     describe('unary-op (binary-exp)', function() {
+      // one-or-more
+      it('one-or-more (atom or atom)', function() {
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'one-or-more (a or c)', CATSTR, 10 , 0, NODE);
+        expect(resultNode.designs.length).to.equal(((ALEN * CLEN) * 2) + ALEN + CLEN);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'one-or-more (a or c)', CATSTR, 10 , 0, EDGE);
+        expect(resultEdge.designs.length).to.equal(((ALEN * CLEN) * 2) + ALEN + CLEN);
+      });
+
+      // it('one-or-more (atom and atom)', function() {
+      //   const resultNode = constellation.goldbar(DESIGN_NAME, 'one-or-more (a and a)', CATSTR, 10 , 0, NODE);
+      //   expectA(resultNode);
+      //   const resultEdge = constellation.goldbar(DESIGN_NAME, 'one-or-more (a and a)', CATSTR, 10 , 0, EDGE);
+      //   expectA(resultEdge);
+      // });
+
+      it('one-or-more (atom then atom)', function() {
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'one-or-more (a then b)', CATSTR, 10 , 0, NODE);
+        expectACartesianB(resultNode);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'one-or-more (a then b)', CATSTR, 10 , 0, EDGE);
+        expectACartesianB(resultEdge);
+      });
+
       // zero-or-more
       it('zero-or-more (atom or atom)', function() {
         const resultNode = constellation.goldbar(DESIGN_NAME, 'zero-or-more (a or b)', CATSTR, 10 , 0, NODE);
@@ -185,25 +257,25 @@ module.exports = function() {
         expectACartesianB(resultEdge);
       });
 
-      // one-or-more
-      it('one-or-more (atom or atom)', function() {
-        const resultNode = constellation.goldbar(DESIGN_NAME, 'one-or-more (a or c)', CATSTR, 10 , 0, NODE);
-        expect(resultNode.designs.length).to.equal(((ALEN * CLEN) * 2) + ALEN + CLEN);
-        const resultEdge = constellation.goldbar(DESIGN_NAME, 'one-or-more (a or c)', CATSTR, 10 , 0, EDGE);
-        expect(resultEdge.designs.length).to.equal(((ALEN * CLEN) * 2) + ALEN + CLEN);
+      // zero-or-one
+      it('zero-or-one (atom or atom)', function() {
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'zero-or-one (a or b)', CATSTR, 10 , 0, NODE);
+        expectAConcatB(resultNode);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'zero-or-one (a or b)', CATSTR, 10 , 0, EDGE);
+        expectAConcatB(resultEdge);
       });
 
-      // it('one-or-more (atom and atom)', function() {
-      //   const resultNode = constellation.goldbar(DESIGN_NAME, 'one-or-more (a and a)', CATSTR, 10 , 0, NODE);
+      // it('zero-or-one (atom and atom)', function() {
+      //   const resultNode = constellation.goldbar(DESIGN_NAME, 'zero-or-one (a and a)', CATSTR, 10 , 0, NODE);
       //   expectA(resultNode);
-      //   const resultEdge = constellation.goldbar(DESIGN_NAME, 'one-or-more (a and a)', CATSTR, 10 , 0, EDGE);
+      //   const resultEdge = constellation.goldbar(DESIGN_NAME, 'zero-or-one (a and a)', CATSTR, 10 , 0, EDGE);
       //   expectA(resultEdge);
       // });
 
-      it('one-or-more (atom then atom)', function() {
-        const resultNode = constellation.goldbar(DESIGN_NAME, 'one-or-more (a then b)', CATSTR, 10 , 0, NODE);
+      it('zero-or-one (atom then atom)', function() {
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'zero-or-one (a then b)', CATSTR, 10 , 0, NODE);
         expectACartesianB(resultNode);
-        const resultEdge = constellation.goldbar(DESIGN_NAME, 'one-or-more (a then b)', CATSTR, 10 , 0, EDGE);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'zero-or-one (a then b)', CATSTR, 10 , 0, EDGE);
         expectACartesianB(resultEdge);
       });
     });
@@ -302,19 +374,31 @@ module.exports = function() {
         expectAConcatB(resultEdge);
       });
 
+      it('atom or (zero-or-one atom)', function() {
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'a or (zero-or-one b)', CATSTR, 10 , 0, NODE);
+        expectAConcatB(resultNode);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'a or (zero-or-one b)', CATSTR, 10 , 0, EDGE);
+        expectAConcatB(resultEdge);
+      });
+
       // AND
+      // it('atom and (one-or-more atom)', function() {
+      //   const result = constellation.goldbar(DESIGN_NAME, 'a and (one-or-more a)', CATSTR, 10 , 0, NODE);
+      //   expectA(result);
+      // });
+      //
       // it('atom and (zero-or-more atom)', function() {
       //   const result = constellation.goldbar(DESIGN_NAME, 'a and (zero-or-more a)', CATSTR, 10 , 0, NODE);
       //   expectA(result);
       // });
       //
-      // it('atom and (zero-or-more atom)', function() {
+      // it('atom and (zero-or-one atom)', function() {
       //   const result = constellation.goldbar(DESIGN_NAME, 'a and (one-or-more a)', CATSTR, 10 , 0, NODE);
       //   expectA(result);
       // });
 
       // THEN
-      it('atom then (zero-or-more atom)', function() {
+      it('atom then (one-or-more atom)', function() {
         const resultNode = constellation.goldbar(DESIGN_NAME, 'a then (one-or-more b)', CATSTR, 10 , 0, NODE);
         expectACartesianB(resultNode);
         const resultEdge = constellation.goldbar(DESIGN_NAME, 'a then (one-or-more b)', CATSTR, 10 , 0, EDGE);
@@ -322,10 +406,17 @@ module.exports = function() {
       });
 
       it('atom then (zero-or-more atom)', function() {
-        const resultNode = constellation.goldbar(DESIGN_NAME, 'a then (one-or-more b)', CATSTR, 10 , 0, NODE);
-        expectACartesianB(resultNode);
-        const resultEdge = constellation.goldbar(DESIGN_NAME, 'a then (one-or-more b)', CATSTR, 10 , 0, EDGE);
-        expectACartesianB(resultEdge);
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'a then (zero-or-more b)', CATSTR, 10 , 0, NODE);
+        expectACartBAndEmpty(resultNode);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'a then (zero-or-more b)', CATSTR, 10 , 0, EDGE);
+        expectACartBAndEmpty(resultEdge);
+      });
+
+      it('atom then (zero-or-one atom)', function() {
+        const resultNode = constellation.goldbar(DESIGN_NAME, 'a then (zero-or-one b)', CATSTR, 10 , 0, NODE);
+        expectACartBAndEmpty(resultNode);
+        const resultEdge = constellation.goldbar(DESIGN_NAME, 'a then (zero-or-one b)', CATSTR, 10 , 0, EDGE);
+        expectACartBAndEmpty(resultEdge);
       });
     });
   });

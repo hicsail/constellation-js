@@ -85,6 +85,12 @@ module.exports = function() {
         expect(result).to.equal('{"ZeroOrMore":[{"Atom":["a"]}]}')
       });
 
+      it('one-or-more(zero-or-one(a))', function () {
+        let toParse = JSON.parse('{"OneOrMore":[{"ZeroOrOne":[{"Atom":["a"]}]}]}');
+        let result = JSON.stringify(simp.simplifyTree(toParse));
+        expect(result).to.equal('{"ZeroOrMore":[{"Atom":["a"]}]}')
+      });
+
       it('zero-or-more(one-or-more(a))', function () {
         let toParse = JSON.parse('{"ZeroOrMore":[{"OneOrMore":[{"Atom":["a"]}]}]}');
         let result = JSON.stringify(simp.simplifyTree(toParse));
@@ -95,6 +101,30 @@ module.exports = function() {
         let toParse = JSON.parse('{"ZeroOrMore":[{"ZeroOrMore":[{"Atom":["a"]}]}]}');
         let result = JSON.stringify(simp.simplifyTree(toParse));
         expect(result).to.equal('{"ZeroOrMore":[{"Atom":["a"]}]}')
+      });
+
+      it('zero-or-more(zero-or-one(a))', function () {
+        let toParse = JSON.parse('{"ZeroOrMore":[{"ZeroOrOne":[{"Atom":["a"]}]}]}');
+        let result = JSON.stringify(simp.simplifyTree(toParse));
+        expect(result).to.equal('{"ZeroOrMore":[{"Atom":["a"]}]}')
+      });
+
+      it('zero-or-one(one-or-more(a))', function () {
+        let toParse = JSON.parse('{"ZeroOrOne":[{"OneOrMore":[{"Atom":["a"]}]}]}');
+        let result = JSON.stringify(simp.simplifyTree(toParse));
+        expect(result).to.equal('{"ZeroOrMore":[{"Atom":["a"]}]}')
+      });
+
+      it('zero-or-one(zero-or-more(a))', function () {
+        let toParse = JSON.parse('{"ZeroOrOne":[{"ZeroOrMore":[{"Atom":["a"]}]}]}');
+        let result = JSON.stringify(simp.simplifyTree(toParse));
+        expect(result).to.equal('{"ZeroOrMore":[{"Atom":["a"]}]}')
+      });
+
+      it('zero-or-one(zero-or-one(a))', function () {
+        let toParse = JSON.parse('{"ZeroOrOne":[{"ZeroOrOne":[{"Atom":["a"]}]}]}');
+        let result = JSON.stringify(simp.simplifyTree(toParse));
+        expect(result).to.equal('{"ZeroOrOne":[{"Atom":["a"]}]}')
       });
 
     })
