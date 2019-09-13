@@ -405,7 +405,7 @@ $(document).ready(function() {
 
     // Parse SBOL and display results
     $.ajax({
-      url: 'http://localhost:8082/importSBOL',
+      url: 'http://34.227.115.255:80/importSBOL',
       type: 'POST',
       data: sbolXML,
       contentType: "text/xml",
@@ -468,7 +468,7 @@ $(document).ready(function() {
     //replace all spaces and special characters for SBOL
     designName = designName.replace(/[^A-Z0-9]/ig, "_");
 
-    $.post('http://localhost:8082/postSpecs', {
+    $.post('http://34.227.115.255:80/postSpecs', {
       "designName": designName,
       "specification": specification,
       "categories": categories,
