@@ -6,7 +6,8 @@
   "scripts": {
     "test": "nyc mocha --timeout 200000",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "build": "webpack --config webpack.config.js --mode production"
+    "build": "webpack --config webpack.config.js --mode production",
+    "start": "node demos/server.js"
   },
   "repository": {
     "type": "git",
