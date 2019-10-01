@@ -67,13 +67,13 @@ function generateGraph(stateGraph) {
     let text;
     let node = stateGraph[nodeId];
 
-    if (node.type === ROOT) {
+    if (node.type === graph.ROOT) {
       text = 'Root';
-    } else if (node.type === EPSILON) {
+    } else if (node.type === graph.EPSILON) {
       text = 'Epsilon'
-    } else if (node.type === ACCEPT) {
+    } else if (node.type === graph.ACCEPT) {
       text =  'Accept';
-    } else if (node.type === ATOM) {
+    } else if (node.type === graph.ATOM) {
       text = node.text;
     }
     nodes.push({id: nodeId, type: node.type, text, operator: node.operator});
@@ -128,6 +128,7 @@ function drawLinks(links) {
  * @param nodes D3 nodes object
  */
 function drawNodes(nodes) {
+  console.log(nodes);
   // Add g component
   nodePointer = svgPointer.selectAll('.node')
     .data(nodes)
@@ -146,14 +147,14 @@ function drawNodes(nodes) {
     .style('font-family', 'Montserrat');
 
   // Add circles
-  circlePointer = nodePointer.filter(function (d) { return d.type !== ATOM; })
+  circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
     .append('circle')
     .attr('fill', function(d) {
-      if (d.type === ROOT) {
+      if (d.type === graph.ROOT) {
         return 'rgb(33,168,174)';
-      } else if (d.type === ACCEPT) {
+      } else if (d.type === graph.ACCEPT) {
         return 'rgb(133,151,41)';
-      } else if (d.type === EPSILON) {
+      } else if (d.type === graph.EPSILON) {
         return 'rgb(253,183,152)';
       } else if (d.type === INTERMEDIATE) {
         return 'rgb(253,183,152)';
@@ -171,7 +172,7 @@ function drawNodes(nodes) {
     });
 
   // Add images
-  imagePointer = nodePointer.filter(function(d) { return d.type === ATOM; })
+  imagePointer = nodePointer.filter(function(d) { return d.type === graph.ATOM; })
     .append('g')
     .attr('transform', 'translate(-15 , -30)')
     .append('svg:image')
