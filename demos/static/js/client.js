@@ -37,7 +37,6 @@ function displayDesigns(editors, designs) {
 function displayDiagram(stateGraph) {
   let {nodes, links} = generateGraph(stateGraph);
   updateSvgSize();
-  console.log("stateGraph", stateGraph);
   // Create SVG
   svgPointer = d3.select('#graph')
     .append('svg')
