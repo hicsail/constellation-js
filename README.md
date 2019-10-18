@@ -22,7 +22,7 @@ var result = constellation(langText, categories, numDesigns, cycleDepth);
 ## Demos
 
 ```shell
-node demos/server.js
+npm run build && npm run start
 ```
 Then view the demo in a browser at `http://localhost:8082/`.
 

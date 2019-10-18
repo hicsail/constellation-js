@@ -4,3 +4,6 @@
 *.iml
 node_modules/
 *~
+dist/
+demos/static/js/constellation.js
+demos/static/js/constellation.js.map
