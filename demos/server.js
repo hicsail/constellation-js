@@ -33,6 +33,7 @@ app.get('/', function(req,res) {
 });
 
 app.post('/postSpecs', function(req,res) {
+  console.log(req.body);
   let designName = req.body.designName;
   let langText = req.body.specification;
   let categories = req.body.categories;

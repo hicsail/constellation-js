@@ -151,37 +151,40 @@
               </div>
             </div>
 
-            <div class="row">
-              <div id="spec-categories-col" class="col-sm hidden">
-                <div class="row">
-                <label for="goldbar-input">Specification</label>
-                <div class="horizontal-padding">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown">
-                    Examples
-                  </button>
-                  <div id="examples-list" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a id='demo-option' class="dropdown-item" href="#">Demo</a>
-                    <a id='debug-option' class="dropdown-item" href="#">Debug</a>
-                  </div>
+            <div class="col">
+              <div id="spec-categories-row-0" class="row hidden">
+                <div id="spec-col-0" class="col-sm">
+                  <label id="goldbar-label-0" for="goldbar-input-0">Specification</label>
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown">
+                      Examples
+                    </button>
+                    <div id="examples-list" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <a id='demo-option' class="dropdown-item" href="#">Demo</a>
+                      <a id='debug-option' class="dropdown-item" href="#">Debug</a>
+                    </div>
+                  <textarea class="codemirror" id="goldbar-input-0" name="paragraph_text" cols="50" rows="10"></textarea>
                 </div>
+                <div id="categories-col-0" class="col-sm">
+                  <label id="cat-label-0" for="categories-0">Categories</label>
+                  <textarea class="codemirror" id="categories-0" cols="50" rows="10"></textarea>
+<!--                  <div class="pull-right"-->
+                  <i id="addSpecsBtn" class="fas fa fa-plus pull-right" data-toggle="tooltip" title="Add another design"></i>
+                  <i id="removeSpecsBtn" class="fas fa fa-minus pull-right hidden" data-toggle="tooltip" title="Remove a design"></i>
                 </div>
-                <textarea class="codemirror" id="goldbar-input" name="paragraph_text" cols="50" rows="10"></textarea>
-                <br>
-                <label for="categories">Categories</label>
-                <textarea class="codemirror" id="categories" cols="50" rows="10"></textarea>
               </div>
 
-              <div id="graph-designs-col" class="col-sm hidden">
+              <div id="addedSpecs"></div>
 
-                <i id="exportSBOLBtn" class="fas fa-download pull-right hidden" data-toggle="tooltip" title="Export design as SBOL"></i>
-
-                <div class="row">
+              <div id="graph-designs-row" class="row hidden">
+                <div class="col-sm">
+                  <i id="exportSBOLBtn" class="fas fa-download pull-right hidden" data-toggle="tooltip" title="Export design as SBOL"></i>
                   <label for="graph">Graph</label>
+                  <div id="graph"></div>
                 </div>
-                <div id="graph"></div>
-                <br>
-                <label for="designs">Designs</label>
-                <textarea readonly class="codemirror" id="designs" cols="50" rows="10"></textarea>
+                <div class="col-sm">
+                  <label for="designs">Designs</label>
+                  <textarea readonly class="codemirror" id="designs" cols="50" rows="10"></textarea>
+                </div>
               </div>
             </div>
 
@@ -189,6 +192,13 @@
               <div class="text-center">
                 <div id="goldbarSpinner" class="spinner hidden">
                   <p><i class="fa fa-spinner fa-spin"></i>  Loading...</p>
+                </div>
+                <button class="hidden btn btn-secondary dropdown-toggle" type="button" id="combine-menu-button" data-toggle="dropdown">
+                  Combine Designs
+                </button>
+                <div id="combine-options" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <a id='and-option' class="dropdown-item">And</a>
+                  <a id='merge-option' class="dropdown-item">Merge</a>
                 </div>
                 <button id="submitBtn" class="btn btn-outline-warning mt-2">Submit</button>
               </div>

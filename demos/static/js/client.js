@@ -446,27 +446,51 @@ function processSBOLFile(file) {
 $(document).ready(function() {
 
   const THEME = 'ambiance';
+  let combineMethod;
+
+  // const editors = {
+  //   "specEditor": CodeMirror.fromTextArea(document.getElementById('goldbar-input-0'), {
+  //     lineNumbers: true,
+  //     lineWrapping:true
+  //   }),
+  //   "catEditor0": CodeMirror.fromTextArea(document.getElementById('categories-0'), {
+  //     lineNumbers: true,
+  //     lineWrapping:true
+  //   }),
+  //   "designsEditor": CodeMirror.fromTextArea(document.getElementById('designs'), {
+  //     lineNumbers: true,
+  //     lineWrapping:true,
+  //     readOnly: true})
+  // };
+
 
   const editors = {
-    "specEditor": CodeMirror.fromTextArea(document.getElementById('goldbar-input'), {
+    "specEditor": [CodeMirror.fromTextArea(document.getElementById('goldbar-input-0'), {
       lineNumbers: true,
       lineWrapping:true
-    }),
-    "catEditor": CodeMirror.fromTextArea(document.getElementById('categories'), {
+    })],
+    "catEditor": [CodeMirror.fromTextArea(document.getElementById('categories-0'), {
       lineNumbers: true,
       lineWrapping:true
-    }),
+    })],
     "designsEditor": CodeMirror.fromTextArea(document.getElementById('designs'), {
       lineNumbers: true,
       lineWrapping:true,
       readOnly: true})
   };
 
+
   document.getElementById('numDesigns').value = 40;
   document.getElementById('maxCycles').value = 0;
 
-  editors.specEditor.setOption("theme", THEME);
-  editors.catEditor.setOption("theme", THEME);
+  for (let specs of editors.specEditor) {
+    specs.setOption("theme", THEME);
+  }
+
+  for (let cat of editors.catEditor) {
+    cat.setOption("theme", THEME);
+  }
+
   editors.designsEditor.setOption("theme", THEME);
 
   /* * * * * * */
@@ -502,17 +526,26 @@ $(document).ready(function() {
 
   $('#demo-option').on('click', function() {
     document.getElementById('designName').value = "demo-example";
-    editors.specEditor.setValue('one-or-more(one-or-more(promoter then nonCodingRna)then cds then \n (zero-or-more \n (nonCodingRna or (one-or-more \n (nonCodingRna then promoter then nonCodingRna) then cds)) then \n (terminator or (terminator then nonCodingRna) or (nonCodingRna then terminator)))))')
-    editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
+    editors.specEditor[0].setValue('one-or-more(one-or-more(promoter then nonCodingRna)then cds then \n (zero-or-more \n (nonCodingRna or (one-or-more \n (nonCodingRna then promoter then nonCodingRna) then cds)) then \n (terminator or (terminator then nonCodingRna) or (nonCodingRna then terminator)))))')
+    editors.catEditor[0].setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
   });
 
 
   $('#debug-option').on('click', function() {
     document.getElementById('designName').value = "debug-example";
-    editors.specEditor.setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
-    editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
+    editors.specEditor[0].setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
+    editors.catEditor[0].setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
   });
 
+  $('#and-option').on('click', function () {
+    document.getElementById('combine-menu-button').innerText = "And";
+    combineMethod = 'and';
+  });
+
+  $('#merge-option').on('click', function () {
+    document.getElementById('combine-menu-button').innerText = "Merge";
+    combineMethod = 'merge';
+  });
 
   $('#exportSBOLBtn').on('click', function() {
     downloadSBOL(sbolDoc, 'constellation_' + designName + '_sbol.xml');
@@ -530,9 +563,29 @@ $(document).ready(function() {
 
     let maxCycles = 0;
     let numDesigns = 10;
+    let specification;
+    let categories = {};
 
-    const specification = editors.specEditor.getValue();
-    const categories = editors.catEditor.getValue();
+    if (editors.specEditor.length > 1) {
+      if (combineMethod === null) {
+        window.alert('Please select a method to combine your designs');
+        return;
+      } else {
+        specification = '('+editors.specEditor[0].getValue()+')';
+        for (let specs of editors.specEditor.slice(1)) {
+          specification += ' ' + combineMethod + ' (' + specs.getValue() + ')';
+        }
+      }
+
+    } else {
+      specification = editors.specEditor[0].getValue();
+      // categories.push(editors.catEditor[0].getValue());
+    }
+
+    for (let i = 0; i < editors.catEditor.length; i++) {
+      categories[i] = editors.catEditor[i].getValue();
+    }
+    console.log(categories);
 
     numDesigns = document.getElementById('numDesigns').value;
     maxCycles = document.getElementById('maxCycles').value;
@@ -544,7 +597,7 @@ $(document).ready(function() {
     $.post('http://localhost:8082/postSpecs', {
       "designName": designName,
       "specification": specification,
-      "categories": categories,
+      "categories": JSON.stringify(categories),
       "numDesigns": numDesigns,
       "maxCycles": maxCycles,
       "number": "2.0",
@@ -611,6 +664,81 @@ $(document).ready(function() {
   });
 
   /*
+   Plus button under Categories lets user add more designs
+   */
+  $("#addSpecsBtn").click(function(){
+    $('#combine-menu-button').removeClass('hidden');
+    $('#compute-options').removeClass('hidden');
+    $('#removeSpecsBtn').removeClass('hidden');
+    // addNewSpecs();
+    // clone the original spec-categories section and remove the examples and plus buttons, and the old editors
+    let newSpecs = $('#spec-categories-row-0').clone();
+    let numSpecs = document.getElementById("addedSpecs").childElementCount + 1;
+    newSpecs.find("#dropdownMenuButton").remove().end();
+    newSpecs.find("#examples-list").remove().end();
+    newSpecs.find("#addSpecsBtn").remove().end();
+    newSpecs.find("#removeSpecsBtn").remove().end();
+    newSpecs.find("#goldbar-input-0").remove().end();
+    newSpecs.find("#categories-0").remove().end();
+    newSpecs.find(".CodeMirror").remove().end();
+
+    let newGoldbarID = 'goldbar-input-'+numSpecs;
+    let newCatID = 'categories-'+numSpecs;
+
+    // create new textareas for the specs and categories with new IDs
+    let newInputField = '<textarea class="codemirror" id="'+newGoldbarID+'" name="paragraph_text" cols="50" rows="10"></textarea>';
+    let newCategories = '<textarea class="codemirror" id="'+newCatID+'" name="paragraph_text" cols="50" rows="10"></textarea>';
+
+    // append the new textareas to the correct section
+    newSpecs.find("#spec-col-0").append(newInputField);
+    newSpecs.find("#categories-col-0").append(newCategories);
+
+    // give all the divs new IDs
+    newSpecs.find("#spec-col-0").attr("id", "spec-col-"+numSpecs);
+    newSpecs.find("#goldbar-label-0").attr("for", newGoldbarID);
+    newSpecs.find("#goldbar-label-0").attr("id", "goldbar-label-"+numSpecs);
+    newSpecs.find("#categories-col-0").attr("id", "categories-col-"+numSpecs);
+    newSpecs.find("#cat-label-0").attr("for", newCatID);
+    newSpecs.find("#cat-label-0").attr("id", "cat-label-"+numSpecs);
+    newSpecs.attr("id", "spec-categories-row-"+numSpecs);
+
+    // append the new section to the addedSpecs div
+    $('#addedSpecs').append(newSpecs);
+
+    // add the new texareas to the editors const in this file (for codemirror formatting)
+    let newSpecEditor = CodeMirror.fromTextArea(document.getElementById(newGoldbarID), {
+      lineNumbers: true,
+      lineWrapping:true
+    });
+
+    let newCatEditor = CodeMirror.fromTextArea(document.getElementById(newCatID), {
+      lineNumbers: true,
+      lineWrapping:true
+    });
+
+    newSpecEditor.setOption("theme", THEME);
+    newCatEditor.setOption("theme", THEME);
+
+    editors.specEditor.push(newSpecEditor);
+    editors.catEditor.push(newCatEditor);
+
+  });
+
+  /*
+   Minus button under Categories lets user remove a design
+   */
+  $('#removeSpecsBtn').click(function () {
+    editors.specEditor.pop();
+    editors.catEditor.pop();
+    $('#addedSpecs').children().last().remove();
+    if (document.getElementById("addedSpecs").childElementCount === 0) {
+      $('#removeSpecsBtn').addClass('hidden');
+      $('#combine-menu-button').addClass('hidden');
+      $('#compute-options').addClass('hidden');
+    }
+  });
+
+  /*
   Back button & Constellation on navbar goes back to step 1 and clears everything
    */
   $("#backBtn").click(function(){
@@ -633,8 +761,8 @@ $(document).ready(function() {
     $('#goldbarSpinner').addClass('hidden');
     $("#exportSBOLBtn").addClass('hidden');
     $('#step2-content').addClass('hidden');
-    $('#graph-designs-col').addClass('hidden');
-    $('#spec-categories-col').addClass('hidden');
+    $('#graph-designs-row').addClass('hidden');
+    $('#spec-categories-row-0').addClass('hidden');
     $('#goldbar-parameters').addClass('hidden');
     $('#goldbar-btns').addClass('hidden');
   }
@@ -656,8 +784,8 @@ function showSBOLStepTwo(){
 
 function showGoldBarStepTwo(){
   $('#step2-content').removeClass('hidden');
-  $('#graph-designs-col').removeClass('hidden');
-  $('#spec-categories-col').removeClass('hidden');
+  $('#graph-designs-row').removeClass('hidden');
+  $('#spec-categories-row-0').removeClass('hidden');
   $('#goldbar-parameters').removeClass('hidden');
   $('#goldbar-btns').removeClass('hidden');
 }
