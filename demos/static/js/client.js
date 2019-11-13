@@ -100,9 +100,9 @@ function generateGraph(stateGraph) {
           links.push({source: id, target: edge});
         }
       } else {
-        nodes.push({id, type: INTERMEDIATE, text: edge.text});
+        nodes.push({id, type: INTERMEDIATE, text: edge.text, component: edge.component});
         links.push({source: edge.src, type: edge.type, text: EPSILON, target: id});
-        links.push({source: id, type: edge.type, text: edge.text, target: edge.dest});
+        links.push({source: id, type: edge.type, text: edge.text, component: edge.component, target: edge.dest});
       }
       id++;
     }
@@ -218,36 +218,39 @@ function drawNodes(nodes) {
     .attr('transform', 'translate(-15 , -30)')
     .append('svg:image')
     .attr('xlink:href', function(d) {
-      switch (d.text) {
+      switch (d.component) {
         // KEEP IN ALPHABETICAL ORDER
-        case 'aptamer':
-        case 'assemblyScar':
-        case 'bluntRestrictionSite':
-        case 'cds':
-        case 'dnaStabilityElement':
-        case 'engineeredRegion':
-        case 'fivePrimeOverhang':
-        case 'fivePrimeStickyRestrictionSite':
-        case 'insulator':
-        case 'nonCodingRna':
-        case 'operator':
-        case 'originOfReplication':
-        case 'originOfTrasnfer':
-        case 'polyA':
-        case 'promoter':
-        case 'proteaseSite':
-        case 'proteinStabilityElement':
-        case 'ribosomeBindingSite':
-        case 'ribozyme':
-        case 'signature':
-        case 'terminator':
-          return './sbol/' + d.text + '.svg';
         case EPSILON:
         case OR_MORE:
         case 'ZERO':
           return;
         default:
-          return './sbol/' + 'noGlyphAssigned.svg';
+          switch (d.component.role) {
+            case 'aptamer':
+            case 'assemblyScar':
+            case 'bluntRestrictionSite':
+            case 'cds':
+            case 'dnaStabilityElement':
+            case 'engineeredRegion':
+            case 'fivePrimeOverhang':
+            case 'fivePrimeStickyRestrictionSite':
+            case 'insulator':
+            case 'nonCodingRna':
+            case 'operator':
+            case 'originOfReplication':
+            case 'originOfTrasnfer':
+            case 'polyA':
+            case 'promoter':
+            case 'proteaseSite':
+            case 'proteinStabilityElement':
+            case 'ribosomeBindingSite':
+            case 'ribozyme':
+            case 'signature':
+            case 'terminator':
+              return './sbol/' + d.component.role + '.svg';
+            default:
+              return './sbol/' + 'noGlyphAssigned.svg';
+          }
       }
     })
     .attr('width', IMAGESIZE);
@@ -554,7 +557,7 @@ $(document).ready(function() {
   $('[data-toggle="tooltip"]').tooltip();
 
 
-  $("#submitBtn").click(function(){
+  $("#submitBtn").click(function() {
     // Reset UI
     resetDiagram();
     displayDesigns(editors, '');
@@ -563,29 +566,23 @@ $(document).ready(function() {
 
     let maxCycles = 0;
     let numDesigns = 10;
-    let specification;
+    let specification = {};
     let categories = {};
 
     if (editors.specEditor.length > 1) {
       if (combineMethod === null) {
         window.alert('Please select a method to combine your designs');
         return;
-      } else {
-        specification = '('+editors.specEditor[0].getValue()+')';
-        for (let specs of editors.specEditor.slice(1)) {
-          specification += ' ' + combineMethod + ' (' + specs.getValue() + ')';
-        }
       }
+    }
 
-    } else {
-      specification = editors.specEditor[0].getValue();
-      // categories.push(editors.catEditor[0].getValue());
+    for (let i = 0; i < editors.specEditor.length; i++) {
+      specification[i] = editors.specEditor[i].getValue();
     }
 
     for (let i = 0; i < editors.catEditor.length; i++) {
       categories[i] = editors.catEditor[i].getValue();
     }
-    console.log(categories);
 
     numDesigns = document.getElementById('numDesigns').value;
     maxCycles = document.getElementById('maxCycles').value;
@@ -596,8 +593,9 @@ $(document).ready(function() {
 
     $.post('http://localhost:8082/postSpecs', {
       "designName": designName,
-      "specification": specification,
+      "specification": JSON.stringify(specification),
       "categories": JSON.stringify(categories),
+      "combine": combineMethod,
       "numDesigns": numDesigns,
       "maxCycles": maxCycles,
       "number": "2.0",
