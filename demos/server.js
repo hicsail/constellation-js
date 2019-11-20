@@ -32,7 +32,7 @@ app.get('/', function(req,res) {
   res.sendFile((path.join(__dirname + '/static/client.html')));
 });
 
-app.post('/postSpecs', function(req,res) {
+app.post('/postSpecs', async function(req,res) {
   console.log(req.body);
   let designName = req.body.designName;
   let langText = req.body.specification;
@@ -52,7 +52,7 @@ app.post('/postSpecs', function(req,res) {
 
   let data;
   try {
-    data = constellation.goldbar(designName, langText, categories, combine, numDesigns, maxCycles, representation);
+    data = await constellation.goldbar(designName, langText, categories, combine, numDesigns, maxCycles, representation);
     res.status(200).send(data);
   } catch (error) {
     console.log(error);

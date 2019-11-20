@@ -1,10 +1,9 @@
-from process_dict import Exp, Or, Then, ZeroOrMore, OneOrMore, ZeroOrOne
+from start_with_dict import Exp, Or, Then, ZeroOrMore, OneOrMore, ZeroOrOne
 import copy
 
 
 # simplifies Then expressions
 def simplify_then(exp1, exp2):
-	# print("WORKING WITH PAIR --> ", exp1, exp2)
 	# if the first expression of the Then is a OneOrMore
 	if exp1.exp_type == "OneOrMore":
 		# if Exp is second
@@ -29,6 +28,8 @@ def simplify_then(exp1, exp2):
 
 	# if the first expression of the Then is a ZeroOrMore
 	if exp1.exp_type == "ZeroOrMore":
+		# print(exp1)
+		# print(exp2)
 		# if Exp is second
 		if exp2.exp_type == "Exp":
 			# case of "ZeroM(a) then nothing"
@@ -98,7 +99,6 @@ def find_matching_then_entries(then1, then2):
 
 # simplifies Or expressions
 def simplify_or(exp1, exp2):
-	# print("OR -- WORKING WITH PAIR --> ", exp1, exp2)
 	# if the first expression of the Or is a OneOrMore
 	if exp1.exp_type == "OneOrMore":
 		# if Exp is second
@@ -371,6 +371,3 @@ def simplify_regex(root):
 
 	return new_root
 
-
-# print("\n", simplify_regex(Then([Exp("cds"), Or([Exp("ribosome_entry_site"), Exp("promoter")])])))
-# print("\n", simplify_regex(Or([Exp("a"), Exp("b"), Exp("a"), Exp("a")])))

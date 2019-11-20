@@ -1,7 +1,6 @@
 import copy
-import sys
-import simp
-import to_goldbar
+import simp2
+import to_goldbar2
 import argparse
 import ast
 
@@ -208,8 +207,8 @@ class DFA:
 			for i in predecessors:
 				# to_add = {}
 				for j in successors:
-					if dict_states[inter]['FINAL'] == Exp('e') and i == j:
-						continue
+					# if dict_states[inter]['FINAL'] == Exp('e') and i == j:
+					# 	continue
 					inter_loop = self.get_if_loop(inter)
 					pred_loop = self.format_zero_or_more(self.get_if_loop(i))
 					# print('i and j : ', i, j)
@@ -229,15 +228,10 @@ class DFA:
 						pred_to_inter = pred_to_inter
 						new_path = self.format_new_path([pred_loop, pred_to_inter,  inter_loop, inter_to_succ])
 
-					# print("new_path --> ", new_path, "\n")
-					# to_add[j] = self.format_entry(dict_states[i][j], i, j, new_path)
 					dict_states[i][j] = self.format_entry(dict_states[i][j], i, j, new_path)
-				# for key in to_add:
-				# 	val = to_add[key]
-				# 	dict_states[i][key] = val
-				# dict_states[i][j] = self.format_entry(dict_states[i][j], i, j, new_path)
 			dict_states = {r: {c: v for c, v in val.items() if c != inter} for r, val in dict_states.items() if
 					   r != inter}  # remove inter node
+			# print(dict_states)
 			self.ds = copy.deepcopy(dict_states)
 
 		return dict_states[self.init_state][self.final_states[0]]
@@ -245,31 +239,26 @@ class DFA:
 
 
 def main():
-	print("called")
+
 	parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
 	parser.add_argument('-states', type=str, dest="states")
 	parser.add_argument('-start', type=str, dest="start")
 	parser.add_argument('-accept', type=str, dest="final")
 	parser.add_argument('-transition', type=str, dest="transition_funct")
-	args = parser.parse_args(['@/Users/vidyaakavoor/Documents/Knox_base/knox/src/main/java/knox/spring/data/neo4j/sbol/args.txt'])
+	args = parser.parse_args(['@/Users/vidyaakavoor/Documents/Constellation_base/constellation-js/lib/to_goldbar/args.txt'])
 
 	# print(sys.argv)
 	states = args.states.split()
-	print(states)
+	# print(states)
 	init_state = args.start
-	print(init_state)
+	# print(init_state)
 	final_states = [args.final]
-	print(final_states)
+	# print(final_states)
 	transition_funct = args.transition_funct
 	# print(transition_funct)
 	transition_funct = ast.literal_eval(transition_funct)
-	print(transition_funct)
+	# print(transition_funct)
 
-	
-
-	# print("transition_funct --> ", transition_funct)
-
-	# transition_funct = {"n0":{"n0":"_", "n1":"cds", "n2":"_", "n4":"_", "n5":"_"}, "n1":{"n0":"_", "n1":"_", "n2":"e", "n4":"_", "n5":"promoter, e"}, "n2":{"n0":"_", "n1":"_", "n2":"_", "n4":"ribosome_entry_site", "n5":"_"}, "n4":{"n0":"_", "n1":"_", "n2":"e", "n4":"_", "n5":"e"}, "n5":{"n0":"_", "n1":"_", "n2":"_", "n4":"_", "n5":"_"}}
 
 	# create a start node with an empty edge to the actual first edge ('e' is the epsilon)
 	start_array = {}
@@ -305,18 +294,17 @@ def main():
 	states += ['START', 'FINAL']
 
 	r = Exp("")
-	# simp = Exp("")
+	simp = Exp("")
 	goldbar = ""
 
 	for f in final_states:
 		dfa = DFA(states, init_state, [f], transition_funct)
 		# print("dict --> ", dfa.transition_dict)
 		r = dfa.toregex()
-		simplified = simp.simplify_regex(r)
-		goldbar = to_goldbar.to_goldbar(simplified)
+		simp = simp2.simplify_regex(r)
+		goldbar = to_goldbar2.to_goldbar(simp)
 
 	print(goldbar)
-	# sys.stdout.flush()
 	return goldbar
 
 

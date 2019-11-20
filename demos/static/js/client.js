@@ -102,7 +102,7 @@ function generateGraph(stateGraph) {
       } else {
         nodes.push({id, type: INTERMEDIATE, text: edge.text, component: edge.component});
         links.push({source: edge.src, type: edge.type, text: EPSILON, target: id});
-        links.push({source: id, type: edge.type, text: edge.text, component: edge.component, target: edge.dest});
+        links.push({source: id, type: edge.type, text: edge.text, target: edge.dest});
       }
       id++;
     }
