@@ -38,11 +38,9 @@
     "form-data": "^2.5.0",
     "imparse": "0.0.2",
     "mocha": "^4.1.0",
-    "python-shell": "^1.0.8",
     "reservoir": "^0.1.2",
     "sboljs": "^2.2.2",
-    "uuidv4": "^0.5.0",
-    "xmlhttprequest": "^1.8.0"
+    "uuidv4": "^0.5.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.5",

@@ -530,14 +530,14 @@ $(document).ready(function() {
   $('#demo-option').on('click', function() {
     document.getElementById('designName').value = "demo-example";
     editors.specEditor[0].setValue('one-or-more(one-or-more(promoter then nonCodingRna)then cds then \n (zero-or-more \n (nonCodingRna or (one-or-more \n (nonCodingRna then promoter then nonCodingRna) then cds)) then \n (terminator or (terminator then nonCodingRna) or (nonCodingRna then terminator)))))')
-    editors.catEditor[0].setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
+    editors.catEditor[0].setValue('{"promoter": {"ids": ["BBa_R0040", "BBa_J23100"], "role": "promoter"},\n "ribosomeBindingSite": {"ids": ["BBa_B0032", "BBa_B0034"], "role": "ribosomeBindingSite"}, \n"cds": {"ids": ["BBa_E0040", "BBa_E1010"], "role": "cds"},\n"nonCodingRna": {"ids": ["BBa_F0010"], "role": "nonCodingRna"},\n"terminator": {"ids": ["BBa_B0010"], "role": "terminator"}}');
   });
 
 
   $('#debug-option').on('click', function() {
     document.getElementById('designName').value = "debug-example";
     editors.specEditor[0].setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
-    editors.catEditor[0].setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
+    editors.catEditor[0].setValue('{"promoter": {"ids": ["BBa_R0040", "BBa_J23100"], "role": "promoter"},\n "ribosomeBindingSite": {"ids": ["BBa_B0032", "BBa_B0034"], "role": "ribosomeBindingSite"}, \n"cds": {"ids": ["BBa_E0040", "BBa_E1010"], "role": "cds"},\n"nonCodingRna": {"ids": ["BBa_F0010"], "role": "nonCodingRna"},\n"terminator": {"ids": ["BBa_B0010"], "role": "terminator"}}');
   });
 
   $('#and-option').on('click', function () {

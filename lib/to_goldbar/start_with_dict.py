@@ -252,7 +252,8 @@ def main():
 	# print(states)
 	init_state = args.start
 	# print(init_state)
-	final_states = [args.final]
+	final_states = args.final
+	# final_states = [args.final]
 	# print(final_states)
 	transition_funct = args.transition_funct
 	# print(transition_funct)
@@ -277,7 +278,7 @@ def main():
 	final_array = {}
 	for key in transition_funct:
 		val = transition_funct[key]
-		if key == final_states[0]:
+		if key in final_states:
 			val['FINAL'] = 'e'
 		else:
 			val['FINAL'] = '_'
