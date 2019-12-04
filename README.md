@@ -85,6 +85,7 @@ The supported GOLDBAR concrete syntax for genetic design spaces is presented bel
 
  <exp> ::= <term> or <exp>
         |  <term> and <exp>
+        |  <term> merge <exp>
         |  <term>
 
 <term> ::= one-or-more <term>
@@ -98,6 +99,10 @@ The supported GOLDBAR concrete syntax for genetic design spaces is presented bel
 ```
 
 ### Constellation Data Structures
+
+#### GOLDBAR Abstract Syntax Tree
+
+The JSON schema for the GOLDBAR abstract syntax tree representation (parsed from the concrete syntax presented above) can be found in [`schemas/ast.schema.json`](schemas/ast.schema.json).
 
 #### Design Space Graph
 
