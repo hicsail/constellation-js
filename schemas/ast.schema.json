@@ -1,0 +1,121 @@
+{
+  "$id": "https://github.com/hicsail/constellation-js/blob/master/schemas/ast.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "GOLDBAR abstract syntax tree representation",
+  "type": "object",
+  "oneOf": [{"$ref": "#/definitions/node"}],
+  "definitions": {
+    "leaf": {
+      "type": "string",
+      "pattern": "([A-Za-z0-9]|-|_)+"
+    },
+    "node": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": ["OneOrMore"],
+          "properties": {
+            "OneOrMore": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/node"},
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["ZeroOrMore"],
+          "properties": {
+            "ZeroOrMore": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/node"},
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["ZeroOrOne"],
+          "properties": {
+            "ZeroOrOne": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/node"},
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["Then"],
+          "properties": {
+            "Then": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/node"},
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["Or"],
+          "properties": {
+            "Or": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/node"},
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["And"],
+          "properties": {
+            "And": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/node"},
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["Merge"],
+          "properties": {
+            "Merge": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/node"},
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["Atom"],
+          "properties": {
+            "Atom": {
+              "type": "array", 
+              "items": {"$ref": "#/definitions/leaf"},
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}
