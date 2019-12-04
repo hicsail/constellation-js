@@ -99,18 +99,22 @@ The supported GOLDBAR concrete syntax for genetic design spaces is presented bel
 
 ### Constellation Data Structures
 
-#### Boundary Graph
+#### Design Space Graph
 
-#### Node Object
-
-##### Example
+The JSON schema for a design space graph can be found in [`schemas/graph.schema.json`](schemas/graph.schema.json). Below is an example of a graph within a single node in JSON format.
 ```
 {
-  "id": "604571a7-9e38-4647-afd0-9546399480b5",
-  "text": "root",
-  "type": "root",
-  "edges": [
-    "b79407eb-95f0-4b78-99da-779f2c9cad46",
-    "7f6ca2fb-ef67-4687-924c-4285de896877"]
+  "604571a7-9e38-4647-afd0-9546399480b5": {
+    "id": "604571a7-9e38-4647-afd0-9546399480b5",
+    "text": "root",
+    "type": "root",
+    "edges": [
+      "b79407eb-95f0-4b78-99da-779f2c9cad46",
+      "7f6ca2fb-ef67-4687-924c-4285de896877"
+    ],
+    "operator": ["One"]
+  }
 }
 ```
+
+#### Boundary Graph
