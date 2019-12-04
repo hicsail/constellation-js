@@ -76,7 +76,7 @@ Designs: <br/>
 
 ## Design Space Representations
 
-### Concrete Syntax (GOLDBAR)
+### GOLDBAR Concrete Syntax
 The supported GOLDBAR concrete syntax for genetic design spaces is presented below using extended BNF notation. Notice that `then` and `.` are equivalent, and the delimiters `(`...`)` and `{`...`}` are equivalent.
 ```
  <seq> ::= <exp> then <seq>
@@ -97,7 +97,7 @@ The supported GOLDBAR concrete syntax for genetic design spaces is presented bel
 <atom> ::= ([A-Za-z0-9]|-|_)+
 ```
 
-### Data Structures
+### Constellation Data Structures
 
 #### Boundary Graph
 
