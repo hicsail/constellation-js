@@ -74,22 +74,52 @@ Designs: <br/>
 ]
 ```
 
-## Data Structures
+## Design Space Representations
 
-### Boundary Graph
+### GOLDBAR Concrete Syntax
+The supported GOLDBAR concrete syntax for genetic design spaces is presented below using extended BNF notation. Notice that `then` and `.` are equivalent, and the delimiters `(`...`)` and `{`...`}` are equivalent.
+```
+ <seq> ::= <exp> then <seq>
+        |  <exp> . <seq>
+        |  <exp>
 
-### Node Object
+ <exp> ::= <term> or <exp>
+        |  <term> and <exp>
+        |  <term> merge <exp>
+        |  <term>
 
-#### Example
+<term> ::= one-or-more <term>
+        |  zero-or-more <term>
+        |  zero-or-one <term>
+        |  ( <seq> )
+        |  { <seq> }
+        |  <atom>
+
+<atom> ::= ([A-Za-z0-9]|-|_)+
+```
+
+### Constellation Data Structures
+
+#### GOLDBAR Abstract Syntax Tree
+
+The JSON schema for the GOLDBAR abstract syntax tree representation (parsed from the concrete syntax presented above) can be found in [`schemas/ast.schema.json`](schemas/ast.schema.json).
+
+#### Design Space Graph
+
+The JSON schema for a design space graph can be found in [`schemas/graph.schema.json`](schemas/graph.schema.json). Below is an example of a graph within a single node in JSON format.
 ```
 {
-  "id": "604571a7-9e38-4647-afd0-9546399480b5",
-  "text": "root",
-  "type": "root",
-  "edges": [
-    "b79407eb-95f0-4b78-99da-779f2c9cad46",
-    "7f6ca2fb-ef67-4687-924c-4285de896877"]
+  "604571a7-9e38-4647-afd0-9546399480b5": {
+    "id": "604571a7-9e38-4647-afd0-9546399480b5",
+    "text": "root",
+    "type": "root",
+    "edges": [
+      "b79407eb-95f0-4b78-99da-779f2c9cad46",
+      "7f6ca2fb-ef67-4687-924c-4285de896877"
+    ],
+    "operator": ["One"]
+  }
 }
 ```
 
-
+#### Boundary Graph
