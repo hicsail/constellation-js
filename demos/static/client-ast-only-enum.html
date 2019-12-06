@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="https://imparse.org/js/lib/imparse.js"></script>
+    <script src="https://reity.org/summations-js/lib/summations.js"></script>
+    <style>
+      html, body { height:100%; margin:0; color:#000000; }
+      body #content { z-index:100; min-height:100%; width:900px; margin:0 auto -90px; }
+      body #content #sheet { margin:0 auto; padding-bottom:40px; color:#000000; background-color:white; }
+      body #content #sheet .section { padding-top:20px; font-family:'Open Sans',sans-serif; font-size:16px; }
+      body #content #sheet .section > pre > code { padding:10px; font-size:14px; }
+      body #content #sheet .section > pre > code { background-color:#F1F1F1; }
+      body #content #sheet .section table { width:100%; font-size:12px; }
+      body #content #sheet .section table div { width:100%; border:1px solid #888888; padding:5px; font-family:Monospace; font-size:11px; }
+      body #content #sheet .section table div pre { margin:0; padding:0; }
+      body #content #sheet .section textarea { width:100%; height:100%; border:1px solid #888888; margin:0; padding:5px; font-size:12px; }
+    </style>
+    <script>
+      var grammar = 
+        [
+          {"Seq": [
+            {"Then": [["Exp"], "then", ["Seq"]]},
+            {"": [["Exp"]]}
+          ]},
+          {"Exp": [
+            {"Or": [["Term"], "or", ["Exp"]]},
+            {"And": [["Term"], "and", ["Exp"]]},
+            {"": [["Term"]]}
+          ]},
+          {"Term": [
+            {"OneOrMore": ["one-or-more", ["Term"]]},
+            {"ZeroOrMore": ["zero-or-more", ["Term"]]},
+            {"ZeroOrOne": ["zero-or-one", ["Term"]]},
+            {"": ["(", ["Seq"], ")"]},
+            {"Atom": [{"RegExp":"([A-Za-z0-9]|-|_)+"}]}
+          ]}
+        ];
+      
+      var ast = {};
+    
+      function reset() {
+        document.getElementById("designs").innerHTML = "";
+      }
+
+      function parse() {
+        var str = document.getElementById('spec').value;
+        if (str.length == 0) {
+          document.getElementById('ast').innerHTML = "No input provided.";
+          document.getElementById('designs').innerHTML = "No input provided.";
+        } else {
+          ast = imparse.parse(grammar, str);
+          if (ast == null)
+            document.getElementById('ast').innerHTML = "Parsing did not succeed.";
+          else
+            document.getElementById('ast').innerHTML = stringify(ast, {maxLength:120}).trim();
+        }
+      }
+
+      function update() {
+        reset();
+        if (ast == null) {
+          // Do nothing.
+        } else {
+          var cat_to_parts = JSON.parse(document.getElementById('parts').value);
+          var rep_bound = parseInt(document.getElementById('bound').value);
+          var rns = repetition_nodes(ast);
+          document.getElementById("repops_count").innerHTML = " (must be >= " + repetition_nodes_min_total(rns) + ")";
+          var sum_breakdowns = summations.sumLen(rep_bound, rns.length);
+          var design_count = 0;
+          for (var k = 0; k < sum_breakdowns.length; k++) {
+            var valid = true;
+            for (var h = 0; h < rns.length; h++) {
+              rns[h].repeat = sum_breakdowns[k][h];
+              if ("OneOrMore" in rns[h] && rns[h].repeat == 0)
+                valid = false;
+            }
+            if (valid) { // This breakdown is valid.
+              design_count += designs_count(cat_to_parts, ast);
+            }
+          }
+          if (rns.length == 0)
+            design_count = designs_count(cat_to_parts, ast);
+          document.getElementById('candidates').value = design_count;
+        }
+      }
+
+      function generate() {
+        reset();
+        document.getElementById("btn_gen").disabled = true;
+        var cat_to_parts = JSON.parse(document.getElementById('parts').value);
+        var rep_bound = parseInt(document.getElementById('bound').value);
+        var rns = repetition_nodes(ast);
+        var designs = [];
+        if (rns.length > 0) {
+          var sum_breakdowns = summations.sumLen(rep_bound, rns.length);
+          generate_step(sum_breakdowns, cat_to_parts, ast, rns, 0, designs);
+        } else {
+          designs = designs_enumerate(cat_to_parts, ast);
+          for (var i = 0; i < designs.length; i++) {
+            document.getElementById("designs").innerHTML += JSON.stringify(designs[i]) + "<br/>";
+          }
+          document.getElementById("designs_count").innerHTML = " (" + designs.length + ")";
+          document.getElementById("btn_gen").disabled = false;
+        }
+      }
+
+      function generate_step(sum_breakdowns, cat_to_parts, ast, rns, k, designs) {
+        if (k < sum_breakdowns.length) {
+          var valid = true;
+          // Assign the sum terms to the repetition nodes for
+          // this particular sum breakdown.
+          for (var h = 0; h < rns.length; h++) {
+            rns[h].repeat = sum_breakdowns[k][h];
+            if ("OneOrMore" in rns[h] && rns[h].repeat == 0)
+              valid = false;
+          }
+          if (valid) { // This breakdown is valid.
+            var designs_new = designs_enumerate(cat_to_parts, ast);
+            for (var i = 0; i < designs_new.length; i++) {
+              if (!inside(designs_new[i], designs)) {
+                document.getElementById("designs").innerHTML += JSON.stringify(designs_new[i]) + "<br/>";
+                designs.push(designs_new[i]);
+              }
+            }
+          }
+          document.getElementById("designs_count").innerHTML = " (" + designs.length + ")";
+          setTimeout( function () { generate_step(sum_breakdowns, cat_to_parts, ast, rns, k+1, designs); }, 100);
+        } else {
+          document.getElementById("btn_gen").disabled = false;
+        }
+      }
+
+      function eq(d1, d2) {
+        if (d1.length != d2.length)
+          return false;
+        for (var i = 0; i < d1.length; i++)
+          if (d1[i] != d2[i])
+            return false;
+        return true;
+      }
+      
+      function inside(d, ds) {
+        for (var i = 0; i < ds.length; i++)
+          if (eq(d, ds[i]))
+            return true;
+        return false;
+      }
+
+      function product(ds1, ds2) {
+        var ds = [];
+        for (var i = 0; i < ds1.length; i++) {
+          for (var j = 0; j < ds2.length; j++) {
+            ds.push(ds1[i].concat(ds2[j])) 
+          }
+        }
+        return ds;
+      }
+
+      function union(ds1, ds2) {
+        var ds = ds1;
+        for (var i = 0; i < ds2.length; i++)
+          if (!inside(ds2[i], ds))
+            ds.push(ds2[i]);
+        return ds;
+      }
+
+      function intersection(ds1, ds2) {
+        var ds = [];
+        for (var i = 0; i < ds1.length; i++)
+          if (inside(ds1[i], ds2))
+            ds.push(ds1[i]);
+        return ds;
+      }
+
+      function designs_enumerate(cat_to_parts, ast_node) {
+        if ("Atom" in ast_node) {
+          if (ast_node["Atom"][0] in cat_to_parts)
+            return cat_to_parts[ast_node["Atom"][0]].map(function(p) { return [p]; });
+          else
+            return [[]];
+        } else if ("Then" in ast_node) {
+          var ds1 = designs_enumerate(cat_to_parts, ast_node["Then"][0]);
+          var ds2 = designs_enumerate(cat_to_parts, ast_node["Then"][1]);
+          return product(ds1, ds2);
+        } else if ("Or" in ast_node) {
+          var ds1 = designs_enumerate(cat_to_parts, ast_node["Or"][0]);
+          var ds2 = designs_enumerate(cat_to_parts, ast_node["Or"][1]);
+          return union(ds1, ds2);
+        } else if ("And" in ast_node) {
+          var ds1 = designs_enumerate(cat_to_parts, ast_node["And"][0]);
+          var ds2 = designs_enumerate(cat_to_parts, ast_node["And"][1]);
+          return intersection(ds1, ds2);
+        } else if ("ZeroOrOne" in ast_node) {
+          var ds = designs_enumerate(cat_to_parts, ast_node["ZeroOrOne"][0]);
+          return [[]].concat(ds);
+        } else if ("ZeroOrMore" in ast_node) {
+          var ds0 = designs_enumerate(cat_to_parts, ast_node["ZeroOrMore"][0]);
+          var ds_final = [];
+          var ds = [[]];
+          var repeat = ('repeat' in ast_node) ? ast_node.repeat : 0;
+          for (var k = 0; k <= repeat; k++) {
+            ds_final = union(ds_final, ds);
+            ds = product(ds, ds0);
+          }
+          return ds_final;
+        } else if ("OneOrMore" in ast_node) {
+          var ds0 = designs_enumerate(cat_to_parts, ast_node["OneOrMore"][0]);
+          var ds_final = [];
+          var ds = [[]];
+          var repeat = ('repeat' in ast_node) ? ast_node.repeat : 1;
+          for (var k = 0; k < repeat; k++) {
+            ds = product(ds, ds0);
+            ds_final = union(ds_final, ds);
+          }
+          return ds_final;
+        }
+      }
+
+      function designs_count(cat_to_parts, ast_node) {
+        if ("Atom" in ast_node) {
+          if (ast_node["Atom"][0] in cat_to_parts)
+            return cat_to_parts[ast_node["Atom"][0]].length;
+          else
+            return 0;
+        } else if ("Then" in ast_node) {
+          var c1 = designs_count(cat_to_parts, ast_node["Then"][0]);
+          var c2 = designs_count(cat_to_parts, ast_node["Then"][1]);
+          return c1 * c2;
+        } else if ("Or" in ast_node) {
+          var c1 = designs_count(cat_to_parts, ast_node["Or"][0]);
+          var c2 = designs_count(cat_to_parts, ast_node["Or"][1]);
+          return c1 + c2;
+        } else if ("And" in ast_node) {
+          var c1 = designs_count(cat_to_parts, ast_node["And"][0]);
+          var c2 = designs_count(cat_to_parts, ast_node["And"][1]);
+          return Math.max(c1, c2);
+        } else if ("ZeroOrOne" in ast_node) {
+          return 1 + designs_count(cat_to_parts, ast_node["ZeroOrOne"][0]);
+        } else if ("ZeroOrMore" in ast_node) {
+          var c = designs_count(cat_to_parts, ast_node["ZeroOrMore"][0]);
+          var total = 0;
+          for (var k = 0; k <= ast_node.repeat; k++)
+            total += Math.pow(c, k)
+          return total;
+        } else if ("OneOrMore" in ast_node) {
+          var c = designs_count(cat_to_parts, ast_node["OneOrMore"][0]);
+          var total = 0;
+          for (var k = 1; k <= ast_node.repeat; k++)
+            total += Math.pow(c, k)
+          return total;
+        }
+      }
+
+      function repetition_nodes(ast_node) {
+        if ("Then" in ast_node) {
+          var rns1 = repetition_nodes(ast_node["Then"][0]);
+          var rns2 = repetition_nodes(ast_node["Then"][1]);
+          return rns1.concat(rns2);
+        } else if ("Or" in ast_node) {
+          var rns1 = repetition_nodes(ast_node["Or"][0]);
+          var rns2 = repetition_nodes(ast_node["Or"][1]);
+          return rns1.concat(rns2);
+        } else if ("And" in ast_node) {
+          var rns1 = repetition_nodes(ast_node["And"][0]);
+          var rns2 = repetition_nodes(ast_node["And"][1]);
+          return rns1.concat(rns2);
+        } else if ("ZeroOrMore" in ast_node) {
+          return [ast_node].concat(repetition_nodes(ast_node["ZeroOrMore"][0]));
+        } else if ("OneOrMore" in ast_node) {
+          return [ast_node].concat(repetition_nodes(ast_node["OneOrMore"][0]));
+        } else if ("ZeroOrOne" in ast_node) {
+          return repetition_nodes(ast_node["ZeroOrOne"][0]);
+        } else {
+          return [];
+        }
+      }
+      
+      function repetition_nodes_min_total(rns) {
+        var total = 0;
+        for (var i = 0; i < rns.length; i++)
+          total += ("OneOrMore" in rns[i]) ? 1 : 0;
+        return total;
+      }
+
+      function initialize() {
+        document.getElementById('spec').value = document.getElementById('spec').value.trim();
+        document.getElementById('parts').value = document.getElementById('parts').value.trim();
+        parse();
+        update();
+      }
+      module = {}; // Avoid error from json-stringify-pretty-compact below.
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/json-stringify-pretty-compact@1.1.0/index.min.js"></script>
+    <base target="_parent">
+  </head>
+  <body onload="initialize();">
+    <div id="content">
+      <div id="sheet">
+        <div class="section">
+          <table>
+            <tr>
+              <td>
+                Specification:<br/>
+                <textarea id="spec" rows="18" onkeyup="parse(); update();">
+one-or-more (
+  one-or-more (a then b) then c then
+    zero-or-more (
+      b or (one-or-more (
+        b then a then b
+      )) then c
+    ) then (d or (d then b) or (b then d))
+)
+                </textarea>
+              </td>
+              <td>
+                Part Categories:<br/>
+                <textarea id="parts" rows="18" onkeyup="update();">
+{
+  "a": ["a1"], 
+  "b": ["b1"],
+  "c": ["c1"],
+  "d": ["d1"]
+}
+                </textarea>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Upper bound on total across all repetition operators<span id="repops_count"></span>:<br/>
+                <textarea id="bound" rows="1" onkeyup="update();" style="width:100px;">4</textarea>
+              </td>
+              <td>
+                Number of design candidates:<br/>
+                <textarea id="candidates" rows="1" style="width:100px;" readonly></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <button type="button" id="btn_gen" style="width:100%;" onclick="generate();">Generate designs</button>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                Unique Designs<span id="designs_count"></span>:<br/>
+                <div><pre id="designs"></pre></div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                AST:<br/>
+                <div><pre id="ast"></pre></div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
