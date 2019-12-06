@@ -9,4 +9,4 @@ const sbolTests = require('./sbolTests');
 constellationTests();
 enumerationTests();
 simplificationTests();
-// sbolTests();
+sbolTests();
