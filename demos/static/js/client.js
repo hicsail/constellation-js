@@ -82,7 +82,7 @@ function generateGraph(stateGraph) {
     } else if (node.type === graph.ATOM) {
       text = node.text;
     }
-    nodes.push({id: nodeId, type: node.type, text, operator: node.operator});
+    nodes.push({id: nodeId, type: node.type, component: node.component, text, operator: node.operator});
   }
 
   // Get edges from stateGraph
@@ -93,11 +93,11 @@ function generateGraph(stateGraph) {
       if (REPRESENTATION === 'NODE') {
         // handle case of self-loop
         if (edge === node) {
-          links.push({source: node, target: edge});
+          links.push({source: node, target: edge, component: stateGraph[node].component});
         } else {
-          nodes.push({id, type: INTERMEDIATE});
-          links.push({source: node, target: id});
-          links.push({source: id, target: edge});
+          nodes.push({id, type: INTERMEDIATE, component: stateGraph[node].component});
+          links.push({source: node, target: id, component: stateGraph[node].component});
+          links.push({source: id, target: edge, component: stateGraph[node].component});
         }
       } else {
         nodes.push({id, type: INTERMEDIATE, text: edge.text, component: edge.component});
@@ -170,7 +170,6 @@ function drawNodes(nodes) {
   circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
     .append('circle')
     .attr('fill', function(d) {
-// <<<<<<< HEAD
       if (d.type === EPSILON) {
         return 'rgb(240,95,64)';
       } else {
@@ -184,16 +183,6 @@ function drawNodes(nodes) {
         return 'rgb(231,29,54)';
       } else if (d.type === EPSILON) {
         return '#ffffff';
-// =======
-//       if (d.type === graph.ROOT) {
-//         return 'rgb(33,168,174)';
-//       } else if (d.type === graph.ACCEPT) {
-//         return 'rgb(133,151,41)';
-//       } else if (d.type === graph.EPSILON) {
-//         return 'rgb(253,183,152)';
-//       } else if (d.type === INTERMEDIATE) {
-//         return 'rgb(253,183,152)';
-// >>>>>>> master
       } else {
         return '#ffffff';
       }
@@ -208,12 +197,8 @@ function drawNodes(nodes) {
     });
 
   // Add images
-// <<<<<<< HEAD
 
   imagePointer = nodePointer.filter(filterByRep)
-// =======
-//   imagePointer = nodePointer.filter(function(d) { return d.type === graph.ATOM; })
-// >>>>>>> master
     .append('g')
     .attr('transform', 'translate(-15 , -30)')
     .append('svg:image')
@@ -451,49 +436,26 @@ $(document).ready(function() {
   const THEME = 'ambiance';
   let combineMethod;
 
-  // const editors = {
-  //   "specEditor": CodeMirror.fromTextArea(document.getElementById('goldbar-input-0'), {
-  //     lineNumbers: true,
-  //     lineWrapping:true
-  //   }),
-  //   "catEditor0": CodeMirror.fromTextArea(document.getElementById('categories-0'), {
-  //     lineNumbers: true,
-  //     lineWrapping:true
-  //   }),
-  //   "designsEditor": CodeMirror.fromTextArea(document.getElementById('designs'), {
-  //     lineNumbers: true,
-  //     lineWrapping:true,
-  //     readOnly: true})
-  // };
-
-
   const editors = {
-    "specEditor": [CodeMirror.fromTextArea(document.getElementById('goldbar-input-0'), {
+    "specEditor": CodeMirror.fromTextArea(document.getElementById('goldbar-input-0'), {
       lineNumbers: true,
       lineWrapping:true
-    })],
-    "catEditor": [CodeMirror.fromTextArea(document.getElementById('categories-0'), {
+    }),
+    "catEditor": CodeMirror.fromTextArea(document.getElementById('categories-0'), {
       lineNumbers: true,
       lineWrapping:true
-    })],
+    }),
     "designsEditor": CodeMirror.fromTextArea(document.getElementById('designs'), {
       lineNumbers: true,
       lineWrapping:true,
       readOnly: true})
   };
 
-
   document.getElementById('numDesigns').value = 40;
   document.getElementById('maxCycles').value = 0;
 
-  for (let specs of editors.specEditor) {
-    specs.setOption("theme", THEME);
-  }
-
-  for (let cat of editors.catEditor) {
-    cat.setOption("theme", THEME);
-  }
-
+  editors.specEditor.setOption("theme", THEME);
+  editors.catEditor.setOption("theme", THEME);
   editors.designsEditor.setOption("theme", THEME);
 
   /* * * * * * */
@@ -540,15 +502,6 @@ $(document).ready(function() {
     editors.catEditor[0].setValue('{"promoter": {"ids": ["BBa_R0040", "BBa_J23100"], "role": "promoter"},\n "ribosomeBindingSite": {"ids": ["BBa_B0032", "BBa_B0034"], "role": "ribosomeBindingSite"}, \n"cds": {"ids": ["BBa_E0040", "BBa_E1010"], "role": "cds"},\n"nonCodingRna": {"ids": ["BBa_F0010"], "role": "nonCodingRna"},\n"terminator": {"ids": ["BBa_B0010"], "role": "terminator"}}');
   });
 
-  $('#and-option').on('click', function () {
-    document.getElementById('combine-menu-button').innerText = "And";
-    combineMethod = 'and';
-  });
-
-  $('#merge-option').on('click', function () {
-    document.getElementById('combine-menu-button').innerText = "Merge";
-    combineMethod = 'merge';
-  });
 
   $('#exportSBOLBtn').on('click', function() {
     downloadSBOL(sbolDoc, 'constellation_' + designName + '_sbol.xml');
@@ -566,8 +519,6 @@ $(document).ready(function() {
 
     let maxCycles = 0;
     let numDesigns = 10;
-    let specification = {};
-    let categories = {};
 
     if (editors.specEditor.length > 1) {
       if (combineMethod === null) {
@@ -576,13 +527,8 @@ $(document).ready(function() {
       }
     }
 
-    for (let i = 0; i < editors.specEditor.length; i++) {
-      specification[i] = editors.specEditor[i].getValue();
-    }
-
-    for (let i = 0; i < editors.catEditor.length; i++) {
-      categories[i] = editors.catEditor[i].getValue();
-    }
+    const specification = editors.specEditor.getValue();
+    const categories = editors.catEditor.getValue();
 
     numDesigns = document.getElementById('numDesigns').value;
     maxCycles = document.getElementById('maxCycles').value;
@@ -593,9 +539,8 @@ $(document).ready(function() {
 
     $.post('http://localhost:8082/postSpecs', {
       "designName": designName,
-      "specification": JSON.stringify(specification),
-      "categories": JSON.stringify(categories),
-      "combine": combineMethod,
+      "specification": specification,
+      "categories": categories,
       "numDesigns": numDesigns,
       "maxCycles": maxCycles,
       "number": "2.0",
@@ -659,81 +604,6 @@ $(document).ready(function() {
     }
 
     $('#step1-content').addClass('hidden');
-  });
-
-  /*
-   Plus button under Categories lets user add more designs
-   */
-  $("#addSpecsBtn").click(function(){
-    $('#combine-menu-button').removeClass('hidden');
-    $('#compute-options').removeClass('hidden');
-    $('#removeSpecsBtn').removeClass('hidden');
-    // addNewSpecs();
-    // clone the original spec-categories section and remove the examples and plus buttons, and the old editors
-    let newSpecs = $('#spec-categories-row-0').clone();
-    let numSpecs = document.getElementById("addedSpecs").childElementCount + 1;
-    newSpecs.find("#dropdownMenuButton").remove().end();
-    newSpecs.find("#examples-list").remove().end();
-    newSpecs.find("#addSpecsBtn").remove().end();
-    newSpecs.find("#removeSpecsBtn").remove().end();
-    newSpecs.find("#goldbar-input-0").remove().end();
-    newSpecs.find("#categories-0").remove().end();
-    newSpecs.find(".CodeMirror").remove().end();
-
-    let newGoldbarID = 'goldbar-input-'+numSpecs;
-    let newCatID = 'categories-'+numSpecs;
-
-    // create new textareas for the specs and categories with new IDs
-    let newInputField = '<textarea class="codemirror" id="'+newGoldbarID+'" name="paragraph_text" cols="50" rows="10"></textarea>';
-    let newCategories = '<textarea class="codemirror" id="'+newCatID+'" name="paragraph_text" cols="50" rows="10"></textarea>';
-
-    // append the new textareas to the correct section
-    newSpecs.find("#spec-col-0").append(newInputField);
-    newSpecs.find("#categories-col-0").append(newCategories);
-
-    // give all the divs new IDs
-    newSpecs.find("#spec-col-0").attr("id", "spec-col-"+numSpecs);
-    newSpecs.find("#goldbar-label-0").attr("for", newGoldbarID);
-    newSpecs.find("#goldbar-label-0").attr("id", "goldbar-label-"+numSpecs);
-    newSpecs.find("#categories-col-0").attr("id", "categories-col-"+numSpecs);
-    newSpecs.find("#cat-label-0").attr("for", newCatID);
-    newSpecs.find("#cat-label-0").attr("id", "cat-label-"+numSpecs);
-    newSpecs.attr("id", "spec-categories-row-"+numSpecs);
-
-    // append the new section to the addedSpecs div
-    $('#addedSpecs').append(newSpecs);
-
-    // add the new texareas to the editors const in this file (for codemirror formatting)
-    let newSpecEditor = CodeMirror.fromTextArea(document.getElementById(newGoldbarID), {
-      lineNumbers: true,
-      lineWrapping:true
-    });
-
-    let newCatEditor = CodeMirror.fromTextArea(document.getElementById(newCatID), {
-      lineNumbers: true,
-      lineWrapping:true
-    });
-
-    newSpecEditor.setOption("theme", THEME);
-    newCatEditor.setOption("theme", THEME);
-
-    editors.specEditor.push(newSpecEditor);
-    editors.catEditor.push(newCatEditor);
-
-  });
-
-  /*
-   Minus button under Categories lets user remove a design
-   */
-  $('#removeSpecsBtn').click(function () {
-    editors.specEditor.pop();
-    editors.catEditor.pop();
-    $('#addedSpecs').children().last().remove();
-    if (document.getElementById("addedSpecs").childElementCount === 0) {
-      $('#removeSpecsBtn').addClass('hidden');
-      $('#combine-menu-button').addClass('hidden');
-      $('#compute-options').addClass('hidden');
-    }
   });
 
   /*
