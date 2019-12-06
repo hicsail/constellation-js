@@ -87,7 +87,7 @@
   </div>
   <!-- end Modal -->
 
-
+<!--  Choose Input Section  -->
   <div class="main-content container">
     <div class="row">
       <div id="step1-content" class="col-md-12">
@@ -126,11 +126,12 @@
 
         </div>
       </div>
-
+<!--  End Choose Input Section  -->
       <div id="step2-content" class="col-md-12 hidden">
         <div class="card card-main">
+<!--  Input GOLDBAR Section  -->
           <div class="card-body">
-
+        <!--  GOLDBAR Parameters  -->
             <div id="goldbar-parameters" class="hidden">
               <div class="row">
                 <div class="col-sm">
@@ -150,7 +151,8 @@
                 </div>
               </div>
             </div>
-
+            <!--  End GOLDBAR Parameters  -->
+            <!--  GOLDBAR Specification and Categories  -->
             <div class="col">
               <div id="spec-categories-row-0" class="row hidden">
                 <div id="spec-col-0" class="col-sm">
@@ -167,14 +169,11 @@
                 <div id="categories-col-0" class="col-sm">
                   <label id="cat-label-0" for="categories-0">Categories</label>
                   <textarea class="codemirror" id="categories-0" cols="50" rows="10"></textarea>
-<!--                  <div class="pull-right"-->
-<!--                  <i id="addSpecsBtn" class="fas fa fa-plus pull-right" data-toggle="tooltip" title="Add another design"></i>-->
-<!--                  <i id="removeSpecsBtn" class="fas fa fa-minus pull-right hidden" data-toggle="tooltip" title="Remove a design"></i>-->
                 </div>
               </div>
+            <!--  End GOLDBAR Specification and Categories  -->
 
-              <div id="addedSpecs"></div>
-
+            <!--  GOLDBAR Graph, Designs, and Submit  -->
               <div id="graph-designs-row" class="row hidden">
                 <div class="col-sm">
                   <i id="exportSBOLBtn" class="fas fa-download pull-right hidden" data-toggle="tooltip" title="Export design as SBOL"></i>
@@ -193,18 +192,13 @@
                 <div id="goldbarSpinner" class="spinner hidden">
                   <p><i class="fa fa-spinner fa-spin"></i>  Loading...</p>
                 </div>
-                <button class="hidden btn btn-secondary dropdown-toggle" type="button" id="combine-menu-button" data-toggle="dropdown">
-                  Combine Designs
-                </button>
-                <div id="combine-options" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  <a id='and-option' class="dropdown-item">And</a>
-                  <a id='merge-option' class="dropdown-item">Merge</a>
-                </div>
                 <button id="submitBtn" class="btn btn-outline-warning mt-2">Submit</button>
               </div>
             </div>
-
           </div>
+          <!--  End GOLDBAR Graph, Designs, and Submit  -->
+
+<!--  End Input GOLDBAR Section  -->
 
           <div class="card-footer">
             <button id="backBtn" class="navBtn">

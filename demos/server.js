@@ -37,7 +37,6 @@ app.post('/postSpecs', async function(req,res) {
   let designName = req.body.designName;
   let langText = req.body.specification;
   let categories = req.body.categories;
-  let combine = req.body.combine;
   let numDesigns = req.body.numDesigns;
   let maxCycles = req.body.maxCycles;
   let representation = req.body.representation;
@@ -45,14 +44,13 @@ app.post('/postSpecs', async function(req,res) {
   console.log('Design Name: ', designName);
   console.log('Specification: ', langText);
   console.log('Categories: ', categories);
-  console.log('Combine: ', combine);
   console.log('numDesigns: ', numDesigns);
   console.log('maxCycles: ', maxCycles);
   console.log('Representation:', representation);
 
   let data;
   try {
-    data = await constellation.goldbar(designName, langText, categories, combine, numDesigns, maxCycles, representation);
+    data = await constellation.goldbar(designName, langText, categories, numDesigns, maxCycles, representation);
     res.status(200).send(data);
   } catch (error) {
     console.log(error);
