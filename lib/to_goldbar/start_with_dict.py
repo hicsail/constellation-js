@@ -3,6 +3,7 @@ import simp2
 import to_goldbar2
 import argparse
 import ast
+import sys
 
 class Exp:
 	def __init__(self, name):
@@ -240,24 +241,13 @@ class DFA:
 
 def main():
 
-	parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
-	parser.add_argument('-states', type=str, dest="states")
-	parser.add_argument('-start', type=str, dest="start")
-	parser.add_argument('-accept', type=str, dest="final")
-	parser.add_argument('-transition', type=str, dest="transition_funct")
-	args = parser.parse_args(['@/Users/vidyaakavoor/Documents/Constellation_base/constellation-js/lib/to_goldbar/args.txt'])
-
-	# print(sys.argv)
-	states = args.states.split()
+	states = ast.literal_eval(sys.argv[1])
 	# print(states)
-	init_state = args.start
+	init_state = sys.argv[2]
 	# print(init_state)
-	final_states = args.final
-	# final_states = [args.final]
+	final_states = ast.literal_eval(sys.argv[3])
 	# print(final_states)
-	transition_funct = args.transition_funct
-	# print(transition_funct)
-	transition_funct = ast.literal_eval(transition_funct)
+	transition_funct = ast.literal_eval(sys.argv[4])
 	# print(transition_funct)
 
 
@@ -306,7 +296,7 @@ def main():
 		goldbar = to_goldbar2.to_goldbar(simp)
 
 	print(goldbar)
-	return goldbar
+	# return goldbar
 
 
 if __name__ == '__main__':

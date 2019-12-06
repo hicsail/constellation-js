@@ -5,7 +5,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 const constellation = require('../lib/constellation');
 
-const CATEGORIES = {"a":{"ids":["a1","a2"], "role":"a"},"b":{"ids":["b1","b2","b3"], "role": "c"},"c":{"ids":["c1"], "role": "c"}};
+const CATEGORIES = {"a":{"ids":["a1","a2"], "role":"a"},"b":{"ids":["b1","b2","b3"], "role": "b"},"c":{"ids":["c1"], "role": "c"}};
 const ALEN = CATEGORIES.a.ids.length;
 const BLEN = CATEGORIES.b.ids.length;
 const CLEN = CATEGORIES.c.ids.length;
