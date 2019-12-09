@@ -34,14 +34,14 @@ app.get('/', function(req,res) {
 
 app.post('/postSpecs', async function(req,res) {
   console.log(req.body);
-  let designName = req.body.designName;
+  let designName = req.body.designName || 'constellation-design';
   let langText = req.body.specification;
   let categories = req.body.categories;
-  let numDesigns = req.body.numDesigns;
-  let maxCycles = req.body.maxCycles;
-  let andTolerance = req.body.andTolerance;
-  let mergeTolerance = req.body.mergeTolerance;
-  let representation = req.body.representation;
+  let numDesigns = req.body.numDesigns || 20;
+  let maxCycles = req.body.maxCycles || 0;
+  let andTolerance = req.body.andTolerance || 0;
+  let mergeTolerance = req.body.mergeTolerance || 0;
+  let representation = req.body.representation || 'EDGE';
   console.log('---Received new input---');
   console.log('Design Name: ', designName);
   console.log('Specification: ', langText);
@@ -54,7 +54,14 @@ app.post('/postSpecs', async function(req,res) {
 
   let data;
   try {
-    data = await constellation.goldbar(designName, langText, categories, numDesigns, maxCycles, representation, andTolerance, mergeTolerance);
+    data = await constellation.goldbar(langText, categories,
+      {designName: designName,
+      numDesigns: numDesigns,
+      maxCycles: maxCycles,
+      representation: representation,
+      andTolerance: andTolerance,
+      mergeTolerance: mergeTolerance
+  });
     res.status(200).send(data);
   } catch (error) {
     console.log(error);
