@@ -6,7 +6,7 @@ let fs = require('fs');
 let NUM_DESIGNS = 10;
 let MAX_CYCLES = 0;
 let DESIGN_NAME = 'design';
-const CATEGORIES = '{"rbs":{"ids":["a1","a2"], "role":"rbs"},"cds":{"ids":["b1","b2","b3"], "role":"cds"},"promoter":{"ids":["c1"], "role":"promoter"}, "terminator": {"ids":["t"], "role":"terminator"}}';
+const CATEGORIES = '{"rbs":{"ids":["a1","a2"], "roles":["rbs"]},"cds":{"ids":["b1","b2","b3"], "roles":["cds"]},"promoter":{"ids":["c1"], "roles":["promoter"]}, "terminator": {"ids":["t"], "roles":["terminator"]}}';
 const NODE = 'NODE';
 
 const util = require('util');
