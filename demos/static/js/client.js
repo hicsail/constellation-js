@@ -1,11 +1,10 @@
-import {config} from './config.js';
 const LINKDISTANCE = 25;
 const CHARGESTRENGTH = -400;
 const MAXDISTANCE = 100;
 const IMAGESIZE = 30;
 const RADIUS = 7;
 const INTERMEDIATE = 'intermediate';
-const REPRESENTATION = config.representation;
+const REPRESENTATION = 'EDGE';
 
 let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDoc, sbolFile;
 let designName = 'Constellation';
