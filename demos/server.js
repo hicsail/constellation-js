@@ -39,6 +39,8 @@ app.post('/postSpecs', async function(req,res) {
   let categories = req.body.categories;
   let numDesigns = req.body.numDesigns;
   let maxCycles = req.body.maxCycles;
+  let andTolerance = req.body.andTolerance;
+  let mergeTolerance = req.body.mergeTolerance;
   let representation = req.body.representation;
   console.log('---Received new input---');
   console.log('Design Name: ', designName);
@@ -46,11 +48,13 @@ app.post('/postSpecs', async function(req,res) {
   console.log('Categories: ', categories);
   console.log('numDesigns: ', numDesigns);
   console.log('maxCycles: ', maxCycles);
+  console.log('andTolerance: ', andTolerance);
+  console.log('mergeTolerance: ', mergeTolerance);
   console.log('Representation:', representation);
 
   let data;
   try {
-    data = await constellation.goldbar(designName, langText, categories, numDesigns, maxCycles, representation);
+    data = await constellation.goldbar(designName, langText, categories, numDesigns, maxCycles, representation, andTolerance, mergeTolerance);
     res.status(200).send(data);
   } catch (error) {
     console.log(error);
