@@ -216,9 +216,9 @@ module.exports = function() {
       // one-or-more
       it('one-or-more (atom or atom)', function() {
         const resultNode = constellation.goldbar(DESIGN_NAME, 'one-or-more (a or c)', CATSTR, 10 , 0, NODE);
-        expect(resultNode.designs.length).to.equal(((ALEN * CLEN) * 2) + ALEN + CLEN);
+        expect(resultNode.designs.length).to.equal(ALEN + CLEN);
         const resultEdge = constellation.goldbar(DESIGN_NAME, 'one-or-more (a or c)', CATSTR, 10 , 0, EDGE);
-        expect(resultEdge.designs.length).to.equal(((ALEN * CLEN) * 2) + ALEN + CLEN);
+        expect(resultEdge.designs.length).to.equal(ALEN + CLEN);
       });
 
       // it('one-or-more (atom and atom)', function() {
