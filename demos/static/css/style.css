@@ -80,14 +80,6 @@ Buttons
   cursor: pointer;
 }
 
-#addSpecsBtn {
-  cursor: pointer;
-}
-
-#removeSpecsBtn {
-  cursor: pointer;
-}
-
 .pull-right {
   float: right !important;
 }
