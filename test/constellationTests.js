@@ -140,8 +140,12 @@ module.exports = function() {
     });
 
     describe('Binary expressions', function() {
-      // AND only works on EDGE representation
+
       describe('and', function() {
+        it('and NODE', async () => {
+          await expect(constellation.goldbar('a1 and a2', TOLSTR, NODE_REP)).to.be.rejectedWith('The AND operation is not supported in the NODE representation');
+        });
+
         it('and tolerance 0', async () => {
           let result = await constellation.goldbar('a1 and a2', TOLSTR, EDGE_REP);
           expectTol0(result);

@@ -88,7 +88,7 @@ module.exports = function() {
 
     it('Parse SBOL or', async() => {
       let result = await constellation.goldbar('promoter or cds', CATEGORIES, NODE_REP);
-      result = await constellation.sbol(result.sbol);
+      result = await constellation.sbol(result.sbol, NODE);
       let atomTexts = Object.values(result.stateGraph).map(obj => obj.text).sort();
       expect(atomTexts).to.be.an('array').that.includes('promoter');
       expect(atomTexts).to.be.an('array').that.includes('cds');
@@ -102,7 +102,7 @@ module.exports = function() {
 
     it('Parse SBOL repeat', async() => {
       let result = await constellation.goldbar('promoter then zero-or-more rbs then cds', CATEGORIES, NODE_REP);
-      result = await constellation.sbol(result.sbol);
+      result = await constellation.sbol(result.sbol, NODE);
       let atomTexts = Object.values(result.stateGraph).map(obj => obj.text).sort();
       expect(atomTexts).to.be.an('array').that.includes('promoter');
       expect(atomTexts).to.be.an('array').that.includes('rbs');
