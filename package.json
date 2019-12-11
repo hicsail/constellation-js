@@ -31,6 +31,8 @@
   "homepage": "https://github.com/hicsail/constellation-js#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "chai-as-promised": "^7.1.1",
+    "child_process": "^1.0.2",
     "d3-force": "^1.2.1",
     "express": "^4.17.1",
     "express-xml-bodyparser": "^0.3.0",
@@ -52,5 +54,8 @@
     "nyc": "^12.0.2",
     "webpack": "^4.39.2",
     "webpack-cli": "^3.3.7"
+  },
+  "browser":{
+    "child_process": false
   }
 }

@@ -1,11 +1,10 @@
-import {config} from './config.js';
 const LINKDISTANCE = 25;
 const CHARGESTRENGTH = -400;
 const MAXDISTANCE = 100;
 const IMAGESIZE = 30;
 const RADIUS = 7;
 const INTERMEDIATE = 'intermediate';
-const REPRESENTATION = config.representation;
+const REPRESENTATION = 'EDGE';
 
 let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDoc, sbolFile;
 let designName = 'Constellation';
@@ -82,7 +81,7 @@ function generateGraph(stateGraph) {
     } else if (node.type === graph.ATOM) {
       text = node.text;
     }
-    nodes.push({id: nodeId, type: node.type, text, operator: node.operator});
+    nodes.push({id: nodeId, type: node.type, component: node.component, text, operator: node.operator});
   }
 
   // Get edges from stateGraph
@@ -93,14 +92,14 @@ function generateGraph(stateGraph) {
       if (REPRESENTATION === 'NODE') {
         // handle case of self-loop
         if (edge === node) {
-          links.push({source: node, target: edge});
+          links.push({source: node, target: edge, component: stateGraph[node].component});
         } else {
-          nodes.push({id, type: INTERMEDIATE});
-          links.push({source: node, target: id});
-          links.push({source: id, target: edge});
+          nodes.push({id, type: INTERMEDIATE, component: stateGraph[node].component});
+          links.push({source: node, target: id, component: stateGraph[node].component});
+          links.push({source: id, target: edge, component: stateGraph[node].component});
         }
       } else {
-        nodes.push({id, type: INTERMEDIATE, text: edge.text});
+        nodes.push({id, type: INTERMEDIATE, text: edge.text, component: edge.component});
         links.push({source: edge.src, type: edge.type, text: EPSILON, target: id});
         links.push({source: id, type: edge.type, text: edge.text, target: edge.dest});
       }
@@ -170,7 +169,6 @@ function drawNodes(nodes) {
   circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
     .append('circle')
     .attr('fill', function(d) {
-// <<<<<<< HEAD
       if (d.type === EPSILON) {
         return 'rgb(240,95,64)';
       } else {
@@ -184,16 +182,6 @@ function drawNodes(nodes) {
         return 'rgb(231,29,54)';
       } else if (d.type === EPSILON) {
         return '#ffffff';
-// =======
-//       if (d.type === graph.ROOT) {
-//         return 'rgb(33,168,174)';
-//       } else if (d.type === graph.ACCEPT) {
-//         return 'rgb(133,151,41)';
-//       } else if (d.type === graph.EPSILON) {
-//         return 'rgb(253,183,152)';
-//       } else if (d.type === INTERMEDIATE) {
-//         return 'rgb(253,183,152)';
-// >>>>>>> master
       } else {
         return '#ffffff';
       }
@@ -208,46 +196,45 @@ function drawNodes(nodes) {
     });
 
   // Add images
-// <<<<<<< HEAD
 
   imagePointer = nodePointer.filter(filterByRep)
-// =======
-//   imagePointer = nodePointer.filter(function(d) { return d.type === graph.ATOM; })
-// >>>>>>> master
     .append('g')
     .attr('transform', 'translate(-15 , -30)')
     .append('svg:image')
     .attr('xlink:href', function(d) {
-      switch (d.text) {
+      switch (d.component) {
         // KEEP IN ALPHABETICAL ORDER
-        case 'aptamer':
-        case 'assemblyScar':
-        case 'bluntRestrictionSite':
-        case 'cds':
-        case 'dnaStabilityElement':
-        case 'engineeredRegion':
-        case 'fivePrimeOverhang':
-        case 'fivePrimeStickyRestrictionSite':
-        case 'insulator':
-        case 'nonCodingRna':
-        case 'operator':
-        case 'originOfReplication':
-        case 'originOfTrasnfer':
-        case 'polyA':
-        case 'promoter':
-        case 'proteaseSite':
-        case 'proteinStabilityElement':
-        case 'ribosomeBindingSite':
-        case 'ribozyme':
-        case 'signature':
-        case 'terminator':
-          return './sbol/' + d.text + '.svg';
         case EPSILON:
         case OR_MORE:
         case 'ZERO':
           return;
         default:
-          return './sbol/' + 'noGlyphAssigned.svg';
+          switch (d.component.roles[0]) {
+            case 'aptamer':
+            case 'assemblyScar':
+            case 'bluntRestrictionSite':
+            case 'cds':
+            case 'dnaStabilityElement':
+            case 'engineeredRegion':
+            case 'fivePrimeOverhang':
+            case 'fivePrimeStickyRestrictionSite':
+            case 'insulator':
+            case 'nonCodingRna':
+            case 'operator':
+            case 'originOfReplication':
+            case 'originOfTrasnfer':
+            case 'polyA':
+            case 'promoter':
+            case 'proteaseSite':
+            case 'proteinStabilityElement':
+            case 'ribosomeBindingSite':
+            case 'ribozyme':
+            case 'signature':
+            case 'terminator':
+              return './sbol/' + d.component.roles[0] + '.svg';
+            default:
+              return './sbol/' + 'noGlyphAssigned.svg';
+          }
       }
     })
     .attr('width', IMAGESIZE);
@@ -446,13 +433,14 @@ function processSBOLFile(file) {
 $(document).ready(function() {
 
   const THEME = 'ambiance';
+  let combineMethod;
 
   const editors = {
-    "specEditor": CodeMirror.fromTextArea(document.getElementById('goldbar-input'), {
+    "specEditor": CodeMirror.fromTextArea(document.getElementById('goldbar-input-0'), {
       lineNumbers: true,
       lineWrapping:true
     }),
-    "catEditor": CodeMirror.fromTextArea(document.getElementById('categories'), {
+    "catEditor": CodeMirror.fromTextArea(document.getElementById('categories-0'), {
       lineNumbers: true,
       lineWrapping:true
     }),
@@ -464,6 +452,8 @@ $(document).ready(function() {
 
   document.getElementById('numDesigns').value = 40;
   document.getElementById('maxCycles').value = 0;
+  document.getElementById('andTolerance').value = 0;
+  document.getElementById('mergeTolerance').value = 0;
 
   editors.specEditor.setOption("theme", THEME);
   editors.catEditor.setOption("theme", THEME);
@@ -503,14 +493,14 @@ $(document).ready(function() {
   $('#demo-option').on('click', function() {
     document.getElementById('designName').value = "demo-example";
     editors.specEditor.setValue('one-or-more(one-or-more(promoter then nonCodingRna)then cds then \n (zero-or-more \n (nonCodingRna or (one-or-more \n (nonCodingRna then promoter then nonCodingRna) then cds)) then \n (terminator or (terminator then nonCodingRna) or (nonCodingRna then terminator)))))')
-    editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
+    editors.catEditor.setValue('{"promoter": {"ids": ["BBa_R0040", "BBa_J23100"], "roles": ["promoter"]},\n "ribosomeBindingSite": {"ids": ["BBa_B0032", "BBa_B0034"], "roles": ["ribosomeBindingSite"]}, \n"cds": {"ids": ["BBa_E0040", "BBa_E1010"], "roles": ["cds"]},\n"nonCodingRna": {"ids": ["BBa_F0010"], "roles": ["nonCodingRna"]},\n"terminator": {"ids": ["BBa_B0010"], "roles": ["terminator"]}}');
   });
 
 
   $('#debug-option').on('click', function() {
     document.getElementById('designName').value = "debug-example";
     editors.specEditor.setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
-    editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
+    editors.catEditor.setValue('{"promoter": {"ids": ["BBa_R0040", "BBa_J23100"], "roles": ["promoter"]},\n "ribosomeBindingSite": {"ids": ["BBa_B0032", "BBa_B0034"], "roles": ["ribosomeBindingSite"]}, \n"cds": {"ids": ["BBa_E0040", "BBa_E1010"], "roles": ["cds"]},\n"nonCodingRna": {"ids": ["BBa_F0010"], "roles": ["nonCodingRna"]},\n"terminator": {"ids": ["BBa_B0010"], "roles": ["terminator"]}}');
   });
 
 
@@ -521,15 +511,17 @@ $(document).ready(function() {
   $('[data-toggle="tooltip"]').tooltip();
 
 
-  $("#submitBtn").click(function(){
+  $("#submitBtn").click(function() {
     // Reset UI
     resetDiagram();
     displayDesigns(editors, '');
     $("#exportSBOLBtn").addClass('hidden');
     $('#goldbarSpinner').removeClass('hidden'); // show spinner
 
-    let maxCycles = 0;
-    let numDesigns = 10;
+    // let maxCycles = 0;
+    // let numDesigns = 10;
+
+    let numDesigns, maxCycles, andTolerance, mergeTolerance;
 
     const specification = editors.specEditor.getValue();
     const categories = editors.catEditor.getValue();
@@ -537,6 +529,8 @@ $(document).ready(function() {
     numDesigns = document.getElementById('numDesigns').value;
     maxCycles = document.getElementById('maxCycles').value;
     designName = document.getElementById('designName').value;
+    andTolerance = document.getElementById('andTolerance').value;
+    mergeTolerance = document.getElementById('mergeTolerance').value;
 
     //replace all spaces and special characters for SBOL
     designName = designName.replace(/[^A-Z0-9]/ig, "_");
@@ -547,6 +541,8 @@ $(document).ready(function() {
       "categories": categories,
       "numDesigns": numDesigns,
       "maxCycles": maxCycles,
+      "andTolerance": andTolerance,
+      "mergeTolerance": mergeTolerance,
       "number": "2.0",
       "name": "specificationname",
       "clientid": "userid",
@@ -558,6 +554,26 @@ $(document).ready(function() {
         displayDesigns(editors, data.designs);
       } else {
         displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+      }
+      // if no design name provided
+      if (designName === '') {
+        document.getElementById('designName').value = 'constellation-design';
+      }
+      // if no numDesigns provided
+      if (numDesigns === '') {
+        document.getElementById('numDesigns').value = 20;
+      }
+      // if no maxCycles provided
+      if (maxCycles === '') {
+        document.getElementById('maxCycles').value = 0;
+      }
+      // if no andTolerance provided
+      if (andTolerance === '') {
+        document.getElementById('andTolerance').value = 0;
+      }
+      // if no mergeTolerance provided
+      if (mergeTolerance === '') {
+        document.getElementById('mergeTolerance').value = 0;
       }
       sbolDoc = data.sbol;
 
@@ -633,8 +649,8 @@ $(document).ready(function() {
     $('#goldbarSpinner').addClass('hidden');
     $("#exportSBOLBtn").addClass('hidden');
     $('#step2-content').addClass('hidden');
-    $('#graph-designs-col').addClass('hidden');
-    $('#spec-categories-col').addClass('hidden');
+    $('#graph-designs-row').addClass('hidden');
+    $('#spec-categories-row-0').addClass('hidden');
     $('#goldbar-parameters').addClass('hidden');
     $('#goldbar-btns').addClass('hidden');
   }
@@ -656,8 +672,8 @@ function showSBOLStepTwo(){
 
 function showGoldBarStepTwo(){
   $('#step2-content').removeClass('hidden');
-  $('#graph-designs-col').removeClass('hidden');
-  $('#spec-categories-col').removeClass('hidden');
+  $('#graph-designs-row').removeClass('hidden');
+  $('#spec-categories-row-0').removeClass('hidden');
   $('#goldbar-parameters').removeClass('hidden');
   $('#goldbar-btns').removeClass('hidden');
 }

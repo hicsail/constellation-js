@@ -32,24 +32,36 @@ app.get('/', function(req,res) {
   res.sendFile((path.join(__dirname + '/static/client.html')));
 });
 
-app.post('/postSpecs', function(req,res) {
-  let designName = req.body.designName;
+app.post('/postSpecs', async function(req,res) {
+  console.log(req.body);
+  let designName = req.body.designName || 'constellation-design';
   let langText = req.body.specification;
   let categories = req.body.categories;
-  let numDesigns = req.body.numDesigns;
-  let maxCycles = req.body.maxCycles;
-  let representation = req.body.representation;
+  let numDesigns = req.body.numDesigns || 20;
+  let maxCycles = req.body.maxCycles || 0;
+  let andTolerance = req.body.andTolerance || 0;
+  let mergeTolerance = req.body.mergeTolerance || 0;
+  let representation = req.body.representation || 'EDGE';
   console.log('---Received new input---');
   console.log('Design Name: ', designName);
   console.log('Specification: ', langText);
   console.log('Categories: ', categories);
   console.log('numDesigns: ', numDesigns);
   console.log('maxCycles: ', maxCycles);
-  console.log('Representation:', representation)
+  console.log('andTolerance: ', andTolerance);
+  console.log('mergeTolerance: ', mergeTolerance);
+  console.log('Representation:', representation);
 
   let data;
   try {
-    data = constellation.goldbar(designName, langText, categories, numDesigns, maxCycles, representation);
+    data = await constellation.goldbar(langText, categories,
+      {designName: designName,
+      numDesigns: numDesigns,
+      maxCycles: maxCycles,
+      representation: representation,
+      andTolerance: andTolerance,
+      mergeTolerance: mergeTolerance
+  });
     res.status(200).send(data);
   } catch (error) {
     console.log(error);
