@@ -1,0 +1,45 @@
+{
+  "$id": "https://github.com/hicsail/constellation-js/blob/master/schemas/graph.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "A JavaScript graph representation of a genetic design space",
+  "type": "object",
+  "patternProperties": {
+    "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$": {
+      "anyOf": [
+        { "$ref": "#/definitions/node" }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+    },
+    "operator": {
+      "type": "string",
+      "enum": ["OneOrMore", "ZeroOrMore", "ZeroOrOne", "One", "Then", "And", "Merge"]
+    },
+    "node_type": {
+      "type": "string",
+      "enum": ["epsilon", "atom", "accept", "root"]
+    },
+    "node": {
+      "type": "object",
+      "required": ["id", "text", "type", "edges"],
+      "properties": {
+        "id": { "$ref": "#/definitions/uuid" },
+        "text": { "$ref": "#/definitions/node_type" },
+        "type": { "$ref": "#/definitions/node_type" },
+        "edges": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/uuid" }
+        },
+        "operator": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/operator" }
+        }
+      }
+    }
+  }
+}
