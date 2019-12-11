@@ -7,12 +7,16 @@ const constellation = require('../lib/constellation');
 
 const CATEGORIES = {"a":{"ids":["a1","a2"], "roles":["a"]},"b":{"ids":["b1","b2","b3"], "roles": ["b"]},"c":{"ids":["c1"], "roles": ["c"]}};
 const FOR_TOLERANCE = {"a1":{"ids":["first","second"], "roles":["a"]},"a2":{"ids":["first"], "roles": ["a", "letter"]},"a3":{"ids":[], "roles": ["a"]}, "a4":{"ids":[], "roles": ["letter"]}};
+const CELLO_CATS = {"pTac":{"roles":["promoter"], "ids":["https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/pTac/1"]},
+  "B1":{"roles":["ribosomeBindingSite"], "ids":["https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B1/1"]},
+  "B_RBS": {"roles": ["ribosomeBindingSite"], "ids": ["https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B1/1", "https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B2/1", "https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B3/1"]}};
 const ALEN = CATEGORIES.a.ids.length;
 const BLEN = CATEGORIES.b.ids.length;
 const CLEN = CATEGORIES.c.ids.length;
 
 const CATSTR = JSON.stringify(CATEGORIES);
 const TOLSTR = JSON.stringify(FOR_TOLERANCE);
+const CELLOSTR = JSON.stringify(CELLO_CATS);
 
 const NODE = 'NODE';
 const EDGE = 'EDGE';
@@ -159,6 +163,12 @@ module.exports = function() {
         it('and tolerance 2', async () => {
           let result = await constellation.goldbar('a3 and a4', TOLSTR, {representation:EDGE, andTolerance:2});
           expect(result.designs.length).to.equal(0);
+        });
+
+        it('and CELLO categories', async () => {
+          let result = await constellation.goldbar('(pTac then B_RBS) and (pTac then B1)', CELLOSTR, EDGE_REP);
+          let resultArr = ['https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/pTac/1,https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B1/1'];
+          expect(result.designs).to.have.members(resultArr);
         });
       });
 
