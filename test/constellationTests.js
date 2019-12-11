@@ -274,9 +274,9 @@ module.exports = function() {
       // one-or-more
       it('one-or-more (atom or atom)', async() => {
         const resultNode = await constellation.goldbar('one-or-more (a or c)', CATSTR, NODE_REP);
-        expect(resultNode.designs.length).to.equal(((ALEN * CLEN) * 2) + ALEN + CLEN);
+        expect(resultNode.designs.length).to.equal(ALEN + CLEN);
         const resultEdge = await constellation.goldbar('one-or-more (a or c)', CATSTR, EDGE_REP);
-        expect(resultEdge.designs.length).to.equal(((ALEN * CLEN) * 2) + ALEN + CLEN);
+        expect(resultEdge.designs.length).to.equal(ALEN + CLEN);
       });
       // AND only works on EDGE representation
       it('one-or-more (atom and atom)', async() => {
