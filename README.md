@@ -23,16 +23,18 @@ var goldbar = '{a then b}';
 var categories = {
 	"a": {
 		"ids": ["a1, a2"],
-		"role": "a"
+		"role": ["a"]
 	},
 	"b": {
 		"ids": ["b1", "b2"],
-		"role": "b"
+		"role": ["b"]
 	}
 };
-var result = constellation.goldbar(goldbar, categories);
+var result = constellation.goldbar(goldbar, categories, {designName: 'my-first-design'});
+// result.stateGraph, result.designs, result.sbol
 ```
-|Additional parameters| Description|
+
+|Optional parameters| Description|
 |--|--|
 |`designName`|Name of design space for SBOL output, defaults is "constellation-design"|
 |`numDesigns`|Max number of designs to enumerate, default is 20|
