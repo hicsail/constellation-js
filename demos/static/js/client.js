@@ -4,10 +4,16 @@ const MAXDISTANCE = 100;
 const IMAGESIZE = 30;
 const RADIUS = 7;
 const INTERMEDIATE = 'intermediate';
+const REPRESENTATION = 'EDGE';
 
 let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDoc, sbolFile;
 let designName = 'Constellation';
 
+const ROOT = 'root';
+const EPSILON = 'epsilon';
+const ACCEPT = 'accept';
+const ATOM = 'atom';
+const OR_MORE = "OrMore";
 /* * * * * * */
 /*  DESIGNS  */
 /* * * * * * */
@@ -29,7 +35,6 @@ function displayDesigns(editors, designs) {
  */
 function displayDiagram(stateGraph) {
   let {nodes, links} = generateGraph(stateGraph);
-
   updateSvgSize();
   // Create SVG
   svgPointer = d3.select('#graph')
@@ -76,16 +81,28 @@ function generateGraph(stateGraph) {
     } else if (node.type === graph.ATOM) {
       text = node.text;
     }
-    nodes.push({id: nodeId, type: node.type, text, operator: node.operator});
+    nodes.push({id: nodeId, type: node.type, component: node.component, text, operator: node.operator});
   }
 
   // Get edges from stateGraph
   let id = 0;
   for (let node in stateGraph) {
     for (let edge of stateGraph[node].edges) {
-      nodes.push({id, type: INTERMEDIATE});
-      links.push({source: node, target: id});
-      links.push({source: id, target: edge});
+      // check if is edge representation
+      if (REPRESENTATION === 'NODE') {
+        // handle case of self-loop
+        if (edge === node) {
+          links.push({source: node, target: edge, component: stateGraph[node].component});
+        } else {
+          nodes.push({id, type: INTERMEDIATE, component: stateGraph[node].component});
+          links.push({source: node, target: id, component: stateGraph[node].component});
+          links.push({source: id, target: edge, component: stateGraph[node].component});
+        }
+      } else {
+        nodes.push({id, type: INTERMEDIATE, text: edge.text, component: edge.component});
+        links.push({source: edge.src, type: edge.type, text: EPSILON, target: id});
+        links.push({source: id, type: edge.type, text: edge.text, target: edge.dest});
+      }
       id++;
     }
   }
@@ -116,10 +133,10 @@ function drawLinks(links) {
     .enter().append('path')
     .attr('class', 'link')
     .style('stroke', 'rgb(150,150,150)')
-    .style( 'stroke-width', 1);
+    .style( 'stroke-width', 1)
+    .style('fill', 'transparent');
 
-  // Attach arrowhead
-  linkPointer.filter( function(d) { return d.source.type  === INTERMEDIATE; } )
+  linkPointer.filter( function(d) { return d.source.type  === INTERMEDIATE || d.source === d.target; } )
     .attr('marker-end', 'url(#arrow)');
 }
 
@@ -136,33 +153,40 @@ function drawNodes(nodes) {
     .append('g')
     .attr('class', 'node');
 
-  // Add tooltip
-  textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
-    .append('text')
-    .text( function(d) {return d.operator; })
-    .attr('opacity', 0)
-    .attr('dx', '20px')
-    .attr('dy', '4px')
-    .style('fill', 'rgb(100,)')
-    .style('font-family', 'Montserrat');
+  // Add tooltip for node representation
+  if (REPRESENTATION === "NODE") {
+    textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
+      .append('text')
+      .text( function(d) {return d.operator; })
+      .attr('opacity', 0)
+      .attr('dx', '20px')
+      .attr('dy', '4px')
+      .style('fill', 'rgb(100,)')
+      .style('font-family', 'Montserrat');
+  }
 
   // Add circles
   circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
     .append('circle')
     .attr('fill', function(d) {
-      if (d.type === graph.ROOT) {
-        return 'rgb(33,168,174)';
-      } else if (d.type === graph.ACCEPT) {
-        return 'rgb(133,151,41)';
-      } else if (d.type === graph.EPSILON) {
-        return 'rgb(253,183,152)';
-      } else if (d.type === INTERMEDIATE) {
-        return 'rgb(253,183,152)';
+      if (d.type === EPSILON) {
+        return 'rgb(240,95,64)';
       } else {
         return '#ffffff';
       }
     })
-    .attr('stroke', 'rgb(200,200,200)')
+    .attr('stroke', function(d) {
+      if (d.type === ROOT) {
+        return 'rgb(5,168,170)';
+      } else if (d.type === ACCEPT) {
+        return 'rgb(231,29,54)';
+      } else if (d.type === EPSILON) {
+        return '#ffffff';
+      } else {
+        return '#ffffff';
+      }
+    })
+    .style( 'stroke-width', 2)
     .attr('title', function(d) {return d.type})
     .attr('r', function(d) {
       if (d.type === INTERMEDIATE) {
@@ -172,42 +196,57 @@ function drawNodes(nodes) {
     });
 
   // Add images
-  imagePointer = nodePointer.filter(function(d) { return d.type === graph.ATOM; })
+
+  imagePointer = nodePointer.filter(filterByRep)
     .append('g')
     .attr('transform', 'translate(-15 , -30)')
     .append('svg:image')
     .attr('xlink:href', function(d) {
-      switch (d.text) {
+      switch (d.component) {
         // KEEP IN ALPHABETICAL ORDER
-        case 'aptamer':
-        case 'assemblyScar':
-        case 'bluntRestrictionSite':
-        case 'cds':
-        case 'dnaStabilityElement':
-        case 'engineeredRegion':
-        case 'fivePrimeOverhang':
-        case 'fivePrimeStickyRestrictionSite':
-        case 'insulator':
-        case 'nonCodingRna':
-        case 'operator':
-        case 'originOfReplication':
-        case 'originOfTrasnfer':
-        case 'polyA':
-        case 'promoter':
-        case 'proteaseSite':
-        case 'proteinStabilityElement':
-        case 'ribosomeBindingSite':
-        case 'ribozyme':
-        case 'signature':
-        case 'terminator':
-          return './sbol/' + d.text + '.svg';
+        case EPSILON:
+        case OR_MORE:
+        case 'ZERO':
+          return;
         default:
-          return './sbol/' + 'noGlyphAssigned.svg';
+          switch (d.component.roles[0]) {
+            case 'aptamer':
+            case 'assemblyScar':
+            case 'bluntRestrictionSite':
+            case 'cds':
+            case 'dnaStabilityElement':
+            case 'engineeredRegion':
+            case 'fivePrimeOverhang':
+            case 'fivePrimeStickyRestrictionSite':
+            case 'insulator':
+            case 'nonCodingRna':
+            case 'operator':
+            case 'originOfReplication':
+            case 'originOfTrasnfer':
+            case 'polyA':
+            case 'promoter':
+            case 'proteaseSite':
+            case 'proteinStabilityElement':
+            case 'ribosomeBindingSite':
+            case 'ribozyme':
+            case 'signature':
+            case 'terminator':
+              return './sbol/' + d.component.roles[0] + '.svg';
+            default:
+              return './sbol/' + 'noGlyphAssigned.svg';
+          }
       }
     })
     .attr('width', IMAGESIZE);
 }
 
+function filterByRep(d) {
+  if (REPRESENTATION === 'NODE') {
+    return d.type === ATOM;
+  } else {
+    return d.type === INTERMEDIATE;
+  }
+}
 /* * * * * * * */
 /*   UPDATES   */
 /* * * * * * * */
@@ -228,19 +267,21 @@ function tick() {
     return 'translate(' + d.x + ',' + d.y + ')'
   });
 
-  // Update image positions
+  // update image positions
   imagePointer.attr('transform', function(d) {
     d.x = Math.max(20, Math.min(width - 20, d.x));
     d.y = Math.max(25, Math.min(height - 10, d.y));
     return 'translate(' + d.x + ',' + d.y + ')'
   });
 
-  // Update text positions
-  textPointer.attr('transform', function(d) {
-    d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
-    d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
-    return 'translate(' + d.x + ',' + d.y + ')'
-  });
+  // update tooltip positions for node representation
+  if (REPRESENTATION === 'NODE') {
+    textPointer.attr('transform', function(d) {
+      d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
+      d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
+      return 'translate(' + d.x + ',' + d.y + ')'
+    });
+  }
 
   // Update link positions
   linkPointer.attr('d', updateLinks);
@@ -255,8 +296,12 @@ function updateLinks(d) {
   let deltaX = d.target.x - d.source.x,
     deltaY = d.target.y - d.source.y,
     dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
-    normX = deltaX / dist,
+    normX = 0,
+    normY = 0;
+  if (dist !== 0) {
+    normX = deltaX / dist;
     normY = deltaY / dist;
+  }
 
   let sourcePadding = 10,
     targetPadding = 10;
@@ -266,12 +311,26 @@ function updateLinks(d) {
   } else if (d.target.type === INTERMEDIATE) {
     targetPadding = 0;
   }
-
   let sourceX = d.source.x + normX * sourcePadding,
     sourceY = d.source.y + normY * sourcePadding,
     targetX = d.target.x - normX * targetPadding,
-    targetY = d.target.y - normY * targetPadding;
-  return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
+    targetY = d.target.y - normY * targetPadding,
+    drx = 0,
+    dry = 0,
+    xRotation = 0,
+    largeArc = 0,
+    sweep = 1;
+  if (sourceX === targetX && sourceY === targetY) {
+      xRotation = -45;
+      largeArc = 1;
+      drx = 30;
+      dry = 20;
+      targetX+=5;
+      targetY+=10;
+    }
+
+  return 'M' + sourceX + ',' + sourceY + 'A' + drx + ',' + dry + ' ' +
+    xRotation + ',' + largeArc + ',' + sweep + ' ' + targetX + ',' + targetY;
 }
 
 /**
@@ -374,13 +433,14 @@ function processSBOLFile(file) {
 $(document).ready(function() {
 
   const THEME = 'ambiance';
+  let combineMethod;
 
   const editors = {
-    "specEditor": CodeMirror.fromTextArea(document.getElementById('goldbar-input'), {
+    "specEditor": CodeMirror.fromTextArea(document.getElementById('goldbar-input-0'), {
       lineNumbers: true,
       lineWrapping:true
     }),
-    "catEditor": CodeMirror.fromTextArea(document.getElementById('categories'), {
+    "catEditor": CodeMirror.fromTextArea(document.getElementById('categories-0'), {
       lineNumbers: true,
       lineWrapping:true
     }),
@@ -392,6 +452,8 @@ $(document).ready(function() {
 
   document.getElementById('numDesigns').value = 40;
   document.getElementById('maxCycles').value = 0;
+  document.getElementById('andTolerance').value = 0;
+  document.getElementById('mergeTolerance').value = 0;
 
   editors.specEditor.setOption("theme", THEME);
   editors.catEditor.setOption("theme", THEME);
@@ -431,14 +493,14 @@ $(document).ready(function() {
   $('#demo-option').on('click', function() {
     document.getElementById('designName').value = "demo-example";
     editors.specEditor.setValue('one-or-more(one-or-more(promoter then nonCodingRna)then cds then \n (zero-or-more \n (nonCodingRna or (one-or-more \n (nonCodingRna then promoter then nonCodingRna) then cds)) then \n (terminator or (terminator then nonCodingRna) or (nonCodingRna then terminator)))))')
-    editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
+    editors.catEditor.setValue('{"promoter": {"ids": ["BBa_R0040", "BBa_J23100"], "roles": ["promoter"]},\n "ribosomeBindingSite": {"ids": ["BBa_B0032", "BBa_B0034"], "roles": ["ribosomeBindingSite"]}, \n"cds": {"ids": ["BBa_E0040", "BBa_E1010"], "roles": ["cds"]},\n"nonCodingRna": {"ids": ["BBa_F0010"], "roles": ["nonCodingRna"]},\n"terminator": {"ids": ["BBa_B0010"], "roles": ["terminator"]}}');
   });
 
 
   $('#debug-option').on('click', function() {
     document.getElementById('designName').value = "debug-example";
     editors.specEditor.setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
-    editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
+    editors.catEditor.setValue('{"promoter": {"ids": ["BBa_R0040", "BBa_J23100"], "roles": ["promoter"]},\n "ribosomeBindingSite": {"ids": ["BBa_B0032", "BBa_B0034"], "roles": ["ribosomeBindingSite"]}, \n"cds": {"ids": ["BBa_E0040", "BBa_E1010"], "roles": ["cds"]},\n"nonCodingRna": {"ids": ["BBa_F0010"], "roles": ["nonCodingRna"]},\n"terminator": {"ids": ["BBa_B0010"], "roles": ["terminator"]}}');
   });
 
 
@@ -449,15 +511,17 @@ $(document).ready(function() {
   $('[data-toggle="tooltip"]').tooltip();
 
 
-  $("#submitBtn").click(function(){
+  $("#submitBtn").click(function() {
     // Reset UI
     resetDiagram();
     displayDesigns(editors, '');
     $("#exportSBOLBtn").addClass('hidden');
     $('#goldbarSpinner').removeClass('hidden'); // show spinner
 
-    let maxCycles = 0;
-    let numDesigns = 10;
+    // let maxCycles = 0;
+    // let numDesigns = 10;
+
+    let numDesigns, maxCycles, andTolerance, mergeTolerance;
 
     const specification = editors.specEditor.getValue();
     const categories = editors.catEditor.getValue();
@@ -465,6 +529,8 @@ $(document).ready(function() {
     numDesigns = document.getElementById('numDesigns').value;
     maxCycles = document.getElementById('maxCycles').value;
     designName = document.getElementById('designName').value;
+    andTolerance = document.getElementById('andTolerance').value;
+    mergeTolerance = document.getElementById('mergeTolerance').value;
 
     //replace all spaces and special characters for SBOL
     designName = designName.replace(/[^A-Z0-9]/ig, "_");
@@ -475,9 +541,12 @@ $(document).ready(function() {
       "categories": categories,
       "numDesigns": numDesigns,
       "maxCycles": maxCycles,
+      "andTolerance": andTolerance,
+      "mergeTolerance": mergeTolerance,
       "number": "2.0",
       "name": "specificationname",
-      "clientid": "userid"
+      "clientid": "userid",
+      "representation": REPRESENTATION
     }, function (data) {
       displayDiagram(data.stateGraph);
       // Undefined design
@@ -485,6 +554,26 @@ $(document).ready(function() {
         displayDesigns(editors, data.designs);
       } else {
         displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+      }
+      // if no design name provided
+      if (designName === '') {
+        document.getElementById('designName').value = 'constellation-design';
+      }
+      // if no numDesigns provided
+      if (numDesigns === '') {
+        document.getElementById('numDesigns').value = 20;
+      }
+      // if no maxCycles provided
+      if (maxCycles === '') {
+        document.getElementById('maxCycles').value = 0;
+      }
+      // if no andTolerance provided
+      if (andTolerance === '') {
+        document.getElementById('andTolerance').value = 0;
+      }
+      // if no mergeTolerance provided
+      if (mergeTolerance === '') {
+        document.getElementById('mergeTolerance').value = 0;
       }
       sbolDoc = data.sbol;
 
@@ -560,8 +649,8 @@ $(document).ready(function() {
     $('#goldbarSpinner').addClass('hidden');
     $("#exportSBOLBtn").addClass('hidden');
     $('#step2-content').addClass('hidden');
-    $('#graph-designs-col').addClass('hidden');
-    $('#spec-categories-col').addClass('hidden');
+    $('#graph-designs-row').addClass('hidden');
+    $('#spec-categories-row-0').addClass('hidden');
     $('#goldbar-parameters').addClass('hidden');
     $('#goldbar-btns').addClass('hidden');
   }
@@ -583,8 +672,8 @@ function showSBOLStepTwo(){
 
 function showGoldBarStepTwo(){
   $('#step2-content').removeClass('hidden');
-  $('#graph-designs-col').removeClass('hidden');
-  $('#spec-categories-col').removeClass('hidden');
+  $('#graph-designs-row').removeClass('hidden');
+  $('#spec-categories-row-0').removeClass('hidden');
   $('#goldbar-parameters').removeClass('hidden');
   $('#goldbar-btns').removeClass('hidden');
 }
