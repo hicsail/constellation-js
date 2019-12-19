@@ -6,7 +6,8 @@ const RADIUS = 7;
 const INTERMEDIATE = 'intermediate';
 const REPRESENTATION = 'EDGE';
 
-let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDoc, sbolFile;
+let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDoc;
+let sbolFiles = [];
 let designName = 'Constellation';
 
 const ROOT = 'root';
@@ -421,7 +422,8 @@ function processSBOLFile(file) {
     let reader = new FileReader();
     reader.readAsText(file, "UTF-8");
     reader.onload = function (evt) {
-      let data = parser.parseFromString(evt.target.result, "application/xml");
+      let data = evt.target.result;
+      // let data = parser.parseFromString(evt.target.result, "application/xml");
       resolve(data);
     };
   });
@@ -433,7 +435,7 @@ function processSBOLFile(file) {
 $(document).ready(function() {
 
   const THEME = 'ambiance';
-  let combineMethod;
+  let combineMethod, tolerance;
 
   const editors = {
     "specEditor": CodeMirror.fromTextArea(document.getElementById('goldbar-input-0'), {
@@ -462,20 +464,35 @@ $(document).ready(function() {
   /* * * * * * */
   /*    SBOL   */
   /* * * * * * */
-  async function processSBOL(file) {
-    //read SBOL file
-    let sbolXML = await processSBOLFile(file);
+  async function processSBOL(files) {
+    console.log(combineMethod);
+    console.log(tolerance);
 
+    //read SBOL file
+    let sbolXMLs = [];
+    for (let i = 0; i < files.length; i++) {
+      let file = files[i];
+      let xmlString = await processSBOLFile(file);
+      sbolXMLs.push(xmlString);
+    }
+
+    let data = {
+      sbol: sbolXMLs,
+      combineMethod: combineMethod,
+      tolerance: tolerance
+    }
     // Parse SBOL and display results
     $.ajax({
       url: 'http://localhost:8082/importSBOL',
       type: 'POST',
-      data: sbolXML,
-      contentType: "text/xml",
-      dataType: "text",
+      data: JSON.stringify(data),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
       processData: false,
       success: function(data){
-        data = JSON.parse(data);
+        console.log(typeof data);
+        console.log(data);
+        // data = JSON.parse(data);
         displayDiagram(data.stateGraph);
         // Undefined design
         if (String(data.designs).includes('is not defined')) {
@@ -503,6 +520,31 @@ $(document).ready(function() {
     editors.catEditor.setValue('{"promoter": {"ids": ["BBa_R0040", "BBa_J23100"], "roles": ["promoter"]},\n "ribosomeBindingSite": {"ids": ["BBa_B0032", "BBa_B0034"], "roles": ["ribosomeBindingSite"]}, \n"cds": {"ids": ["BBa_E0040", "BBa_E1010"], "roles": ["cds"]},\n"nonCodingRna": {"ids": ["BBa_F0010"], "roles": ["nonCodingRna"]},\n"terminator": {"ids": ["BBa_B0010"], "roles": ["terminator"]}}');
   });
 
+  $('#and').on('click', function() {
+    document.getElementById('operationMenu').innerText = 'And';
+    combineMethod = 'and';
+  });
+
+  $('#merge').on('click', function() {
+    document.getElementById('operationMenu').innerText = 'Merge';
+    combineMethod = 'merge';
+  });
+
+  $('#zero').on('click', function() {
+    document.getElementById('toleranceMenu').innerText = 0;
+    tolerance = 0;
+  });
+
+  $('#one').on('click', function() {
+    document.getElementById('toleranceMenu').innerText = 1;
+    tolerance = 1;
+  });
+
+  $('#two').on('click', function() {
+    document.getElementById('toleranceMenu').innerText = 2;
+    tolerance = 2;
+  });
+
 
   $('#exportSBOLBtn').on('click', function() {
     downloadSBOL(sbolDoc, 'constellation_' + designName + '_sbol.xml');
@@ -511,7 +553,7 @@ $(document).ready(function() {
   $('[data-toggle="tooltip"]').tooltip();
 
 
-  $("#submitBtn").click(function() {
+  $("#goldarSubmitBtn").click(function() {
     // Reset UI
     resetDiagram();
     displayDesigns(editors, '');
@@ -588,11 +630,62 @@ $(document).ready(function() {
   });
 
   /*
-  Auto check the SBOL radio button when SBOL file is uploaded
+  Update list of sbol files when upload button is clicked or when file is dragged and dropped
    */
   $('#importSBOLBtn').on('change', function() {
     $("#specification-sbol").prop("checked", true).change(); //trigger change
-    sbolFile = this.files[0];
+    if (this.files) {
+      updateSBOLFiles(this.files);
+    }
+  });
+
+  let dropArea = document.getElementById('sbol-drop-area');
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false)
+  })
+
+  function preventDefaults (e) {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  dropArea.addEventListener('drop', handleDrop, false)
+
+  function handleDrop(e) {
+    let dt = e.dataTransfer
+    let files = dt.files
+    updateSBOLFiles(files)
+  }
+
+  function updateSBOLFiles(files) {
+    if (sbolFiles.length >= 10) {
+      alert('You have uploaded the maximum number of files.');
+    }
+    for (let file of files) {
+      sbolFiles.push(file);
+      $('#sbol-filenames').append(file.name + '\n');
+    }
+    if (sbolFiles.length > 1) {
+      $("#operationMenu").attr("disabled", false);
+      $("#toleranceMenu").attr("disabled", false);
+    }
+  }
+
+  $('#clearSBOLBtn').click(function () {
+    console.log("here");
+    sbolFiles = [];
+    $('#sbol-filenames').empty();
+    // $('#sbol-filenames').innerHTML = '';
+
+  })
+
+  $("#SBOLSubmitBtn").click(async function(){
+    if(sbolFiles.length === 0) {
+      alert('No file uploaded!');
+      resetStepOne();
+      return;
+    }
+    await processSBOL(sbolFiles);
   });
 
   /*
@@ -615,11 +708,11 @@ $(document).ready(function() {
     }
 
     if(specMethod === 'sbol'){
-      if(!sbolFile){
-        alert('No file uploaded!');
-        resetStepOne();
-      }
-      await processSBOL(sbolFile);
+      // if(!sbolFile){
+      //   alert('No file uploaded!');
+      //   resetStepOne();
+      // }
+      // await processSBOL(sbolFile);
       showSBOLStepTwo();
     }
 
@@ -652,6 +745,9 @@ $(document).ready(function() {
     $('#graph-designs-row').addClass('hidden');
     $('#spec-categories-row-0').addClass('hidden');
     $('#goldbar-parameters').addClass('hidden');
+    $('#sbol-parameters').addClass('hidden');
+    $('#goldarSubmitBtn').addClass('hidden');
+    $('#SBOLSubmitBtn').addClass('hidden');
     $('#goldbar-btns').addClass('hidden');
   }
 
@@ -667,7 +763,11 @@ function resetStepOne(){
 
 function showSBOLStepTwo(){
   $('#step2-content').removeClass('hidden');
-  $('#graph-designs-col').removeClass('hidden'); //show only graph and designs
+  $('#sbol-parameters').removeClass('hidden');
+  $('#graph-designs-row').removeClass('hidden'); //show only graph and designs
+  $('#goldbar-btns').removeClass('hidden');
+  $('#SBOLSubmitBtn').removeClass('hidden');
+
 }
 
 function showGoldBarStepTwo(){
@@ -676,6 +776,7 @@ function showGoldBarStepTwo(){
   $('#spec-categories-row-0').removeClass('hidden');
   $('#goldbar-parameters').removeClass('hidden');
   $('#goldbar-btns').removeClass('hidden');
+  $('#goldarSubmitBtn').removeClass('hidden');
 }
 
 function downloadSBOL(text, filename) {

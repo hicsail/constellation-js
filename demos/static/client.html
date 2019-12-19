@@ -96,19 +96,19 @@
             How do you want to enter your specifications?
           </div>
           <div class="card-body">
-              <div class="form-group">
-                <div >
-                  <input type="radio" id="specification-sbol" name="spec-method" value="sbol">
-                  <label for="specification-sbol">Upload SBOL</label>
-                  <br>
-                  <input id="importSBOLBtn" class="btn" type="file" accept=".sbol,.xml">
-                </div>
+            <div class="form-group">
+              <div >
+                <input type="radio" id="specification-sbol" name="spec-method" value="sbol">
+                <label for="specification-sbol">Upload SBOL</label>
                 <br>
-                <div>
-                  <input type="radio" id="specification-goldbar" name="spec-method" value="goldbar">
-                  <label for="specification-goldbar">Type in using GOLDBAR syntax</label>
-                </div>
+<!--                <input id="importSBOLBtn" class="btn" type="file" accept=".sbol,.xml">-->
               </div>
+              <br>
+              <div>
+                <input type="radio" id="specification-goldbar" name="spec-method" value="goldbar">
+                <label for="specification-goldbar">Type in using GOLDBAR syntax</label>
+              </div>
+            </div>
             <div class="text-center">
               <div id="sbolSpinner" class="spinner hidden">
                 <p><i class="fa fa-spinner fa-spin"></i>  Loading...</p>
@@ -183,8 +183,55 @@
                 </div>
               </div>
             <!--  End GOLDBAR Specification and Categories  -->
+            <!--  SBOL Parameters  -->
+              <div id="sbol-parameters" class="hidden">
+                <div class="row">
+                  <div class="col-sm">
+                    <div class="card card-sub sbol">
+                      <div class="card-title">Drag and drop your SBOL file(s) below or click "Choose Files"</div>
+                      <div id="sbol-drop-area" class="card-body drop-area">
+                        <label class="btn btn-outline-warning btn-file"> Choose files
+                          <input type="file" id="importSBOLBtn" style="display: none;" accept=".sbol,.xml" multiple>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm">
+                    <div class="card card-sub scroll">
+                      <div class="card-title">
+                        Files Uploaded
+                        <label id="clearSBOLBtn" class="btn btn-outline-warning btn-file pull-right"> Clear all files
+                        <button style="display: none;"></button>
+                        </label>
+                      </div>
+                      <div id="sbol-filenames"></div>
+                    </div>
+                  </div>
+                </div>
+                <br>
+                <div class="row">
+                  <div class="col-sm">
+                    <label><h5>Operation:</h5></label>
+                    <button disabled class="btn btn-secondary dropdown-toggle" type="button" id="operationMenu" data-toggle="dropdown">Select</button>
+                    <div id="operation-option" class="dropdown-menu" aria-labelledby="operationMenu">
+                      <a id='and' class="dropdown-item" href="#">And</a>
+                      <a id='merge' class="dropdown-item" href="#">Merge</a>
+                    </div>
+                  </div>
 
-            <!--  GOLDBAR Graph, Designs, and Submit  -->
+                  <div class="col-sm">
+                    <label><h5>Tolerance:</h5></label>
+                    <button disabled class="btn btn-secondary dropdown-toggle" type="button" id="toleranceMenu" data-toggle="dropdown">Select</button>
+                    <div id="tolerance-option" class="dropdown-menu" aria-labelledby="toleranceMenu">
+                      <a id='zero' class="dropdown-item" href="#">0</a>
+                      <a id='one' class="dropdown-item" href="#">1</a>
+                      <a id='two' class="dropdown-item" href="#">2</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <!--  End SBOL Parameters  -->
+            <!--  Graph, Designs, and Submit  -->
               <div id="graph-designs-row" class="row hidden">
                 <div class="col-sm">
                   <i id="exportSBOLBtn" class="fas fa-download pull-right hidden" data-toggle="tooltip" title="Export design as SBOL"></i>
@@ -203,7 +250,8 @@
                 <div id="goldbarSpinner" class="spinner hidden">
                   <p><i class="fa fa-spinner fa-spin"></i>  Loading...</p>
                 </div>
-                <button id="submitBtn" class="btn btn-outline-warning mt-2">Submit</button>
+                <button id="goldarSubmitBtn" class="btn btn-outline-warning mt-2 hidden">Submit</button>
+                <button id="SBOLSubmitBtn" class="btn btn-outline-warning mt-2 hidden">Submit</button>
               </div>
             </div>
           </div>

@@ -259,7 +259,17 @@ def simplify_zero_one(zero_one):
 	return zero_one
 
 
+def collapse_mutli_or(or_exp):
+	new_exps = []
+	for i in range(len(or_exp.exps)):
+		if or_exp.exps[i].exp_type == "Or":
+			new_exps += or_exp.exps[i].exps
+		else:
+			new_exps += [or_exp.exps[i]]
+	return Or(new_exps)
+
 def simplify_or_helper(or_exp):
+	or_exp = collapse_mutli_or(or_exp)
 	for i in range(len(or_exp.exps)):
 		or_exp.exps[i] = simplify_helper(or_exp.exps[i])
 

@@ -59,6 +59,16 @@ input[type=radio] {
   padding-right: 5px;
 }
 
+div.scroll {
+  width: 100%;
+  height: 200px;
+  overflow: auto;
+}
+
+div.sbol {
+  height: 200px;
+}
+
 /*
 Buttons
 */
