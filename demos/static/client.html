@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/theme/solarized.css">
     <link rel="stylesheet" href="css/theme/ambiance.css">
-    <link rel="icon" href="favicon.png" type="image/x-icon" />
+    <link rel="icon" href="favicon2.png" type="image/x-icon" />
     <link href="https://fonts.googleapis.com/css?family=Montserrat:200,300" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
           integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -26,7 +26,7 @@
 
     <script type="application/javascript" src="js/codemirror.js"></script>
     <script type="application/javascript" src="js/scheme.js"></script>
-    <script type="application/javascript" src="js/client.js"></script>
+    <script type="module" src="js/client.js"></script>
 
     <title>Constellation</title>
   </head>
@@ -87,7 +87,7 @@
   </div>
   <!-- end Modal -->
 
-
+<!--  Choose Input Section  -->
   <div class="main-content container">
     <div class="row">
       <div id="step1-content" class="col-md-12">
@@ -126,11 +126,12 @@
 
         </div>
       </div>
-
+<!--  End Choose Input Section  -->
       <div id="step2-content" class="col-md-12 hidden">
         <div class="card card-main">
+<!--  Input GOLDBAR Section  -->
           <div class="card-body">
-
+        <!--  GOLDBAR Parameters  -->
             <div id="goldbar-parameters" class="hidden">
               <div class="row">
                 <div class="col-sm">
@@ -149,39 +150,51 @@
                   <input id="maxCycles" type="number" min="0" max="1000">
                 </div>
               </div>
-            </div>
+              <div class="row">
+                <div class="col-sm">
+                  <label><h5>AND Tolerance (0-2):</h5></label>
+                  <input id="andTolerance" type="number" min="0" max="2">
+                </div>
 
-            <div class="row">
-              <div id="spec-categories-col" class="col-sm hidden">
-                <div class="row">
-                <label for="goldbar-input">Specification</label>
-                <div class="horizontal-padding">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown">
-                    Examples
-                  </button>
-                  <div id="examples-list" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a id='demo-option' class="dropdown-item" href="#">Demo</a>
-                    <a id='debug-option' class="dropdown-item" href="#">Debug</a>
-                  </div>
+                <div class="col-sm">
+                  <label><h5>MERGE Tolerance (0-2):</h5></label>
+                  <input id="mergeTolerance" type="number" min="0" max="2">
                 </div>
-                </div>
-                <textarea class="codemirror" id="goldbar-input" name="paragraph_text" cols="50" rows="10"></textarea>
-                <br>
-                <label for="categories">Categories</label>
-                <textarea class="codemirror" id="categories" cols="50" rows="10"></textarea>
               </div>
-
-              <div id="graph-designs-col" class="col-sm hidden">
-
-                <i id="exportSBOLBtn" class="fas fa-download pull-right hidden" data-toggle="tooltip" title="Export design as SBOL"></i>
-
-                <div class="row">
-                  <label for="graph">Graph</label>
+            </div>
+            <!--  End GOLDBAR Parameters  -->
+            <!--  GOLDBAR Specification and Categories  -->
+            <div class="col">
+              <div id="spec-categories-row-0" class="row hidden">
+                <div id="spec-col-0" class="col-sm">
+                  <label id="goldbar-label-0" for="goldbar-input-0">Specification</label>
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown">
+                      Examples
+                    </button>
+                    <div id="examples-list" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <a id='demo-option' class="dropdown-item" href="#">Demo</a>
+                      <a id='debug-option' class="dropdown-item" href="#">Debug</a>
+                    </div>
+                  <textarea class="codemirror" id="goldbar-input-0" name="paragraph_text" cols="50" rows="10"></textarea>
                 </div>
-                <div id="graph"></div>
-                <br>
-                <label for="designs">Designs</label>
-                <textarea readonly class="codemirror" id="designs" cols="50" rows="10"></textarea>
+                <div id="categories-col-0" class="col-sm">
+                  <label id="cat-label-0" for="categories-0">Categories</label>
+                  <textarea class="codemirror" id="categories-0" cols="50" rows="10"></textarea>
+                </div>
+              </div>
+            <!--  End GOLDBAR Specification and Categories  -->
+
+            <!--  GOLDBAR Graph, Designs, and Submit  -->
+              <div id="graph-designs-row" class="row hidden">
+                <div class="col-sm">
+                  <i id="exportSBOLBtn" class="fas fa-download pull-right hidden" data-toggle="tooltip" title="Export design as SBOL"></i>
+                  <label for="graph">Graph</label>
+                  <div id="graph"></div>
+                </div>
+                <div class="col-sm">
+                  <label for="designs">Designs</label>
+                  <textarea readonly class="codemirror" id="designs" cols="50" rows="10"></textarea>
+                </div>
               </div>
             </div>
 
@@ -193,8 +206,10 @@
                 <button id="submitBtn" class="btn btn-outline-warning mt-2">Submit</button>
               </div>
             </div>
-
           </div>
+          <!--  End GOLDBAR Graph, Designs, and Submit  -->
+
+<!--  End Input GOLDBAR Section  -->
 
           <div class="card-footer">
             <button id="backBtn" class="navBtn">
