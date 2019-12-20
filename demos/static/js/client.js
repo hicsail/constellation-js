@@ -587,6 +587,30 @@ $(document).ready(function() {
 
   });
 
+  $("#submitBtnSym").click(function() {
+    // Reset UI
+    resetDiagram();
+    displayDesigns(editors, '');
+    $("#exportSBOLBtn").addClass('hidden');
+
+    // let maxCycles = 0;
+    // let numDesigns = 10;
+
+    let numDesigns, maxCycles, andTolerance, mergeTolerance;
+
+    const specification = editors.specEditor.getValue();
+    const categories = editors.catEditor.getValue();
+
+    numDesigns = document.getElementById('numDesigns').value;
+    maxCycles = document.getElementById('maxCycles').value;
+    designName = document.getElementById('designName').value;
+    andTolerance = document.getElementById('andTolerance').value;
+    mergeTolerance = document.getElementById('mergeTolerance').value;
+
+    var ast = parse(specification);
+    update(editors, ast, categories);
+  });
+
   /*
   Auto check the SBOL radio button when SBOL file is uploaded
    */
