@@ -5,7 +5,11 @@
 ### Latest stable version available at [ConstellationCAD](http://constellationcad.org/)
 
 #### Local Build
+##### Requirements
 
+[![node](https://user-images.githubusercontent.com/7750862/70819282-d5ad4a80-1da3-11ea-8f65-dcf2468c74ef.png)](https://nodejs.org/en/download/) [![python](https://user-images.githubusercontent.com/7750862/70819279-d3e38700-1da3-11ea-9321-309ec4d3cc51.png)](https://www.python.org/downloads/)
+
+##### Instructions
 ```shell
 git clone git@github.com:hicsail/constellation-js.git
 npm run build && npm run start
@@ -23,11 +27,11 @@ var goldbar = '{a then b}';
 var categories = {
 	"a": {
 		"ids": ["a1, a2"],
-		"role": ["a"]
+		"roles": ["a"]
 	},
 	"b": {
 		"ids": ["b1", "b2"],
-		"role": ["b"]
+		"roles": ["b"]
 	}
 };
 var result = constellation.goldbar(goldbar, categories, {designName: 'my-first-design'});
@@ -37,7 +41,7 @@ var result = constellation.goldbar(goldbar, categories, {designName: 'my-first-d
 |--|--|
 |`designName`|Name of design space for SBOL output, defaults is "constellation-design"|
 |`numDesigns`|Max number of designs to enumerate, default is 20|
-|`maxCycles`|Cycle depth for -orMore operators, default is 1|
+|`maxCycles`|Cycle depth for -orMore operators, default is 0|
 |`representation`|Choose between `EDGE` or `NODE` based graph, default is EDGE|
 |`andTolerance`|Choose between 0, 1, 2 for the AND operator, default is 0|
 |`mergeTolerance`|Choose between 0, 1, 2 for the MERGE operator, default is 0|
