@@ -69,6 +69,40 @@ div.sbol {
   height: 200px;
 }
 
+/* for drop area */
+.drop-area {
+  border: 3px dashed #CCC;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #fcfcfc;
+  transition: border-color 0.5s;
+  text-align: center;
+  display: block;
+  vertical-align: middle;
+  font-size: 18px;
+  width: 100%;
+}
+
+.drop-area p {
+  font-size: 13px;
+  margin-top: 25px;
+}
+
+.drop-area button {
+  margin-top: -25px;
+  padding-left: 25px;
+  padding-right: 25px;
+  border-radius: 20px;
+}
+
+.drop-area.dragenter {
+  border-color: #ecbf3e;
+}
+
+.drop-area.dragdefault {
+  border-color: #666;
+}
+
 /*
 Buttons
 */

@@ -650,9 +650,35 @@ $(document).ready(function() {
   }
 
   dropArea.addEventListener('drop', handleDrop, false)
+  dropArea.addEventListener('dragleave', sbolDragLeave, false)
+  dropArea.addEventListener('dragover', sbolDragOver, false)
+  // dropArea.addEventListener('drop', handleDrop, false)
 
-  function handleDrop(e) {
-    let dt = e.dataTransfer
+  function sbolDragOver(ev) {
+    ev.stopPropagation();
+    ev.preventDefault();
+    ev.dataTransfer.dropEffect = 'copy';
+    $('#sbol-drop-area').removeClass('dragdefault');
+    $('#sbol-drop-area').addClass('dragenter');
+  }
+
+  function sbolDragLeave() {
+    $('#sbol-drop-area').removeClass('dragenter');
+  }
+
+
+  function handleDrop(ev) {
+    ev.preventDefault();
+    $('#sbol-drop-area').removeClass('dragenter');
+    if (ev.dataTransfer.files.length > 1) {
+      alert('Error: Too many files');
+      return;
+    }
+    if (!ev.dataTransfer.files[0].name.endsWith(".sbol") && !ev.dataTransfer.files[0].name.endsWith(".xml")) {
+      alert('Error: Invalid file type');
+      return;
+    }
+    let dt = ev.dataTransfer
     let files = dt.files
     updateSBOLFiles(files)
   }
@@ -672,14 +698,14 @@ $(document).ready(function() {
   }
 
   $('#clearSBOLBtn').click(function () {
-    console.log("here");
     sbolFiles = [];
     $('#sbol-filenames').empty();
-    // $('#sbol-filenames').innerHTML = '';
 
   })
 
   $("#SBOLSubmitBtn").click(async function(){
+    resetDiagram();
+    displayDesigns(editors, '');
     if(sbolFiles.length === 0) {
       alert('No file uploaded!');
       resetStepOne();
