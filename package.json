@@ -40,7 +40,7 @@
     "imparse": "0.0.2",
     "mocha": "^4.1.0",
     "reservoir": "^0.1.2",
-    "sboljs": "^2.2.3",
+    "sboljs": "^2.2.4",
     "uuidv4": "^0.5.0"
   },
   "devDependencies": {
