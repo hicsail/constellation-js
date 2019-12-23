@@ -36,42 +36,95 @@
   <nav class="navbar navbar-expand-md navbar-light">
     <a class="navbar-brand" href="#" id="navbarBrand">Constellation</a>
 
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link about-open" href="#" data-toggle="modal" data-target="#aboutModal">About</a>
-        </li>
-      </ul>
-    </div>
+    <!--<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">-->
+      <!--<span class="navbar-toggler-icon"></span>-->
+    <!--</button>-->
+    <!--<div class="collapse navbar-collapse" id="navbarSupportedContent">-->
+      <!--<ul class="navbar-nav ml-auto">-->
+        <!--<li class="nav-item">-->
+          <!--<a class="nav-link about-open" href="#" data-toggle="modal" data-target="#aboutModal">About</a>-->
+        <!--</li>-->
+      <!--</ul>-->
+    <!--</div>-->
   </nav>
+
   <!-- Modal -->
-  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <!-- About - Step 1 Modal -->
-      <div class="modal-content text-left about">
+  <!--<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel" aria-hidden="true">-->
+    <!--<div class="modal-dialog modal-dialog-centered modal-lg" role="document">-->
 
-        <div class="modal-header">
-          <h5 class="modal-title">About Constellation</h5>
-          <button type="button" class="btn btn-outline-warning" data-dismiss="modal" aria-label="Close">Close</button>
-        </div>
+      <!--&lt;!&ndash; About Modal &ndash;&gt;-->
+      <!--<div class="modal-content text-left about">-->
 
-        <div class="modal-body">
-          <p>
-            Constellation is open-source and its codebase can be found on <a href="https://github.com/hicsail/constellation-js">Github</a>.
-            <br>
-            For questions, please email Dr. Douglas Densmore at dougd@bu.edu
-          </p>
-        </div>
+        <!--<div class="modal-header">-->
+          <!--<h5 class="modal-title">About Constellation</h5>-->
+          <!--<button type="button" class="btn btn-outline-warning" data-dismiss="modal" aria-label="Close">Close</button>-->
+        <!--</div>-->
 
-        <div class="modal-footer about-footer">
-          <div class="row">
-            <a href="https://www.bu.edu/">
-              <img class="logo" src="images/bu.png" alt="Boston University logo"/>
-            </a>
+        <!--<div class="modal-body">-->
+          <!--<p>-->
+            <!--Constellation is open-source and its codebase can be found on <a href="https://github.com/hicsail/constellation-js">Github</a>.-->
+            <!--<br>-->
+            <!--For questions, please email Dr. Douglas Densmore at dougd@bu.edu-->
+          <!--</p>-->
+        <!--</div>-->
 
+        <!--<div class="modal-footer about-footer">-->
+          <!--<div class="row">-->
+            <!--<a href="https://www.bu.edu/">-->
+              <!--<img class="logo" src="images/bu.png" alt="Boston University logo"/>-->
+            <!--</a>-->
+
+            <!--<a href="http://cidarlab.org/">-->
+              <!--<img class="logo" src="images/cidar.png" alt="Cidar Lab logo"/>-->
+            <!--</a>-->
+
+            <!--<a href="http://sail.bu.edu">-->
+              <!--<img class="logo" src="images/sail.png" alt="SAIL logo"/>-->
+            <!--</a>-->
+          <!--</div>-->
+        <!--</div>-->
+
+      <!--</div>-->
+      <!---->
+    <!--</div>-->
+  <!--</div>-->
+  <!-- end Modal -->
+
+<!--  Choose Input Section  -->
+  <div class="main-content container">
+    <div class="row">
+
+      <div id="demo-space" class="col-md-12">
+        <div class="card card-main">
+
+          <div class="card-header">
+            Welcome to Constellation's Demo Space
+          </div>
+
+          <div class="card-body">
+            <table id='doc_links_table' class="table table-condensed">
+              <tr>
+                <td width="20%">
+                  <a class="btn btn-outline-warning mt-2 btn-block" type="button" target="_blank" href="https://github.com/hicsail/constellation-js">Github</a>
+                </td>
+                <td width="80%" class="align-middle">Constellation is open source and available on Github</td>
+              </tr>
+              <tr>
+                <td width="20%">
+                  <a class="btn btn-outline-warning mt-2 btn-block" type="button" target="_blank" href="https://github.com/hicsail/constellation-js/blob/master/README.md#design-space-representations">Readme</a>
+                </td>
+                <td width="80%" class="align-middle">Overview of genetic design space representations in Constellation</td>
+              </tr>
+              <tr>
+                <td width="20%">
+                  <button id="playground" class="btn btn-outline-warning mt-2 btn-block">Playground</button>
+                </td>
+                <td width="80%" class="align-middle">Web interface for running examples</td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="card-footer text-right">
             <a href="http://cidarlab.org/">
               <img class="logo" src="images/cidar.png" alt="Cidar Lab logo"/>
             </a>
@@ -80,28 +133,23 @@
               <img class="logo" src="images/sail.png" alt="SAIL logo"/>
             </a>
           </div>
+
         </div>
-
       </div>
-    </div>
-  </div>
-  <!-- end Modal -->
 
-<!--  Choose Input Section  -->
-  <div class="main-content container">
-    <div class="row">
-      <div id="step1-content" class="col-md-12">
+      <div id="step1-content" class="col-md-12 hidden">
         <div class="card card-main">
+
           <div class="card-header">
             How do you want to enter your specifications?
           </div>
+
           <div class="card-body">
             <div class="form-group">
               <div >
                 <input type="radio" id="specification-sbol" name="spec-method" value="sbol">
                 <label for="specification-sbol">Upload SBOL</label>
                 <br>
-<!--                <input id="importSBOLBtn" class="btn" type="file" accept=".sbol,.xml">-->
               </div>
               <br>
               <div>
@@ -113,9 +161,7 @@
               <div id="sbolSpinner" class="spinner hidden">
                 <p><i class="fa fa-spinner fa-spin"></i>  Loading...</p>
               </div>
-              <!--<button disabled id="nextBtn" class="btn btn-outline-warning mt-2 navBtn">Next</button>-->
             </div>
-
           </div>
 
           <div class="card-footer text-right">
@@ -126,6 +172,7 @@
 
         </div>
       </div>
+
 <!--  End Choose Input Section  -->
       <div id="step2-content" class="col-md-12 hidden">
         <div class="card card-main">
@@ -136,7 +183,7 @@
               <div class="row">
                 <div class="col-sm">
                   <label><h5>Design name:</h5></label>
-                  <input id="designName" type="text">
+                  <input id="designName" type="text" placeholder="constellation-design">
                 </div>
               </div>
               <div class="row">

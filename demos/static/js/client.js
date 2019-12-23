@@ -402,37 +402,21 @@ function dragEnded() {
   d3.event.subject.fy = null;
 }
 
-/* * * * * * */
-/*  CLEANUP  */
-/* * * * * * */
-/**
- * Resets graph and removes SVG elements
- */
-function resetDiagram() {
-  if(simulationPointer){
-    simulationPointer.stop();
-  }
-  d3.selectAll('svg').remove();
-}
 
-function processSBOLFile(file) {
-  return new Promise((resolve) => {
-    // Parse file into XML object
-    let parser = new DOMParser();
-    let reader = new FileReader();
-    reader.readAsText(file, "UTF-8");
-    reader.onload = function (evt) {
-      let data = evt.target.result;
-      // let data = parser.parseFromString(evt.target.result, "application/xml");
-      resolve(data);
-    };
-  });
-}
+
+
 
 /* * * * * * */
 /*  BROWSER  */
 /* * * * * * */
 $(document).ready(function() {
+
+
+  $('#playground').on('click', function() {
+    $('#demo-space').addClass('hidden');
+    $('#step1-content').removeClass('hidden');
+  });
+
 
   const THEME = 'ambiance';
   let combineMethod, tolerance;
@@ -461,51 +445,13 @@ $(document).ready(function() {
   editors.catEditor.setOption("theme", THEME);
   editors.designsEditor.setOption("theme", THEME);
 
-  /* * * * * * */
-  /*    SBOL   */
-  /* * * * * * */
-  async function processSBOL(files) {
-    console.log(combineMethod);
-    console.log(tolerance);
-
-    //read SBOL file
-    let sbolXMLs = [];
-    for (let i = 0; i < files.length; i++) {
-      let file = files[i];
-      let xmlString = await processSBOLFile(file);
-      sbolXMLs.push(xmlString);
-    }
-
-    let data = {
-      sbol: sbolXMLs,
-      combineMethod: combineMethod,
-      tolerance: tolerance
-    }
-    // Parse SBOL and display results
-    $.ajax({
-      url: 'http://localhost:8082/importSBOL',
-      type: 'POST',
-      data: JSON.stringify(data),
-      contentType: "application/json; charset=utf-8",
-      dataType: "json",
-      processData: false,
-      success: function(data){
-        console.log(typeof data);
-        console.log(data);
-        // data = JSON.parse(data);
-        displayDiagram(data.stateGraph);
-        // Undefined design
-        if (String(data.designs).includes('is not defined')) {
-          displayDesigns(editors, data.designs);
-        } else {
-          displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
-        }
-      }
-    })
-      .fail((response) => {
-        alert(response.responseText);
-      });
-  };
+  let dropArea = document.getElementById('sbol-drop-area');
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false)
+  })
+  dropArea.addEventListener('drop', handleDrop, false)
+  dropArea.addEventListener('dragleave', sbolDragLeave, false)
+  dropArea.addEventListener('dragover', sbolDragOver, false)
 
   $('#demo-option').on('click', function() {
     document.getElementById('designName').value = "demo-example";
@@ -560,9 +506,6 @@ $(document).ready(function() {
     $("#exportSBOLBtn").addClass('hidden');
     $('#goldbarSpinner').removeClass('hidden'); // show spinner
 
-    // let maxCycles = 0;
-    // let numDesigns = 10;
-
     let numDesigns, maxCycles, andTolerance, mergeTolerance;
 
     const specification = editors.specEditor.getValue();
@@ -597,10 +540,7 @@ $(document).ready(function() {
       } else {
         displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
       }
-      // if no design name provided
-      if (designName === '') {
-        document.getElementById('designName').value = 'constellation-design';
-      }
+
       // if no numDesigns provided
       if (numDesigns === '') {
         document.getElementById('numDesigns').value = 20;
@@ -639,64 +579,6 @@ $(document).ready(function() {
     }
   });
 
-  let dropArea = document.getElementById('sbol-drop-area');
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropArea.addEventListener(eventName, preventDefaults, false)
-  })
-
-  function preventDefaults (e) {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-
-  dropArea.addEventListener('drop', handleDrop, false)
-  dropArea.addEventListener('dragleave', sbolDragLeave, false)
-  dropArea.addEventListener('dragover', sbolDragOver, false)
-  // dropArea.addEventListener('drop', handleDrop, false)
-
-  function sbolDragOver(ev) {
-    ev.stopPropagation();
-    ev.preventDefault();
-    ev.dataTransfer.dropEffect = 'copy';
-    $('#sbol-drop-area').removeClass('dragdefault');
-    $('#sbol-drop-area').addClass('dragenter');
-  }
-
-  function sbolDragLeave() {
-    $('#sbol-drop-area').removeClass('dragenter');
-  }
-
-
-  function handleDrop(ev) {
-    ev.preventDefault();
-    $('#sbol-drop-area').removeClass('dragenter');
-    if (ev.dataTransfer.files.length > 1) {
-      alert('Error: Too many files');
-      return;
-    }
-    if (!ev.dataTransfer.files[0].name.endsWith(".sbol") && !ev.dataTransfer.files[0].name.endsWith(".xml")) {
-      alert('Error: Invalid file type');
-      return;
-    }
-    let dt = ev.dataTransfer
-    let files = dt.files
-    updateSBOLFiles(files)
-  }
-
-  function updateSBOLFiles(files) {
-    if (sbolFiles.length >= 10) {
-      alert('You have uploaded the maximum number of files.');
-    }
-    for (let file of files) {
-      sbolFiles.push(file);
-      $('#sbol-filenames').append(file.name + '\n');
-    }
-    if (sbolFiles.length > 1) {
-      $("#operationMenu").attr("disabled", false);
-      $("#toleranceMenu").attr("disabled", false);
-    }
-  }
-
   $('#clearSBOLBtn').click(function () {
     sbolFiles = [];
     $('#sbol-filenames').empty();
@@ -729,16 +611,11 @@ $(document).ready(function() {
     $('#sbolSpinner').removeClass('hidden'); // show spinner
 
     let specMethod = $("input[name='spec-method']:checked").val();
+
     if (specMethod === 'goldbar'){
       showGoldBarStepTwo();
     }
-
     if(specMethod === 'sbol'){
-      // if(!sbolFile){
-      //   alert('No file uploaded!');
-      //   resetStepOne();
-      // }
-      // await processSBOL(sbolFile);
       showSBOLStepTwo();
     }
 
@@ -749,35 +626,40 @@ $(document).ready(function() {
   Back button & Constellation on navbar goes back to step 1 and clears everything
    */
   $("#backBtn").click(function(){
-    resetAll();
+    resetAll(editors);
   });
 
   $("#navbarBrand").click(function(){
-    resetAll();
+    resetAll(editors);
+    $('#demo-space').removeClass('hidden');
+    $('#step1-content').addClass('hidden');
   });
 
-  function resetAll(){
-    resetStepOne();
-    resetStepTwo();
-    $('#step1-content').removeClass('hidden'); //show step 1
-  }
-
-  function resetStepTwo(){
-    resetDiagram();
-    displayDesigns(editors, '');
-    $('#goldbarSpinner').addClass('hidden');
-    $("#exportSBOLBtn").addClass('hidden');
-    $('#step2-content').addClass('hidden');
-    $('#graph-designs-row').addClass('hidden');
-    $('#spec-categories-row-0').addClass('hidden');
-    $('#goldbar-parameters').addClass('hidden');
-    $('#sbol-parameters').addClass('hidden');
-    $('#goldarSubmitBtn').addClass('hidden');
-    $('#SBOLSubmitBtn').addClass('hidden');
-    $('#goldbar-btns').addClass('hidden');
-  }
-
 });
+
+
+
+
+
+
+/* * * * * * */
+/*  CLEANUP  */
+/* * * * * * */
+/**
+ * Resets graph and removes SVG elements
+ */
+function resetDiagram() {
+  if(simulationPointer){
+    simulationPointer.stop();
+  }
+  d3.selectAll('svg').remove();
+}
+
+function resetAll(editors){
+  resetStepOne();
+  resetStepTwo(editors);
+  $('#step1-content').removeClass('hidden'); //show step 1
+}
 
 function resetStepOne(){
   $("#importSBOLBtn").val("");
@@ -786,6 +668,37 @@ function resetStepOne(){
   $("#specification-sbol").prop("checked", false);
   $("#specification-goldbar").prop("checked", false);
 }
+
+function resetStepTwo(editors){
+  $('#designName').val('');
+  resetDiagram();
+  //clear CodeMirror editors
+  Object.values(editors).forEach(function(cm) {
+    cm.setValue("");
+    cm.clearHistory();
+  });
+
+  $('#goldbarSpinner').addClass('hidden');
+  $("#exportSBOLBtn").addClass('hidden');
+  $('#step2-content').addClass('hidden');
+  $('#graph-designs-row').addClass('hidden');
+  $('#spec-categories-row-0').addClass('hidden');
+  $('#goldbar-parameters').addClass('hidden');
+  $('#sbol-parameters').addClass('hidden');
+  $('#goldarSubmitBtn').addClass('hidden');
+  $('#SBOLSubmitBtn').addClass('hidden');
+  $('#goldbar-btns').addClass('hidden');
+}
+
+
+
+
+
+
+
+/* * * * * * */
+/*  STEP TWO  */
+/* * * * * * */
 
 function showSBOLStepTwo(){
   $('#step2-content').removeClass('hidden');
@@ -805,6 +718,18 @@ function showGoldBarStepTwo(){
   $('#goldarSubmitBtn').removeClass('hidden');
 }
 
+
+
+
+
+
+
+
+
+/* * * * * * */
+/*    SBOL   */
+/* * * * * * */
+
 function downloadSBOL(text, filename) {
   let element = document.createElement('a');
   element.setAttribute('href', 'data:application/xml,' + encodeURIComponent(text));
@@ -814,4 +739,109 @@ function downloadSBOL(text, filename) {
   element.click();
   document.body.removeChild(element);
 }
+
+function preventDefaults (e) {
+  e.preventDefault()
+  e.stopPropagation()
+}
+
+function sbolDragOver(ev) {
+  ev.stopPropagation();
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = 'copy';
+  $('#sbol-drop-area').removeClass('dragdefault');
+  $('#sbol-drop-area').addClass('dragenter');
+}
+
+function sbolDragLeave() {
+  $('#sbol-drop-area').removeClass('dragenter');
+}
+
+
+function handleDrop(ev) {
+  ev.preventDefault();
+  $('#sbol-drop-area').removeClass('dragenter');
+  if (ev.dataTransfer.files.length > 1) {
+    alert('Error: Too many files');
+    return;
+  }
+  if (!ev.dataTransfer.files[0].name.endsWith(".sbol") && !ev.dataTransfer.files[0].name.endsWith(".xml")) {
+    alert('Error: Invalid file type');
+    return;
+  }
+  let dt = ev.dataTransfer
+  let files = dt.files
+  updateSBOLFiles(files)
+}
+
+function updateSBOLFiles(files) {
+  if (sbolFiles.length >= 10) {
+    alert('You have uploaded the maximum number of files.');
+  }
+  for (let file of files) {
+    sbolFiles.push(file);
+    $('#sbol-filenames').append(file.name + '\n');
+  }
+  if (sbolFiles.length > 1) {
+    $("#operationMenu").attr("disabled", false);
+    $("#toleranceMenu").attr("disabled", false);
+  }
+}
+
+function processSBOLFile(file) {
+  return new Promise((resolve) => {
+    // Parse file into XML object
+    let parser = new DOMParser();
+    let reader = new FileReader();
+    reader.readAsText(file, "UTF-8");
+    reader.onload = function (evt) {
+      let data = evt.target.result;
+      // let data = parser.parseFromString(evt.target.result, "application/xml");
+      resolve(data);
+    };
+  });
+}
+
+async function processSBOL(files) {
+  console.log(combineMethod);
+  console.log(tolerance);
+
+  //read SBOL file
+  let sbolXMLs = [];
+  for (let i = 0; i < files.length; i++) {
+    let file = files[i];
+    let xmlString = await processSBOLFile(file);
+    sbolXMLs.push(xmlString);
+  }
+
+  let data = {
+    sbol: sbolXMLs,
+    combineMethod: combineMethod,
+    tolerance: tolerance
+  }
+  // Parse SBOL and display results
+  $.ajax({
+    url: 'http://localhost:8082/importSBOL',
+    type: 'POST',
+    data: JSON.stringify(data),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    processData: false,
+    success: function(data){
+      console.log(typeof data);
+      console.log(data);
+      // data = JSON.parse(data);
+      displayDiagram(data.stateGraph);
+      // Undefined design
+      if (String(data.designs).includes('is not defined')) {
+        displayDesigns(editors, data.designs);
+      } else {
+        displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+      }
+    }
+  })
+    .fail((response) => {
+      alert(response.responseText);
+    });
+};
 

@@ -69,7 +69,16 @@ div.sbol {
   height: 200px;
 }
 
-/* for drop area */
+/*
+Main page table
+ */
+.table > tbody > tr:first-child > td {
+  border: none;
+}
+
+/*
+Drop area
+*/
 .drop-area {
   border: 3px dashed #CCC;
   border-radius: 8px;
