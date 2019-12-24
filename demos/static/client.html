@@ -172,11 +172,11 @@
 
         </div>
       </div>
-
 <!--  End Choose Input Section  -->
+
       <div id="step2-content" class="col-md-12 hidden">
         <div class="card card-main">
-<!--  Input GOLDBAR Section  -->
+      <!--  Input GOLDBAR Section  -->
           <div class="card-body">
         <!--  GOLDBAR Parameters  -->
             <div id="goldbar-parameters" class="hidden">
@@ -230,28 +230,32 @@
                 </div>
               </div>
             <!--  End GOLDBAR Specification and Categories  -->
+
             <!--  SBOL Parameters  -->
               <div id="sbol-parameters" class="hidden">
                 <div class="row">
                   <div class="col-sm">
-                    <div class="card card-sub sbol">
-                      <div class="card-title">Drag and drop your SBOL file(s) below</div>
-                      <div id="sbol-drop-area" class="card-body drop-area">
-                        <label class="btn btn-outline-warning btn-file"> Choose files
-                          <input type="file" id="importSBOLBtn" style="display: none;" accept=".sbol,.xml" multiple>
-                        </label>
+                    <div class="card sbol-card">
+                      <h5 class="card-title text-center">Drag and drop your SBOL file(s) below</h5>
+                      <div class="card-text">
+                        <div id="sbol-drop-area" class="drop-area">
+                          <label class="btn btn-outline-warning btn-file"> Choose files
+                            <input type="file" id="importSBOLBtn" style="display: none;" accept=".sbol,.xml" multiple>
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </div>
                   <div class="col-sm">
-                    <div class="card card-sub scroll">
-                      <div class="card-title">
+                    <div class="card sbol-card">
+                      <h5 class="card-title middle-align">
                         Files Uploaded
-                        <label id="clearSBOLBtn" class="btn btn-outline-warning btn-file pull-right"> Clear all files
-                        <button style="display: none;"></button>
+                        <button id="clearSBOLBtn" class="btn btn-outline-warning pull-right align-middle">Clear all files</button>
                         </label>
+                      </h5>
+                      <div class="scrollable">
+                        <p class="card-text" id="sbol-filenames"></p>
                       </div>
-                      <div id="sbol-filenames"></div>
                     </div>
                   </div>
                 </div>

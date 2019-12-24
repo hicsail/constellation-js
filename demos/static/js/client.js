@@ -761,7 +761,7 @@ function sbolDragLeave() {
 function handleDrop(ev) {
   ev.preventDefault();
   $('#sbol-drop-area').removeClass('dragenter');
-  if (ev.dataTransfer.files.length > 1) {
+  if (ev.dataTransfer.files.length >= 10) {
     alert('Error: Too many files');
     return;
   }
@@ -780,7 +780,7 @@ function updateSBOLFiles(files) {
   }
   for (let file of files) {
     sbolFiles.push(file);
-    $('#sbol-filenames').append(file.name + '\n');
+    $('#sbol-filenames').append(file.name + '<br>');
   }
   if (sbolFiles.length > 1) {
     $("#operationMenu").attr("disabled", false);
