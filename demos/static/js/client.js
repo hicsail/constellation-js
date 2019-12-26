@@ -582,6 +582,8 @@ $(document).ready(function() {
   $('#clearSBOLBtn').click(function () {
     sbolFiles = [];
     $('#sbol-filenames').empty();
+    $("#operationMenu").attr("disabled", true);
+    $("#toleranceMenu").attr("disabled", true);
 
   })
 
@@ -593,7 +595,7 @@ $(document).ready(function() {
       resetStepOne();
       return;
     }
-    await processSBOL(sbolFiles);
+    await processSBOL(sbolFiles, combineMethod, tolerance);
   });
 
   /*
@@ -802,7 +804,7 @@ function processSBOLFile(file) {
   });
 }
 
-async function processSBOL(files) {
+async function processSBOL(files, combineMethod, tolerance) {
   console.log(combineMethod);
   console.log(tolerance);
 
