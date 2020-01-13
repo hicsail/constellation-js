@@ -580,11 +580,7 @@ $(document).ready(function() {
   });
 
   $('#clearSBOLBtn').click(function () {
-    sbolFiles = [];
-    $('#sbol-filenames').empty();
-    $("#operationMenu").attr("disabled", true);
-    $("#toleranceMenu").attr("disabled", true);
-
+    clearAllFiles();
   })
 
   $("#SBOLSubmitBtn").click(async function(){
@@ -647,9 +643,17 @@ $(document).ready(function() {
 /* * * * * * */
 /*  CLEANUP  */
 /* * * * * * */
+
 /**
- * Resets graph and removes SVG elements
+ * Removes all uploaded SBOL files
  */
+function clearAllFiles(){
+  sbolFiles = [];
+  $('#sbol-filenames').empty();
+  $("#operationMenu").attr("disabled", true);
+  $("#toleranceMenu").attr("disabled", true);
+}
+
 function resetDiagram() {
   if(simulationPointer){
     simulationPointer.stop();
@@ -674,6 +678,7 @@ function resetStepOne(){
 function resetStepTwo(editors){
   $('#designName').val('');
   resetDiagram();
+  clearAllFiles();
   //clear CodeMirror editors
   Object.values(editors).forEach(function(cm) {
     cm.setValue("");
