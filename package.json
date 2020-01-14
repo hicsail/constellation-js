@@ -38,7 +38,9 @@
     "express-xml-bodyparser": "^0.3.0",
     "form-data": "^2.5.0",
     "imparse": "0.0.2",
+    "js2xmlparser": "^4.0.0",
     "mocha": "^4.1.0",
+    "python-shell": "^1.0.8",
     "reservoir": "^0.1.2",
     "sboljs": "^2.2.2",
     "uuidv4": "^0.5.0"
@@ -55,7 +57,7 @@
     "webpack": "^4.39.2",
     "webpack-cli": "^3.3.7"
   },
-  "browser":{
+  "browser": {
     "child_process": false
   }
 }

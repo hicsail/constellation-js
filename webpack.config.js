@@ -8,7 +8,8 @@ module.exports = {
     library: 'constellation',
   },
   node: {
-    fs: 'empty'
+    fs: 'empty',
+    child_process: 'empty',
   },
   module: {
     rules: [
