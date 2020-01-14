@@ -520,7 +520,7 @@ $(document).ready(function() {
     resetDiagram();
     displayDesigns(editors, '');
     $("#exportSBOLBtn").addClass('hidden');
-    $('#goldbarSpinner').removeClass('hidden'); // show spinner
+    $('#spinner').removeClass('hidden'); // show spinner
 
     let numDesigns, maxCycles, andTolerance, mergeTolerance;
 
@@ -576,11 +576,11 @@ $(document).ready(function() {
       sbolDoc = data.sbol;
 
       $("#exportSBOLBtn").removeClass('hidden'); //show export button
-      $("#goldbarSpinner").addClass('hidden');
+      $("#spinner").addClass('hidden');
 
     }).fail((response) => {
       alert(response.responseText);
-      $("#goldbarSpinner").addClass('hidden');
+      $("#spinner").addClass('hidden');
     });
 
   });
@@ -607,7 +607,7 @@ $(document).ready(function() {
       resetStepOne();
       return;
     }
-    await processSBOL(sbolFiles, combineMethod, tolerance);
+    await processSBOL(editors, sbolFiles, combineMethod, tolerance);
   });
 
   /*
@@ -701,7 +701,7 @@ function resetStepTwo(editors){
     cm.clearHistory();
   });
 
-  $('#goldbarSpinner').addClass('hidden');
+  $('#spinner').addClass('hidden');
   $("#exportSBOLBtn").addClass('hidden');
   $('#step2-content').addClass('hidden');
   $('#graph-designs-row').addClass('hidden');
@@ -825,9 +825,8 @@ function processSBOLFile(file) {
   });
 }
 
-async function processSBOL(files, combineMethod, tolerance) {
-  console.log(combineMethod);
-  console.log(tolerance);
+async function processSBOL(editors, files, combineMethod, tolerance) {
+  $("#spinner").removeClass('hidden');
 
   //read SBOL file
   let sbolXMLs = [];
@@ -861,10 +860,12 @@ async function processSBOL(files, combineMethod, tolerance) {
       } else {
         displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
       }
+      $("#spinner").addClass('hidden');
     }
   })
     .fail((response) => {
       alert(response.responseText);
+      $("#spinner").addClass('hidden');
     });
 };
 
