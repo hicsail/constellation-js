@@ -155,16 +155,26 @@ function drawNodes(nodes) {
     .attr('class', 'node');
 
   // Add tooltip for node representation
-  if (REPRESENTATION === "NODE") {
-    textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
-      .append('text')
-      .text( function(d) {return d.operator; })
-      .attr('opacity', 0)
-      .attr('dx', '20px')
-      .attr('dy', '4px')
-      .style('fill', 'rgb(100,)')
-      .style('font-family', 'Montserrat');
-  }
+  // if (REPRESENTATION === "NODE") {
+  //   textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
+  //     .append('text')
+  //     .text( function(d) {return d.operator; })
+  //     .attr('opacity', 0)
+  //     .attr('dx', '20px')
+  //     .attr('dy', '4px')
+  //     .style('fill', 'rgb(100,)')
+  //     .style('font-family', 'Montserrat');
+  // }
+
+  textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
+    .append('text')
+    .text( function(d) {return d.operator + ',' + d.id; })
+    .attr('opacity', 0)
+    .attr('dx', '20px')
+    .attr('dy', '4px')
+    .style('fill', 'rgb(100,)')
+    .style('font-family', 'Montserrat');
+
 
   // Add circles
   circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
@@ -276,13 +286,19 @@ function tick() {
   });
 
   // update tooltip positions for node representation
-  if (REPRESENTATION === 'NODE') {
-    textPointer.attr('transform', function(d) {
-      d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
-      d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
-      return 'translate(' + d.x + ',' + d.y + ')'
-    });
-  }
+  // if (REPRESENTATION === 'NODE') {
+  //   textPointer.attr('transform', function(d) {
+  //     d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
+  //     d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
+  //     return 'translate(' + d.x + ',' + d.y + ')'
+  //   });
+  // }
+
+  textPointer.attr('transform', function(d) {
+    d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
+    d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
+    return 'translate(' + d.x + ',' + d.y + ')'
+  });
 
   // Update link positions
   linkPointer.attr('d', updateLinks);
