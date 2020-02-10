@@ -220,7 +220,7 @@ function drawNodes(nodes) {
         case 'ZERO':
           return;
         default:
-          switch (d.component.roles[0]) {
+          switch (Object.keys(d.component)[0]) {
             case 'aptamer':
             case 'assemblyScar':
             case 'bluntRestrictionSite':
@@ -242,7 +242,7 @@ function drawNodes(nodes) {
             case 'ribozyme':
             case 'signature':
             case 'terminator':
-              return './sbol/' + d.component.roles[0] + '.svg';
+              return './sbol/' + Object.keys(d.component)[0] + '.svg';
             default:
               return './sbol/' + 'noGlyphAssigned.svg';
           }
@@ -472,14 +472,14 @@ $(document).ready(function() {
   $('#demo-option').on('click', function() {
     document.getElementById('designName').value = "demo-example";
     editors.specEditor.setValue('one-or-more(one-or-more(promoter then nonCodingRna)then cds then \n (zero-or-more \n (nonCodingRna or (one-or-more \n (nonCodingRna then promoter then nonCodingRna) then cds)) then \n (terminator or (terminator then nonCodingRna) or (nonCodingRna then terminator)))))')
-    editors.catEditor.setValue('{"promoter": {"ids": ["BBa_R0040", "BBa_J23100"], "roles": ["promoter"]},\n "ribosomeBindingSite": {"ids": ["BBa_B0032", "BBa_B0034"], "roles": ["ribosomeBindingSite"]}, \n"cds": {"ids": ["BBa_E0040", "BBa_E1010"], "roles": ["cds"]},\n"nonCodingRna": {"ids": ["BBa_F0010"], "roles": ["nonCodingRna"]},\n"terminator": {"ids": ["BBa_B0010"], "roles": ["terminator"]}}');
+    editors.catEditor.setValue('{"promoter": {"promoter": ["BBa_R0040", "BBa_J23100"]},\n "ribosomeBindingSite": {"ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"]}, \n"cds": {"cds": ["BBa_E0040", "BBa_E1010"]},\n"nonCodingRna": {"nonCodingRna": ["BBa_F0010"]},\n"terminator": {"terminator": ["BBa_B0010"]}}');
   });
 
 
   $('#debug-option').on('click', function() {
     document.getElementById('designName').value = "debug-example";
     editors.specEditor.setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
-    editors.catEditor.setValue('{"promoter": {"ids": ["BBa_R0040", "BBa_J23100"], "roles": ["promoter"]},\n "ribosomeBindingSite": {"ids": ["BBa_B0032", "BBa_B0034"], "roles": ["ribosomeBindingSite"]}, \n"cds": {"ids": ["BBa_E0040", "BBa_E1010"], "roles": ["cds"]},\n"nonCodingRna": {"ids": ["BBa_F0010"], "roles": ["nonCodingRna"]},\n"terminator": {"ids": ["BBa_B0010"], "roles": ["terminator"]}}');
+    editors.catEditor.setValue('{"promoter": {"promoter": ["BBa_R0040", "BBa_J23100"]},\n "ribosomeBindingSite": {"ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"]}, \n"cds": {"cds": ["BBa_E0040", "BBa_E1010"]},\n"nonCodingRna": {"nonCodingRna": ["BBa_F0010"]},\n"terminator": {"terminator": ["BBa_B0010"]}}');
   });
 
   $('#and').on('click', function() {
