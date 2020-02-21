@@ -33,7 +33,6 @@ app.get('/', function(req,res) {
 });
 
 app.post('/postSpecs', async function(req,res) {
-  console.log(req.body);
   let designName = req.body.designName || 'constellation-design';
   let langText = req.body.specification;
   let categories = req.body.categories;
@@ -69,10 +68,19 @@ app.post('/postSpecs', async function(req,res) {
   }
 });
 
-app.post('/importSBOL', xmlparser(), async function(req,res) {
+// app.post('/importSBOL', xmlparser(), async function(req,res) {
+app.post('/importSBOL', async function(req,res) {
+  let sbolDocs = req.body.sbol;
+  let combineMethod = req.body.combineMethod || '';
+  let tolerance = req.body.tolerance || 0;
+  console.log('---Received new input---');
+  console.log('combineMethod: ', combineMethod);
+  console.log('tolerance: ', tolerance);
+  console.log('sbolDocs: ', sbolDocs);
+
   let data;
   try {
-    data = await constellation.sbol(req.rawBody);
+    data = await constellation.sbol(sbolDocs, combineMethod, tolerance);
     res.status(200).send(data);
   } catch (error) {
     console.log(error);
