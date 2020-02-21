@@ -26,10 +26,8 @@
 
     <script type="application/javascript" src="js/codemirror.js"></script>
     <script type="application/javascript" src="js/scheme.js"></script>
-    <script type="application/javascript" src="https://imparse.org/js/lib/imparse.js"></script>
-    <script type="application/javascript" src="https://reity.org/summations-js/lib/summations.js"></script>
-    <script type="application/javascript" src="js/symbolic.js"></script>
     <script type="module" src="js/client.js"></script>
+
     <title>Constellation</title>
   </head>
 
@@ -38,42 +36,95 @@
   <nav class="navbar navbar-expand-md navbar-light">
     <a class="navbar-brand" href="#" id="navbarBrand">Constellation</a>
 
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link about-open" href="#" data-toggle="modal" data-target="#aboutModal">About</a>
-        </li>
-      </ul>
-    </div>
+    <!--<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">-->
+      <!--<span class="navbar-toggler-icon"></span>-->
+    <!--</button>-->
+    <!--<div class="collapse navbar-collapse" id="navbarSupportedContent">-->
+      <!--<ul class="navbar-nav ml-auto">-->
+        <!--<li class="nav-item">-->
+          <!--<a class="nav-link about-open" href="#" data-toggle="modal" data-target="#aboutModal">About</a>-->
+        <!--</li>-->
+      <!--</ul>-->
+    <!--</div>-->
   </nav>
+
   <!-- Modal -->
-  <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <!-- About - Step 1 Modal -->
-      <div class="modal-content text-left about">
+  <!--<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel" aria-hidden="true">-->
+    <!--<div class="modal-dialog modal-dialog-centered modal-lg" role="document">-->
 
-        <div class="modal-header">
-          <h5 class="modal-title">About Constellation</h5>
-          <button type="button" class="btn btn-outline-warning" data-dismiss="modal" aria-label="Close">Close</button>
-        </div>
+      <!--&lt;!&ndash; About Modal &ndash;&gt;-->
+      <!--<div class="modal-content text-left about">-->
 
-        <div class="modal-body">
-          <p>
-            Constellation is open-source and its codebase can be found on <a href="https://github.com/hicsail/constellation-js">Github</a>.
-            <br>
-            For questions, please email Dr. Douglas Densmore at dougd@bu.edu
-          </p>
-        </div>
+        <!--<div class="modal-header">-->
+          <!--<h5 class="modal-title">About Constellation</h5>-->
+          <!--<button type="button" class="btn btn-outline-warning" data-dismiss="modal" aria-label="Close">Close</button>-->
+        <!--</div>-->
 
-        <div class="modal-footer about-footer">
-          <div class="row">
-            <a href="https://www.bu.edu/">
-              <img class="logo" src="images/bu.png" alt="Boston University logo"/>
-            </a>
+        <!--<div class="modal-body">-->
+          <!--<p>-->
+            <!--Constellation is open-source and its codebase can be found on <a href="https://github.com/hicsail/constellation-js">Github</a>.-->
+            <!--<br>-->
+            <!--For questions, please email Dr. Douglas Densmore at dougd@bu.edu-->
+          <!--</p>-->
+        <!--</div>-->
 
+        <!--<div class="modal-footer about-footer">-->
+          <!--<div class="row">-->
+            <!--<a href="https://www.bu.edu/">-->
+              <!--<img class="logo" src="images/bu.png" alt="Boston University logo"/>-->
+            <!--</a>-->
+
+            <!--<a href="http://cidarlab.org/">-->
+              <!--<img class="logo" src="images/cidar.png" alt="Cidar Lab logo"/>-->
+            <!--</a>-->
+
+            <!--<a href="http://sail.bu.edu">-->
+              <!--<img class="logo" src="images/sail.png" alt="SAIL logo"/>-->
+            <!--</a>-->
+          <!--</div>-->
+        <!--</div>-->
+
+      <!--</div>-->
+      <!---->
+    <!--</div>-->
+  <!--</div>-->
+  <!-- end Modal -->
+
+<!--  Choose Input Section  -->
+  <div class="main-content container">
+    <div class="row">
+
+      <div id="demo-space" class="col-md-12">
+        <div class="card card-main">
+
+          <div class="card-header">
+            Welcome to Constellation's Demo Space
+          </div>
+
+          <div class="card-body">
+            <table id='doc_links_table' class="table table-condensed">
+              <tr>
+                <td width="20%">
+                  <a class="btn btn-outline-warning mt-2 btn-block" type="button" target="_blank" href="https://github.com/hicsail/constellation-js">Github</a>
+                </td>
+                <td width="80%" class="align-middle">Constellation is open source and available on Github</td>
+              </tr>
+              <tr>
+                <td width="20%">
+                  <a class="btn btn-outline-warning mt-2 btn-block" type="button" target="_blank" href="https://github.com/hicsail/constellation-js/blob/master/README.md#design-space-representations">Readme</a>
+                </td>
+                <td width="80%" class="align-middle">Overview of genetic design space representations in Constellation</td>
+              </tr>
+              <tr>
+                <td width="20%">
+                  <button id="playground" class="btn btn-outline-warning mt-2 btn-block">Playground</button>
+                </td>
+                <td width="80%" class="align-middle">Web interface for running examples</td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="card-footer text-right">
             <a href="http://cidarlab.org/">
               <img class="logo" src="images/cidar.png" alt="Cidar Lab logo"/>
             </a>
@@ -82,42 +133,35 @@
               <img class="logo" src="images/sail.png" alt="SAIL logo"/>
             </a>
           </div>
+
         </div>
-
       </div>
-    </div>
-  </div>
-  <!-- end Modal -->
 
-<!--  Choose Input Section  -->
-  <div class="main-content container">
-    <div class="row">
-      <div id="step1-content" class="col-md-12">
+      <div id="step1-content" class="col-md-12 hidden">
         <div class="card card-main">
+
           <div class="card-header">
             How do you want to enter your specifications?
           </div>
+
           <div class="card-body">
-              <div class="form-group">
-                <div >
-                  <input type="radio" id="specification-sbol" name="spec-method" value="sbol">
-                  <label for="specification-sbol">Upload SBOL</label>
-                  <br>
-                  <input id="importSBOLBtn" class="btn" type="file" accept=".sbol,.xml">
-                </div>
+            <div class="form-group">
+              <div >
+                <input type="radio" id="specification-sbol" name="spec-method" value="sbol">
+                <label for="specification-sbol">Upload SBOL</label>
                 <br>
-                <div>
-                  <input type="radio" id="specification-goldbar" name="spec-method" value="goldbar">
-                  <label for="specification-goldbar">Type in using GOLDBAR syntax</label>
-                </div>
               </div>
+              <br>
+              <div>
+                <input type="radio" id="specification-goldbar" name="spec-method" value="goldbar">
+                <label for="specification-goldbar">Type in using GOLDBAR syntax</label>
+              </div>
+            </div>
             <div class="text-center">
               <div id="sbolSpinner" class="spinner hidden">
                 <p><i class="fa fa-spinner fa-spin"></i>  Loading...</p>
               </div>
-              <!--<button disabled id="nextBtn" class="btn btn-outline-warning mt-2 navBtn">Next</button>-->
             </div>
-
           </div>
 
           <div class="card-footer text-right">
@@ -129,16 +173,17 @@
         </div>
       </div>
 <!--  End Choose Input Section  -->
+
       <div id="step2-content" class="col-md-12 hidden">
         <div class="card card-main">
-<!--  Input GOLDBAR Section  -->
+      <!--  Input GOLDBAR Section  -->
           <div class="card-body">
         <!--  GOLDBAR Parameters  -->
             <div id="goldbar-parameters" class="hidden">
               <div class="row">
                 <div class="col-sm">
                   <label><h5>Design name:</h5></label>
-                  <input id="designName" type="text">
+                  <input id="designName" type="text" placeholder="constellation-design">
                 </div>
               </div>
               <div class="row">
@@ -186,7 +231,58 @@
               </div>
             <!--  End GOLDBAR Specification and Categories  -->
 
-            <!--  GOLDBAR Graph, Designs, and Submit  -->
+            <!--  SBOL Parameters  -->
+              <div id="sbol-parameters" class="hidden">
+                <div class="row">
+                  <div class="col-sm">
+                    <div class="card sbol-card">
+                      <h5 class="card-title text-center">Drag and drop your SBOL file(s) below</h5>
+                      <div class="card-text">
+                        <div id="sbol-drop-area" class="drop-area">
+                          <label class="btn btn-outline-warning btn-file"> Choose files
+                            <input type="file" id="importSBOLBtn" style="display: none;" accept=".sbol,.xml" multiple>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm">
+                    <div class="card sbol-card">
+                      <h5 class="card-title middle-align">
+                        Files Uploaded
+                        <button id="clearSBOLBtn" class="btn btn-outline-warning pull-right align-middle">Clear all files</button>
+                        </label>
+                      </h5>
+                      <div class="scrollable">
+                        <p class="card-text" id="sbol-filenames"></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <br>
+                <div class="row">
+                  <div class="col-sm">
+                    <label><h5>Operation:</h5></label>
+                    <button disabled class="btn btn-secondary dropdown-toggle" type="button" id="operationMenu" data-toggle="dropdown">Select</button>
+                    <div id="operation-option" class="dropdown-menu" aria-labelledby="operationMenu">
+                      <a id='and' class="dropdown-item" href="#">And</a>
+                      <a id='merge' class="dropdown-item" href="#">Merge</a>
+                    </div>
+                  </div>
+
+                  <div class="col-sm">
+                    <label><h5>Tolerance:</h5></label>
+                    <button disabled class="btn btn-secondary dropdown-toggle" type="button" id="toleranceMenu" data-toggle="dropdown">Select</button>
+                    <div id="tolerance-option" class="dropdown-menu" aria-labelledby="toleranceMenu">
+                      <a id='zero' class="dropdown-item" href="#">0</a>
+                      <a id='one' class="dropdown-item" href="#">1</a>
+                      <a id='two' class="dropdown-item" href="#">2</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <!--  End SBOL Parameters  -->
+            <!--  Graph, Designs, and Submit  -->
               <div id="graph-designs-row" class="row hidden">
                 <div class="col-sm">
                   <i id="exportSBOLBtn" class="fas fa-download pull-right hidden" data-toggle="tooltip" title="Export design as SBOL"></i>
@@ -205,8 +301,8 @@
                 <div id="goldbarSpinner" class="spinner hidden">
                   <p><i class="fa fa-spinner fa-spin"></i>  Loading...</p>
                 </div>
-                <button id="submitBtn" class="btn btn-outline-warning mt-2">Submit</button>
-                <button id="submitBtnSym" class="btn btn-outline-warning mt-2">Symbolic Enumeration</button>
+                <button id="goldarSubmitBtn" class="btn btn-outline-warning mt-2 hidden">Submit</button>
+                <button id="SBOLSubmitBtn" class="btn btn-outline-warning mt-2 hidden">Submit</button>
               </div>
             </div>
           </div>
