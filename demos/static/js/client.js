@@ -569,7 +569,7 @@ $(document).ready(function() {
 
   });
 
-  $("#submitBtnSym").click(function() {
+  /*$("#submitBtnSym").click(function() {
     // Reset UI
     resetDiagram();
     displayDesigns(editors, '');
@@ -591,7 +591,7 @@ $(document).ready(function() {
 
     var ast = parse(specification);
     update(editors, ast, categories);
-  });
+  });*/
 
   /*
   Update list of sbol files when upload button is clicked or when file is dragged and dropped
