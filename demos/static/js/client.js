@@ -6,7 +6,8 @@ const RADIUS = 7;
 const INTERMEDIATE = 'intermediate';
 const REPRESENTATION = 'EDGE';
 
-let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDoc, sbolFile;
+let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDoc;
+let sbolFiles = [];
 let designName = 'Constellation';
 
 const ROOT = 'root';
@@ -401,39 +402,24 @@ function dragEnded() {
   d3.event.subject.fy = null;
 }
 
-/* * * * * * */
-/*  CLEANUP  */
-/* * * * * * */
-/**
- * Resets graph and removes SVG elements
- */
-function resetDiagram() {
-  if(simulationPointer){
-    simulationPointer.stop();
-  }
-  d3.selectAll('svg').remove();
-}
 
-function processSBOLFile(file) {
-  return new Promise((resolve) => {
-    // Parse file into XML object
-    let parser = new DOMParser();
-    let reader = new FileReader();
-    reader.readAsText(file, "UTF-8");
-    reader.onload = function (evt) {
-      let data = parser.parseFromString(evt.target.result, "application/xml");
-      resolve(data);
-    };
-  });
-}
+
+
 
 /* * * * * * */
 /*  BROWSER  */
 /* * * * * * */
 $(document).ready(function() {
 
+
+  $('#playground').on('click', function() {
+    $('#demo-space').addClass('hidden');
+    $('#step1-content').removeClass('hidden');
+  });
+
+
   const THEME = 'ambiance';
-  let combineMethod;
+  let combineMethod, tolerance;
 
   const editors = {
     "specEditor": CodeMirror.fromTextArea(document.getElementById('goldbar-input-0'), {
@@ -459,36 +445,13 @@ $(document).ready(function() {
   editors.catEditor.setOption("theme", THEME);
   editors.designsEditor.setOption("theme", THEME);
 
-  /* * * * * * */
-  /*    SBOL   */
-  /* * * * * * */
-  async function processSBOL(file) {
-    //read SBOL file
-    let sbolXML = await processSBOLFile(file);
-
-    // Parse SBOL and display results
-    $.ajax({
-      url: 'http://localhost:8082/importSBOL',
-      type: 'POST',
-      data: sbolXML,
-      contentType: "text/xml",
-      dataType: "text",
-      processData: false,
-      success: function(data){
-        data = JSON.parse(data);
-        displayDiagram(data.stateGraph);
-        // Undefined design
-        if (String(data.designs).includes('is not defined')) {
-          displayDesigns(editors, data.designs);
-        } else {
-          displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
-        }
-      }
-    })
-      .fail((response) => {
-        alert(response.responseText);
-      });
-  };
+  let dropArea = document.getElementById('sbol-drop-area');
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false)
+  })
+  dropArea.addEventListener('drop', handleDrop, false)
+  dropArea.addEventListener('dragleave', sbolDragLeave, false)
+  dropArea.addEventListener('dragover', sbolDragOver, false)
 
   $('#demo-option').on('click', function() {
     document.getElementById('designName').value = "demo-example";
@@ -503,6 +466,31 @@ $(document).ready(function() {
     editors.catEditor.setValue('{"promoter": {"ids": ["BBa_R0040", "BBa_J23100"], "roles": ["promoter"]},\n "ribosomeBindingSite": {"ids": ["BBa_B0032", "BBa_B0034"], "roles": ["ribosomeBindingSite"]}, \n"cds": {"ids": ["BBa_E0040", "BBa_E1010"], "roles": ["cds"]},\n"nonCodingRna": {"ids": ["BBa_F0010"], "roles": ["nonCodingRna"]},\n"terminator": {"ids": ["BBa_B0010"], "roles": ["terminator"]}}');
   });
 
+  $('#and').on('click', function() {
+    document.getElementById('operationMenu').innerText = 'And';
+    combineMethod = 'and';
+  });
+
+  $('#merge').on('click', function() {
+    document.getElementById('operationMenu').innerText = 'Merge';
+    combineMethod = 'merge';
+  });
+
+  $('#zero').on('click', function() {
+    document.getElementById('toleranceMenu').innerText = 0;
+    tolerance = 0;
+  });
+
+  $('#one').on('click', function() {
+    document.getElementById('toleranceMenu').innerText = 1;
+    tolerance = 1;
+  });
+
+  $('#two').on('click', function() {
+    document.getElementById('toleranceMenu').innerText = 2;
+    tolerance = 2;
+  });
+
 
   $('#exportSBOLBtn').on('click', function() {
     downloadSBOL(sbolDoc, 'constellation_' + designName + '_sbol.xml');
@@ -511,15 +499,12 @@ $(document).ready(function() {
   $('[data-toggle="tooltip"]').tooltip();
 
 
-  $("#submitBtn").click(function() {
+  $("#goldarSubmitBtn").click(function() {
     // Reset UI
     resetDiagram();
     displayDesigns(editors, '');
     $("#exportSBOLBtn").addClass('hidden');
     $('#goldbarSpinner').removeClass('hidden'); // show spinner
-
-    // let maxCycles = 0;
-    // let numDesigns = 10;
 
     let numDesigns, maxCycles, andTolerance, mergeTolerance;
 
@@ -555,10 +540,7 @@ $(document).ready(function() {
       } else {
         displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
       }
-      // if no design name provided
-      if (designName === '') {
-        document.getElementById('designName').value = 'constellation-design';
-      }
+
       // if no numDesigns provided
       if (numDesigns === '') {
         document.getElementById('numDesigns').value = 20;
@@ -612,11 +594,28 @@ $(document).ready(function() {
   });
 
   /*
-  Auto check the SBOL radio button when SBOL file is uploaded
+  Update list of sbol files when upload button is clicked or when file is dragged and dropped
    */
   $('#importSBOLBtn').on('change', function() {
     $("#specification-sbol").prop("checked", true).change(); //trigger change
-    sbolFile = this.files[0];
+    if (this.files) {
+      updateSBOLFiles(this.files);
+    }
+  });
+
+  $('#clearSBOLBtn').click(function () {
+    clearAllFiles();
+  })
+
+  $("#SBOLSubmitBtn").click(async function(){
+    resetDiagram();
+    displayDesigns(editors, '');
+    if(sbolFiles.length === 0) {
+      alert('No file uploaded!');
+      resetStepOne();
+      return;
+    }
+    await processSBOL(sbolFiles, combineMethod, tolerance);
   });
 
   /*
@@ -634,16 +633,11 @@ $(document).ready(function() {
     $('#sbolSpinner').removeClass('hidden'); // show spinner
 
     let specMethod = $("input[name='spec-method']:checked").val();
+
     if (specMethod === 'goldbar'){
       showGoldBarStepTwo();
     }
-
     if(specMethod === 'sbol'){
-      if(!sbolFile){
-        alert('No file uploaded!');
-        resetStepOne();
-      }
-      await processSBOL(sbolFile);
       showSBOLStepTwo();
     }
 
@@ -654,32 +648,48 @@ $(document).ready(function() {
   Back button & Constellation on navbar goes back to step 1 and clears everything
    */
   $("#backBtn").click(function(){
-    resetAll();
+    resetAll(editors);
   });
 
   $("#navbarBrand").click(function(){
-    resetAll();
+    resetAll(editors);
+    $('#demo-space').removeClass('hidden');
+    $('#step1-content').addClass('hidden');
   });
 
-  function resetAll(){
-    resetStepOne();
-    resetStepTwo();
-    $('#step1-content').removeClass('hidden'); //show step 1
-  }
-
-  function resetStepTwo(){
-    resetDiagram();
-    displayDesigns(editors, '');
-    $('#goldbarSpinner').addClass('hidden');
-    $("#exportSBOLBtn").addClass('hidden');
-    $('#step2-content').addClass('hidden');
-    $('#graph-designs-row').addClass('hidden');
-    $('#spec-categories-row-0').addClass('hidden');
-    $('#goldbar-parameters').addClass('hidden');
-    $('#goldbar-btns').addClass('hidden');
-  }
-
 });
+
+
+
+
+
+
+/* * * * * * */
+/*  CLEANUP  */
+/* * * * * * */
+
+/**
+ * Removes all uploaded SBOL files
+ */
+function clearAllFiles(){
+  sbolFiles = [];
+  $('#sbol-filenames').empty();
+  $("#operationMenu").attr("disabled", true);
+  $("#toleranceMenu").attr("disabled", true);
+}
+
+function resetDiagram() {
+  if(simulationPointer){
+    simulationPointer.stop();
+  }
+  d3.selectAll('svg').remove();
+}
+
+function resetAll(editors){
+  resetStepOne();
+  resetStepTwo(editors);
+  $('#step1-content').removeClass('hidden'); //show step 1
+}
 
 function resetStepOne(){
   $("#importSBOLBtn").val("");
@@ -689,9 +699,45 @@ function resetStepOne(){
   $("#specification-goldbar").prop("checked", false);
 }
 
+function resetStepTwo(editors){
+  $('#designName').val('');
+  resetDiagram();
+  clearAllFiles();
+  //clear CodeMirror editors
+  Object.values(editors).forEach(function(cm) {
+    cm.setValue("");
+    cm.clearHistory();
+  });
+
+  $('#goldbarSpinner').addClass('hidden');
+  $("#exportSBOLBtn").addClass('hidden');
+  $('#step2-content').addClass('hidden');
+  $('#graph-designs-row').addClass('hidden');
+  $('#spec-categories-row-0').addClass('hidden');
+  $('#goldbar-parameters').addClass('hidden');
+  $('#sbol-parameters').addClass('hidden');
+  $('#goldarSubmitBtn').addClass('hidden');
+  $('#SBOLSubmitBtn').addClass('hidden');
+  $('#goldbar-btns').addClass('hidden');
+}
+
+
+
+
+
+
+
+/* * * * * * */
+/*  STEP TWO  */
+/* * * * * * */
+
 function showSBOLStepTwo(){
   $('#step2-content').removeClass('hidden');
-  $('#graph-designs-col').removeClass('hidden'); //show only graph and designs
+  $('#sbol-parameters').removeClass('hidden');
+  $('#graph-designs-row').removeClass('hidden'); //show only graph and designs
+  $('#goldbar-btns').removeClass('hidden');
+  $('#SBOLSubmitBtn').removeClass('hidden');
+
 }
 
 function showGoldBarStepTwo(){
@@ -700,7 +746,20 @@ function showGoldBarStepTwo(){
   $('#spec-categories-row-0').removeClass('hidden');
   $('#goldbar-parameters').removeClass('hidden');
   $('#goldbar-btns').removeClass('hidden');
+  $('#goldarSubmitBtn').removeClass('hidden');
 }
+
+
+
+
+
+
+
+
+
+/* * * * * * */
+/*    SBOL   */
+/* * * * * * */
 
 function downloadSBOL(text, filename) {
   let element = document.createElement('a');
@@ -711,4 +770,109 @@ function downloadSBOL(text, filename) {
   element.click();
   document.body.removeChild(element);
 }
+
+function preventDefaults (e) {
+  e.preventDefault()
+  e.stopPropagation()
+}
+
+function sbolDragOver(ev) {
+  ev.stopPropagation();
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = 'copy';
+  $('#sbol-drop-area').removeClass('dragdefault');
+  $('#sbol-drop-area').addClass('dragenter');
+}
+
+function sbolDragLeave() {
+  $('#sbol-drop-area').removeClass('dragenter');
+}
+
+
+function handleDrop(ev) {
+  ev.preventDefault();
+  $('#sbol-drop-area').removeClass('dragenter');
+  if (ev.dataTransfer.files.length >= 10) {
+    alert('Error: Too many files');
+    return;
+  }
+  if (!ev.dataTransfer.files[0].name.endsWith(".sbol") && !ev.dataTransfer.files[0].name.endsWith(".xml")) {
+    alert('Error: Invalid file type');
+    return;
+  }
+  let dt = ev.dataTransfer
+  let files = dt.files
+  updateSBOLFiles(files)
+}
+
+function updateSBOLFiles(files) {
+  if (sbolFiles.length >= 10) {
+    alert('You have uploaded the maximum number of files.');
+  }
+  for (let file of files) {
+    sbolFiles.push(file);
+    $('#sbol-filenames').append(file.name + '<br>');
+  }
+  if (sbolFiles.length > 1) {
+    $("#operationMenu").attr("disabled", false);
+    $("#toleranceMenu").attr("disabled", false);
+  }
+}
+
+function processSBOLFile(file) {
+  return new Promise((resolve) => {
+    // Parse file into XML object
+    let parser = new DOMParser();
+    let reader = new FileReader();
+    reader.readAsText(file, "UTF-8");
+    reader.onload = function (evt) {
+      let data = evt.target.result;
+      // let data = parser.parseFromString(evt.target.result, "application/xml");
+      resolve(data);
+    };
+  });
+}
+
+async function processSBOL(files, combineMethod, tolerance) {
+  console.log(combineMethod);
+  console.log(tolerance);
+
+  //read SBOL file
+  let sbolXMLs = [];
+  for (let i = 0; i < files.length; i++) {
+    let file = files[i];
+    let xmlString = await processSBOLFile(file);
+    sbolXMLs.push(xmlString);
+  }
+
+  let data = {
+    sbol: sbolXMLs,
+    combineMethod: combineMethod,
+    tolerance: tolerance
+  }
+  // Parse SBOL and display results
+  $.ajax({
+    url: 'http://localhost:8082/importSBOL',
+    type: 'POST',
+    data: JSON.stringify(data),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    processData: false,
+    success: function(data){
+      console.log(typeof data);
+      console.log(data);
+      // data = JSON.parse(data);
+      displayDiagram(data.stateGraph);
+      // Undefined design
+      if (String(data.designs).includes('is not defined')) {
+        displayDesigns(editors, data.designs);
+      } else {
+        displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+      }
+    }
+  })
+    .fail((response) => {
+      alert(response.responseText);
+    });
+};
 

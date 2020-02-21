@@ -45,6 +45,10 @@ input[type=radio] {
   padding: 0;
 }
 
+.card-text {
+  margin-top: 0;
+}
+
 .form-group {
   text-align: left;
   margin-left: 30%;
@@ -57,6 +61,70 @@ input[type=radio] {
 .horizontal-padding{
   padding-left: 5px;
   padding-right: 5px;
+}
+
+.scrollable {
+  width: 105%; /*card has padding*/
+  overflow-y: auto;
+  max-height: 120px;
+  padding: 0;
+}
+
+.sbol-card {
+  height: 180px;
+}
+
+/*
+Main page table
+ */
+.table > tbody > tr:first-child > td {
+  border: none;
+}
+
+/*
+Drop area
+*/
+.drop-area {
+  border: 3px dashed #CCC;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #fcfcfc;
+  transition: border-color 0.5s;
+  text-align: center;
+  display: block;
+  vertical-align: middle;
+  font-size: 18px;
+  width: 100%;
+}
+
+.drop-area p {
+  font-size: 13px;
+  margin-top: 25px;
+}
+
+.drop-area button {
+  margin-top: -25px;
+  padding-left: 25px;
+  padding-right: 25px;
+  border-radius: 20px;
+}
+
+.drop-area.dragenter {
+  border-color: #ecbf3e;
+}
+
+.drop-area.dragdefault {
+  border-color: #666;
+}
+
+.sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  background: #bbb;
+  z-index: 2;
+  height: 20px;
 }
 
 /*
@@ -128,18 +196,5 @@ About section
   height: 50px;
   padding: 5px;
 }
-
-/*.link line {*/
-  /*stroke: #585858;*/
-  /*stroke-opacity: 100;*/
-  /*stroke-width: 2px;*/
-/*}*/
-
-/*.node text {*/
-  /*pointer-events: none;*/
-  /*fill: #000000;*/
-  /*font: 14px sans-serif;*/
-  /*text-align: center;*/
-/*}*/
 
 

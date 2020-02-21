@@ -4,6 +4,7 @@ import to_goldbar2
 import argparse
 import ast
 import sys
+import json
 
 class Exp:
 	def __init__(self, name):
@@ -240,17 +241,16 @@ class DFA:
 
 
 def main():
-
-	states = ast.literal_eval(sys.argv[1])
-	# print(states)
-	init_state = sys.argv[2]
-	# print(init_state)
-	final_states = ast.literal_eval(sys.argv[3])
-	# print(final_states)
-	transition_funct = ast.literal_eval(sys.argv[4])
-	# print(transition_funct)
-
-
+	states = []
+	init_state = ""
+	final_states = []
+	transition_funct = {}
+	for line in sys.stdin:
+		args = json.loads(line)
+		states = args['states']
+		init_state = args['root']
+		final_states = args['accepts']
+		transition_funct = args['transition']
 	# create a start node with an empty edge to the actual first edge ('e' is the epsilon)
 	start_array = {}
 	for key in transition_funct:
@@ -295,8 +295,9 @@ def main():
 		simp = simp2.simplify_regex(r)
 		goldbar = to_goldbar2.to_goldbar(simp)
 
-	print(goldbar)
-	# return goldbar
+	message = {"goldbar": goldbar}
+	print(json.dumps(message))
+	# return message
 
 
 if __name__ == '__main__':
