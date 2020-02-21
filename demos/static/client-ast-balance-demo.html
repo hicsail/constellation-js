@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="https://imparse.org/js/lib/imparse.js"></script>
+    <script src="https://reity.org/summations-js/lib/summations.js"></script>
+    <style>
+      html, body { height:100%; margin:0; color:#000000; }
+      body #content { z-index:100; min-height:100%; width:900px; margin:0 auto -90px; }
+      body #content #sheet { margin:0 auto; padding-bottom:40px; color:#000000; background-color:white; }
+      body #content #sheet .section { padding-top:20px; font-family:'Open Sans',sans-serif; font-size:16px; }
+      body #content #sheet .section > pre > code { padding:10px; font-size:14px; }
+      body #content #sheet .section > pre > code { background-color:#F1F1F1; }
+      body #content #sheet .section table { width:100%; font-size:12px; }
+      body #content #sheet .section table div { width:100%; border:1px solid #888888; padding:5px; font-family:Monospace; font-size:11px; }
+      body #content #sheet .section table div pre { margin:0; padding:0; }
+      body #content #sheet .section textarea { width:100%; height:100%; border:1px solid #888888; margin:0; padding:5px; font-size:12px; }
+    </style>
+    <script>
+      var grammar = 
+        [
+          {"Seq": [
+            {"Then": [["Exp"], "then", ["Seq"]]},
+            {"": [["Exp"]]}
+          ]},
+          {"Exp": [
+            {"Or": [["Term"], "or", ["Exp"]]},
+            {"And": [["Term"], "and", ["Exp"]]},
+            {"": [["Term"]]}
+          ]},
+          {"Term": [
+            {"OneOrMore": ["one-or-more", ["Term"]]},
+            {"ZeroOrMore": ["zero-or-more", ["Term"]]},
+            {"ZeroOrOne": ["zero-or-one", ["Term"]]},
+            {"": ["(", ["Seq"], ")"]},
+            {"Atom": [{"RegExp":"([A-Za-z0-9]|-|_)+"}]}
+          ]}
+        ];
+      
+      var ast = {};
+
+      function balance(ast_node) {
+        // A node has only one key, so this loop runs once.
+        for (var operator in ast_node) {
+          if (operator != "Atom") {
+            var children = ast_node[operator];
+            for (var i = 0; i < children.length; i++) {
+              children[i] = balance(children[i]); // Recursively balance first.
+              children[i] = balance_root(children[i]); // Balance this node.
+            }
+            ast_node[operator] = children;
+          }
+        }
+        return ast_node;
+      }
+
+      function balance_root(ast_node) {
+        var operators = ["Or", "And"];
+        for (var i = 0; i < operators.length; i++) {
+          if (operators[i] in ast_node) {
+            return spread(gather(ast_node, operators[i]), operators[i]);
+          }
+        }
+        return ast_node; // Not a binary operator.
+      }
+
+      function gather(ast_node, operator) {
+        if (operator in ast_node) {
+          var nodes = [];
+          nodes = nodes.concat(gather(ast_node[operator][0], operator));
+          nodes = nodes.concat(gather(ast_node[operator][1], operator));
+          return nodes;
+        } else {
+          return [ast_node];
+        }
+      }
+
+      function spread(nodes, operator) {
+        if (nodes.length == 1) {
+          return nodes[0];
+        } else {
+          var half = Math.floor(nodes.length / 2);
+          var lft = spread(nodes.slice(0, half), operator);
+          var rgt = spread(nodes.slice(half, nodes.length), operator);
+          var node = {};
+          node[operator] = [lft, rgt];
+          return node;
+        }
+      }
+
+      function parse() {
+        var str = document.getElementById('spec').value;
+        if (str.length == 0) {
+          document.getElementById('ast').innerHTML = "No input provided.";
+        } else {
+          ast = imparse.parse(grammar, str);
+          ast = balance(ast);
+          if (ast == null)
+            document.getElementById('ast').innerHTML = "Parsing did not succeed.";
+          else
+            document.getElementById('ast').innerHTML = stringify(ast, {maxLength:120}).trim();
+        }
+      }
+
+      function initialize() {
+        document.getElementById('spec').value = document.getElementById('spec').value.trim();
+        parse();
+      }
+      module = {}; // Avoid error from json-stringify-pretty-compact below.
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/json-stringify-pretty-compact@1.1.0/index.min.js"></script>
+    <base target="_parent">
+  </head>
+  <body onload="initialize();">
+    <div id="content">
+      <div id="sheet">
+        <div class="section">
+          <table>
+            <tr>
+              <td>
+                Specification:<br/>
+                <textarea id="spec" rows="18" onkeyup="parse();">
+(a and b and c and d and e and f and g and h) then
+(u or v or w or x or y or z) then
+(u or v or w or x or y or z) then
+(u or v or w or x or y or z)
+                </textarea>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                AST:<br/>
+                <div><pre id="ast"></pre></div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
