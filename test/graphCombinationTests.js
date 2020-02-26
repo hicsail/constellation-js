@@ -63,7 +63,7 @@ function getAllIDs(category) {
 
 function expectUnion(result) {
   expectAllReturnValues(result);
-  const union = [...new Set(CATEGORIES['cds1'].ids.concat(CATEGORIES['cds2'].ids))];
+  const union = [...new Set(getAllIDs(CATEGORIES.cds1).concat(getAllIDs(CATEGORIES.cds2)))];
   expect(result.designs.length).to.equal(union.length);
   expect(result.designs).to.have.members(union);
 }
