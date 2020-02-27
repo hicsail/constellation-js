@@ -61,6 +61,12 @@ function getAllIDs(category) {
 }
 
 
+function expectUnion(result) {
+  expectAllReturnValues(result);
+  const union = [...new Set(CATEGORIES['cds1'].ids.concat(CATEGORIES['cds2'].ids))];
+  expect(result.designs.length).to.equal(union.length);
+  expect(result.designs).to.have.members(union);
+}
 
 module.exports = function() {
   describe('AND tests', function() {
@@ -117,6 +123,31 @@ module.exports = function() {
         expectAllReturnValues(result);
         expect(result.designs.length).to.equal(0);
       });
+    });
+  });
+
+  describe('MERGE tests', function () {
+    describe('toy examples', function () {
+      it('cds1 merge cds2', async () => {
+        const result = await constellation.goldbar('cds1 merge cds2', CATSTR, EDGE_REP);
+        expectUnion(result);
+      });
+
+      it('zero-or-one(cds1) merge zero-or-one(cds2)', async () => {
+        const result = await constellation.goldbar('zero-or-one(cds1) merge zero-or-one(cds2)', CATSTR, EDGE_REP);
+        expectUnion(result);
+      });
+
+      it('zero-or-more(cds1) merge zero-or-more(cds2)', async () => {
+        const result = await constellation.goldbar('zero-or-more(cds1) merge zero-or-more(cds2)', CATSTR, EDGE_REP);
+        expectUnion(result);
+      });
+
+      it('one-or-more(cds1) merge one-or-more(cds2)', async () => {
+        const result = await constellation.goldbar('one-or-more(cds1) merge one-or-more(cds2)', CATSTR, EDGE_REP);
+        expectUnion(result);
+      });
+
     });
   });
 };

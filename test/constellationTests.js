@@ -160,7 +160,6 @@ module.exports = function() {
         expectAConcatB(resultNode);
         let resultEdge = await constellation.goldbar('b or a', CATSTR, EDGE_REP);
         expectAConcatB(resultEdge);
-
         resultNode = await constellation.goldbar('a or a', CATSTR, NODE_REP);
         expectA(resultNode);
         resultEdge = await constellation.goldbar('a or a', CATSTR, EDGE_REP);
