@@ -23,18 +23,22 @@ npm install constellation-js
 ```
 ```javascript
 const constellation = require('constellation-js');
-var goldbar = '{a then b}';
-var categories = {
-	"a": {
-		"ids": ["a1, a2"],
-		"roles": ["a"]
-	},
-	"b": {
-		"ids": ["b1", "b2"],
-		"roles": ["b"]
-	}
-};
-var result = constellation.goldbar(goldbar, categories, {designName: 'my-first-design'});
+let goldbar = '{PT7_a then galK}';
+let categories = {
+	"PT7_a":{
+	  "promoter": [
+	    "PT7_WTa",
+	    "PT7_3a",
+	    "PT7_1a"
+	    ]
+      },
+	"galK":{
+	  "cds": [
+	    "galK"
+	    ]
+      }
+}
+let result = constellation.goldbar(goldbar, categories, {designName: 'my-first-design'});
 // result.stateGraph, result.designs, result.sbol
 ```
 

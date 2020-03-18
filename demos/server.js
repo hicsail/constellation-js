@@ -8,8 +8,8 @@ const xmlparser = require('express-xml-bodyparser');
 
 let constellation = require('../lib/constellation');
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
 app.set('json spaces', 1);
 
 app.use(function(req, res, next) {
