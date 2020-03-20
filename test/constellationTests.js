@@ -5,18 +5,22 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 const constellation = require('../lib/constellation');
 
-const CATEGORIES = {"a":{"ids":["a1","a2"], "roles":["a"]},"b":{"ids":["b1","b2","b3"], "roles": ["b"]},"c":{"ids":["c1"], "roles": ["c"]}};
-const FOR_TOLERANCE = {"a1":{"ids":["first","second"], "roles":["a"]},"a2":{"ids":["first"], "roles": ["a", "letter"]},"a3":{"ids":[], "roles": ["a"]}, "a4":{"ids":[], "roles": ["letter"]}};
-const CELLO_CATS = {"pTac":{"roles":["promoter"], "ids":["https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/pTac/1"]},
-  "B1":{"roles":["ribosomeBindingSite"], "ids":["https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B1/1"]},
-  "B_RBS": {"roles": ["ribosomeBindingSite"], "ids": ["https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B1/1", "https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B2/1", "https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B3/1"]}};
-const ALEN = CATEGORIES.a.ids.length;
-const BLEN = CATEGORIES.b.ids.length;
-const CLEN = CATEGORIES.c.ids.length;
+const CATEGORIES = {"a":{"a":["a1","a2"]},"b":{"b":["b1","b2","b3"]},"c":{"c":["c1"]}};
+const FOR_TOLERANCE = {"a1":{"a":["first","second"]},"a2":{"a":["first"], "letter": ["first"]},"a3":{"a":[]}, "a4":{"letter":[]}};
+// const CELLO_CATS = {"pTac":{"roles":["promoter"], "ids":["https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/pTac/1"]},
+//   "B1":{"roles":["ribosomeBindingSite"], "ids":["https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B1/1"]},
+//   "B_RBS": {"roles": ["ribosomeBindingSite"], "ids": ["https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B1/1", "https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B2/1", "https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B3/1"]}};
+const AMEM = getAllIDs(CATEGORIES.a);
+const BMEM = getAllIDs(CATEGORIES.b);
+const CMEM = getAllIDs(CATEGORIES.c);
+
+const ALEN = AMEM.length;
+const BLEN = BMEM.length;
+const CLEN = CMEM.length;
 
 const CATSTR = JSON.stringify(CATEGORIES);
 const TOLSTR = JSON.stringify(FOR_TOLERANCE);
-const CELLOSTR = JSON.stringify(CELLO_CATS);
+// const CELLOSTR = JSON.stringify(CELLO_CATS);
 
 const NODE = 'NODE';
 const EDGE = 'EDGE';
@@ -26,37 +30,44 @@ const EDGE_REP = {representation:EDGE};
 const f = (a, b) => [].concat(...a.map(d => b.map(e => d.concat(',').concat(e))));
 const cartesian = (a, b, ...c) => (b ? cartesian(f(a, b), ...c) : a);
 
+function expectAllReturnValues(result) {
+  expect(result.stateGraph).to.not.equal(undefined);
+  expect(result.designs).to.not.equal(undefined);
+  expect(result.sbol).to.not.equal(undefined);
+}
+
 function expectA(result) {
+  expectAllReturnValues(result);
   expect(result.designs.length).to.equal(ALEN);
-  expect(result.designs).to.have.members(CATEGORIES.a.ids);
+  expect(result.designs).to.have.members(AMEM);
 }
 
 function expectAConcatB(result) {
+  expectAllReturnValues(result);
   expect(result.designs.length).to.equal(ALEN + BLEN);
-  expect(result.designs).to.have.members((CATEGORIES.a.ids).concat(CATEGORIES.b.ids));
+  expect(result.designs).to.have.members((AMEM).concat(BMEM));
 }
 
 function expectACartesianB(result) {
+  expectAllReturnValues(result);
   expect(result.designs.length).to.equal(ALEN * BLEN);
-  expect(result.designs).to.have.members(cartesian(CATEGORIES.a.ids, CATEGORIES.b.ids));
+  expect(result.designs).to.have.members(cartesian(AMEM, BMEM));
 }
 
 function expectACartBAndEmpty(result) {
-  const emptiesAndCart = CATEGORIES.a.ids.concat(cartesian(CATEGORIES.a.ids, CATEGORIES.b.ids));
+  expectAllReturnValues(result);
+  const emptiesAndCart = AMEM.concat(cartesian(AMEM, BMEM));
   expect(result.designs.length).to.equal(emptiesAndCart.length);
   expect(result.designs).to.have.members(emptiesAndCart);
 }
 
-function expectTol0(result) {
-  expect(result.designs.length).to.equal(FOR_TOLERANCE.a2.ids.length);
-  expect(result.designs).to.have.members(FOR_TOLERANCE.a2.ids);
+function getAllIDs(category) {
+  let ids = [];
+  for (let role in category) {
+    ids = [...new Set(ids.concat(category[role]))];
+  }
+  return ids;
 }
-
-function expectTol1(result) {
-  expect(result.designs.length).to.equal(FOR_TOLERANCE.a1.ids.length);
-  expect(result.designs).to.have.members(FOR_TOLERANCE.a1.ids);
-}
-
 
 module.exports = function() {
   describe('Missing input errors', function() {
@@ -70,15 +81,15 @@ module.exports = function() {
       await expect(constellation.goldbar('a', '{}')).to.be.rejectedWith('No categories specified');
     });
 
-    it('Missing ids in categories', async() => {
-      await expect(constellation.goldbar('a', '{"a": {"roles":["a"]}}')).to.be.rejectedWith('Every category must have ids and a role');
-      await expect(constellation.goldbar('a', '{"a": {"roles":["a"]}}')).to.be.rejectedWith('Every category must have ids and a role');
-    });
-
-    it('Missing roles in categories', async() => {
-      await expect(constellation.goldbar('a', '{"a": {"ids":["a"]}}')).to.be.rejectedWith('Every category must have ids and a role');
-      await expect(constellation.goldbar('a', '{"a": {"ids":["a"]}}')).to.be.rejectedWith('Every category must have ids and a role');
-    });
+    // it('Missing ids in categories', async() => {
+    //   await expect(constellation.goldbar('a', '{"a": {"roles":["a"]}}')).to.be.rejectedWith('Every category must have ids and a role');
+    //   await expect(constellation.goldbar('a', '{"a": {"roles":["a"]}}')).to.be.rejectedWith('Every category must have ids and a role');
+    // });
+    //
+    // it('Missing roles in categories', async() => {
+    //   await expect(constellation.goldbar('a', '{"a": {"ids":["a"]}}')).to.be.rejectedWith('Every category must have ids and a role');
+    //   await expect(constellation.goldbar('a', '{"a": {"ids":["a"]}}')).to.be.rejectedWith('Every category must have ids and a role');
+    // });
 
     it('Invalid num designs', async() => {
       await expect(constellation.goldbar('a', CATEGORIES, {numDesigns:0})).to.be.rejectedWith('Invalid number of designs');
@@ -144,60 +155,30 @@ module.exports = function() {
     });
 
     describe('Binary expressions', function() {
+      it('or', async() => {
+        let resultNode = await constellation.goldbar('b or a', CATSTR, NODE_REP);
+        expectAConcatB(resultNode);
+        let resultEdge = await constellation.goldbar('b or a', CATSTR, EDGE_REP);
+        expectAConcatB(resultEdge);
 
-      describe('and', function() {
-        it('and NODE', async () => {
-          await expect(constellation.goldbar('a1 and a2', TOLSTR, NODE_REP)).to.be.rejectedWith('The AND operation is not supported in the NODE representation');
-        });
-
-        it('and tolerance 0', async () => {
-          let result = await constellation.goldbar('a1 and a2', TOLSTR, EDGE_REP);
-          expectTol0(result);
-        });
-
-        it('and tolerance 1', async () => {
-          let result = await constellation.goldbar('a1 and a3', TOLSTR, {representation:EDGE, andTolerance:1});
-          expectTol1(result);
-        });
-
-        it('and tolerance 2', async () => {
-          let result = await constellation.goldbar('a3 and a4', TOLSTR, {representation:EDGE, andTolerance:2});
-          expect(result.designs.length).to.equal(0);
-        });
-
-        it('and CELLO categories', async () => {
-          let result = await constellation.goldbar('(pTac then B_RBS) and (pTac then B1)', CELLOSTR, EDGE_REP);
-          let resultArr = ['https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/pTac/1,https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B1/1'];
-          expect(result.designs).to.have.members(resultArr);
-        });
+        resultNode = await constellation.goldbar('a or a', CATSTR, NODE_REP);
+        expectA(resultNode);
+        resultEdge = await constellation.goldbar('a or a', CATSTR, EDGE_REP);
+        expectA(resultEdge);
+        // TODO: what should the graph be?
       });
 
-      describe('or and then', function() {
-        it('or', async() => {
-          let resultNode = await constellation.goldbar('b or a', CATSTR, NODE_REP);
-          expectAConcatB(resultNode);
-          let resultEdge = await constellation.goldbar('b or a', CATSTR, EDGE_REP);
-          expectAConcatB(resultEdge);
+      it('then', async() => {
+        let resultNode = await constellation.goldbar('a then b', CATSTR, NODE_REP);
+        expectACartesianB(resultNode);
+        let resultEdge = await constellation.goldbar('a then b', CATSTR, EDGE_REP);
+        expectACartesianB(resultEdge);
 
-          resultNode = await constellation.goldbar('a or a', CATSTR, NODE_REP);
-          expectA(resultNode);
-          resultEdge = await constellation.goldbar('a or a', CATSTR, EDGE_REP);
-          expectA(resultEdge);
-          // TODO: what should the graph be?
-        });
-
-        it('then', async() => {
-          let resultNode = await constellation.goldbar('a then b', CATSTR, NODE_REP);
-          expectACartesianB(resultNode);
-          let resultEdge = await constellation.goldbar('a then b', CATSTR, EDGE_REP);
-          expectACartesianB(resultEdge);
-
-          resultNode = await constellation.goldbar('a . b', CATSTR, NODE_REP);
-          expectACartesianB(resultNode);
-          resultEdge = await constellation.goldbar('a . b', CATSTR, EDGE_REP);
-          expectACartesianB(resultEdge);
-        });
-      })
+        resultNode = await constellation.goldbar('a . b', CATSTR, NODE_REP);
+        expectACartesianB(resultNode);
+        resultEdge = await constellation.goldbar('a . b', CATSTR, EDGE_REP);
+        expectACartesianB(resultEdge);
+      });
     });
   });
 
@@ -274,8 +255,10 @@ module.exports = function() {
       // one-or-more
       it('one-or-more (atom or atom)', async() => {
         const resultNode = await constellation.goldbar('one-or-more (a or c)', CATSTR, NODE_REP);
+        expectAllReturnValues(resultNode);
         expect(resultNode.designs.length).to.equal(ALEN + CLEN);
         const resultEdge = await constellation.goldbar('one-or-more (a or c)', CATSTR, EDGE_REP);
+        expectAllReturnValues(resultEdge);
         expect(resultEdge.designs.length).to.equal(ALEN + CLEN);
       });
       // AND only works on EDGE representation
@@ -336,11 +319,13 @@ module.exports = function() {
       // Or
       it('(atom or atom) or atom', async() => {
         let resultNode = await constellation.goldbar('a or b or c', CATSTR, NODE_REP);
+        expectAllReturnValues(resultNode);
         expect(resultNode.designs.length).to.equal(ALEN + BLEN + CLEN);
-        expect(resultNode.designs).to.have.members((CATEGORIES.c.ids).concat(CATEGORIES.b.ids).concat(CATEGORIES.a.ids));
+        expect(resultNode.designs).to.have.members((CMEM).concat(BMEM).concat(AMEM));
         let resultEdge = await constellation.goldbar('a or b or c', CATSTR, EDGE_REP);
+        expectAllReturnValues(resultEdge);
         expect(resultEdge.designs.length).to.equal(ALEN + BLEN + CLEN);
-        expect(resultEdge.designs).to.have.members((CATEGORIES.c.ids).concat(CATEGORIES.b.ids).concat(CATEGORIES.a.ids));
+        expect(resultEdge.designs).to.have.members((CMEM).concat(BMEM).concat(AMEM));
 
         resultNode = await constellation.goldbar('a or a or b', CATSTR, NODE_REP);
         expectAConcatB(resultNode);
@@ -355,24 +340,28 @@ module.exports = function() {
 
       it('(atom or atom) then atom', async() => {
         const resultNode = await constellation.goldbar('(a or b) then c', CATSTR, NODE_REP);
+        expectAllReturnValues(resultNode);
         expect(resultNode.designs.length).to.equal((ALEN * CLEN) + (BLEN * CLEN));
-        expect(resultNode.designs).to.have.members((cartesian(CATEGORIES.b.ids, CATEGORIES.c.ids)).concat(cartesian(CATEGORIES.a.ids, CATEGORIES.c.ids)));
+        expect(resultNode.designs).to.have.members((cartesian(BMEM, CMEM)).concat(cartesian(AMEM, CMEM)));
 
         const resultEdge = await constellation.goldbar('(a or b) then c', CATSTR, EDGE_REP);
+        expectAllReturnValues(resultEdge);
         expect(resultEdge.designs.length).to.equal((ALEN * CLEN) + (BLEN * CLEN));
-        expect(resultEdge.designs).to.have.members((cartesian(CATEGORIES.b.ids, CATEGORIES.c.ids)).concat(cartesian(CATEGORIES.a.ids, CATEGORIES.c.ids)));
+        expect(resultEdge.designs).to.have.members((cartesian(BMEM, CMEM)).concat(cartesian(AMEM, CMEM)));
       });
 
       // And
       // AND only works on EDGE representation
       it('(atom and atom) or atom', async() => {
         const result = await constellation.goldbar('(a and b) or c', CATSTR, EDGE_REP);
+        expectAllReturnValues(result);
         expect(result.designs.length).to.equal(CLEN);
-        expect(result.designs).to.have.members(CATEGORIES.c.ids);
+        expect(result.designs).to.have.members(CMEM);
       });
 
       it('(atom and atom) and atom', async() => {
         const result = await constellation.goldbar('(a and a) and b', CATSTR, EDGE_REP);
+        expectAllReturnValues(result);
         expect(result.designs.length).to.equal(0);
       });
 
@@ -384,26 +373,31 @@ module.exports = function() {
       // Then
       it('(atom then atom) or atom', async() => {
         const resultNode = await constellation.goldbar('(a then b) or c', CATSTR, NODE_REP);
+        expectAllReturnValues(resultNode);
         expect(resultNode.designs.length).to.equal((ALEN * BLEN) + CLEN);
-        expect(resultNode.designs).to.have.members((CATEGORIES.c.ids).concat(cartesian(CATEGORIES.a.ids, CATEGORIES.b.ids)));
+        expect(resultNode.designs).to.have.members((CMEM).concat(cartesian(AMEM, BMEM)));
 
         const resultEdge = await constellation.goldbar('(a then b) or c', CATSTR, EDGE_REP);
+        expectAllReturnValues(resultEdge);
         expect(resultEdge.designs.length).to.equal((ALEN * BLEN) + CLEN);
-        expect(resultEdge.designs).to.have.members((CATEGORIES.c.ids).concat(cartesian(CATEGORIES.a.ids, CATEGORIES.b.ids)));
+        expect(resultEdge.designs).to.have.members((CMEM).concat(cartesian(AMEM, BMEM)));
       });
 
       it('(atom then atom) then atom', async() => {
         const resultNode = await constellation.goldbar('(a then b) then c', CATSTR, NODE_REP);
+        expectAllReturnValues(resultNode);
         expect(resultNode.designs.length).to.equal(ALEN * BLEN * CLEN);
-        expect(resultNode.designs).to.have.members(cartesian(CATEGORIES.a.ids, CATEGORIES.b.ids, CATEGORIES.c.ids));
+        expect(resultNode.designs).to.have.members(cartesian(AMEM, BMEM, CMEM));
 
         const resultEdge = await constellation.goldbar('(a then b) then c', CATSTR, EDGE_REP);
+        expectAllReturnValues(resultEdge);
         expect(resultEdge.designs.length).to.equal(ALEN * BLEN * CLEN);
-        expect(resultEdge.designs).to.have.members(cartesian(CATEGORIES.a.ids, CATEGORIES.b.ids, CATEGORIES.c.ids));
+        expect(resultEdge.designs).to.have.members(cartesian(AMEM, BMEM, CMEM));
       });
       // AND only works on EDGE representation
       it('(atom then atom) and atom', async() => {
         const result = await constellation.goldbar('(a then b) and a', CATSTR, EDGE_REP);
+        expectAllReturnValues(result);
         expect(result.designs.length).to.equal(0);
       });
     });
@@ -476,13 +470,16 @@ module.exports = function() {
   describe('Cycles', function () {
     it('atom', async() => {
       let resultNode = await constellation.goldbar('c', CATSTR, {representation:NODE, maxCycles:2});
+      expectAllReturnValues(resultNode);
       expect(resultNode.designs.length).to.equal(CLEN);
       let resultEdge = await constellation.goldbar('c', CATSTR, {representation:EDGE, maxCycles:2});
+      expectAllReturnValues(resultEdge);
       expect(resultEdge.designs.length).to.equal(CLEN);
     });
 
     it('zero-or-more', async() => {
       const resultNode = await constellation.goldbar('zero-or-more a', CATSTR, {representation:NODE, maxCycles:1});
+      expectAllReturnValues(resultNode);
       expect(resultNode.designs.length).to.equal(ALEN + ALEN * ALEN);
       expect(resultNode.designs).to.contain('a1');
       expect(resultNode.designs).to.contain('a2');
@@ -493,6 +490,7 @@ module.exports = function() {
       // expect(resultNode.paths.length).to.equal(2);
 
       const resultEdge = await constellation.goldbar('zero-or-more a', CATSTR, {representation:EDGE, maxCycles:1});
+      expectAllReturnValues(resultEdge);
       expect(resultEdge.designs.length).to.equal(ALEN + ALEN * ALEN);
       expect(resultEdge.designs).to.contain('a1');
       expect(resultEdge.designs).to.contain('a2');
@@ -507,9 +505,9 @@ module.exports = function() {
   describe('Sanitise category input', function () {
 
     it('handle defined but empty category', async () => {
-      const resultNode = await constellation.goldbar('a', '{"a": {"ids":[], "roles":["a"]}}', NODE_REP);
+      const resultNode = await constellation.goldbar('a', '{"a": {"a":[]}}', NODE_REP);
       expect(JSON.stringify(resultNode.designs)).to.equal('[]');
-      const resultEdge = await constellation.goldbar('a', '{"a": {"ids":[], "roles":["a"]}}', EDGE_REP);
+      const resultEdge = await constellation.goldbar('a', '{"a": {"a":[]}}', EDGE_REP);
       expect(JSON.stringify(resultEdge.designs)).to.equal('[]');
     });
 
@@ -521,21 +519,21 @@ module.exports = function() {
 
   describe('Invalid characters', function () {
     it('Whitespace should not be included in designs', async() => {
-      const resultNode = await constellation.goldbar('a', '{"a":{"ids":["\ta1", " a2"], "roles":["a"]}}', NODE_REP);
+      const resultNode = await constellation.goldbar('a', '{"a":{"a":["\ta1", " a2"]}}', NODE_REP);
       expect(JSON.stringify(resultNode.designs)).to.contain('a1');
       expect(JSON.stringify(resultNode.designs)).to.contain('a2');
 
-      const resultEdge = await constellation.goldbar('a', '{"a":{"ids":["\ta1", " a2"], "roles":["a"]}}', EDGE_REP);
+      const resultEdge = await constellation.goldbar('a', '{"a":{"a":["\ta1", " a2"]}}', EDGE_REP);
       expect(JSON.stringify(resultEdge.designs)).to.contain('a1');
       expect(JSON.stringify(resultEdge.designs)).to.contain('a2');
     });
 
     it('Other symbols should be parsed into category', async() => {
-      const resultNode = await constellation.goldbar('a', '{"a":{"ids":["$a1", " a2"], "roles":["a"]}}', NODE_REP);
+      const resultNode = await constellation.goldbar('a', '{"a":{"a":["$a1", " a2"]}}', NODE_REP);
       expect(JSON.stringify(resultNode.designs)).to.contain('a1');
       expect(JSON.stringify(resultNode.designs)).to.contain('a2');
 
-      const resultEdge = await constellation.goldbar('a', '{"a":{"ids":["$a1", " a2"], "roles":["a"]}}', EDGE_REP);
+      const resultEdge = await constellation.goldbar('a', '{"a":{"a":["$a1", " a2"]}}', EDGE_REP);
       expect(JSON.stringify(resultEdge.designs)).to.contain('a1');
       expect(JSON.stringify(resultEdge.designs)).to.contain('a2');
     });

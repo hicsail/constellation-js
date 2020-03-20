@@ -3,17 +3,13 @@ const constellation = require('../lib/constellation');
 const expect = require('chai').expect;
 let fs = require('fs');
 
-const CATEGORIES = '{"rbs":{"ids":["a1","a2"], "roles":["rbs"]},"cds":{"ids":["b1","b2","b3"], "roles":["cds"]},"promoter":{"ids":["c1"], "roles":["promoter"]}, "terminator": {"ids":["t"], "roles":["terminator"]}}';
+const CATEGORIES = '{"rbs":{"rbs":["a1","a2"]},"cds":{"cds":["b1","b2","b3"]},"promoter":{"promoter":["c1"]}, "terminator": {"terminator":["t"]}}';
 const NODE = 'NODE';
 const NODE_REP = {designName: 'design', representation:NODE};
 
-const util = require('util');
-
 function trimX(str) {
   return str.replace(/\s/g, "X");
-
 }
-
 
 function readModuleFile(path, callback) {
   try {
