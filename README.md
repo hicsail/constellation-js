@@ -18,9 +18,11 @@ Then open `http://localhost:8082/` on browser
 
 #### NPM Package
 
+The package can be installed in the following way.
 ```shell
 npm install constellation-js
 ```
+It is possible to generate a collection of designs that match a specification using graph construction and traversals.
 ```javascript
 const constellation = require('constellation-js');
 let goldbar = '{PT7_a then galK}';
@@ -56,6 +58,14 @@ let result = constellation.goldbar(goldbar, categories, {designName: 'my-first-d
 |`stateGraph`|See [Graph Data Structure](#Graph-Data-Structure)|
 |`designs`|List of enumerated designs|
 |`sbol`| See [Synthetic Biology Open Language](#Synthetic-Biology-Open-Language)|
+
+It is also possible to generate a collection of designs that match a specification using a purely symbolic approach (note that this approach supports only a tolerance of `0` for the AND operator and does not support the MERGE operator).
+```javascript
+let result = constellation.symbolic(
+               "(one-or-more a) then (one-or-more x)", 
+               {"a": {"b": ["c"]}, "x":{"y": ["z1", "z2", "z3"]}}, 
+               {"numDesigns": 'all', "maxCycles":7});
+```
 
 ## Case Studies
 The web version of Constellation contains several examples that can be chosen from the dropdown menu. Additional case studies from the manuscript can be found [here]().
