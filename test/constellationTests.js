@@ -511,8 +511,8 @@ module.exports = function() {
     });
 
     it('mismatched brackets', async() => {
-      await expect(constellation.goldbar('(a}', '{}', NODE_REP)).to.be.rejectedWith('Parsing error!');
-      await expect(constellation.goldbar('(a}', '{}', EDGE_REP)).to.be.rejectedWith('Parsing error!');
+      await expect(constellation.goldbar('(a}', '{}', NODE_REP)).to.be.rejectedWith('Error parsing design specification');
+      await expect(constellation.goldbar('(a}', '{}', EDGE_REP)).to.be.rejectedWith('Error parsing design specification');
     });
   });
 
@@ -546,8 +546,8 @@ module.exports = function() {
     });
 
     it('Mismatched brackets', async() => {
-      await expect(constellation.goldbar('(a}', CATSTR, NODE_REP)).to.be.rejectedWith('Parsing error!');
-      await expect(constellation.goldbar('(a}', CATSTR, EDGE_REP)).to.be.rejectedWith('Parsing error!');
+      await expect(constellation.goldbar('(a}', CATSTR, NODE_REP)).to.be.rejectedWith('Error parsing design specification');
+      await expect(constellation.goldbar('(a}', CATSTR, EDGE_REP)).to.be.rejectedWith('Error parsing design specification');
     });
 
     describe('Invalid characters', function () {
@@ -562,7 +562,7 @@ module.exports = function() {
       });
 
       // it('$', function () {
-      //   expect(() => constellation.goldbar('a then $a', CATSTR, 10)).to.throw('Parsing error!');
+      //   expect(() => constellation.goldbar('a then $a', CATSTR, 10)).to.throw('Error parsing design specification');
       // });
       // TODO turn back on when imparse starts throwing errors
 
