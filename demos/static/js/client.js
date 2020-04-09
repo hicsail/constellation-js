@@ -554,6 +554,14 @@ $(document).ready(function() {
       if (String(data.designs).includes('is not defined')) {
         displayDesigns(editors, data.designs);
       } else {
+        if (data.messages.exceedsDesigns !== null) {
+          // show the tooltip and give it the warning message
+          $('#designWarning').removeClass('hidden');
+          $("#designWarning").attr("data-original-title", data.messages.exceedsDesigns);
+        } else {
+          // hide the tooltip
+          $('#designWarning').addClass('hidden');
+        }
         displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
       }
 

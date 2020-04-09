@@ -7,9 +7,13 @@ const constellation = require('../lib/constellation');
 
 const CATEGORIES = {"a":{"a":["a1","a2"]},"b":{"b":["b1","b2","b3"]},"c":{"c":["c1"]}};
 const FOR_TOLERANCE = {"a1":{"a":["first","second"]},"a2":{"a":["first"], "letter": ["first"]},"a3":{"a":[]}, "a4":{"letter":[]}};
-// const CELLO_CATS = {"pTac":{"roles":["promoter"], "ids":["https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/pTac/1"]},
-//   "B1":{"roles":["ribosomeBindingSite"], "ids":["https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B1/1"]},
-//   "B_RBS": {"roles": ["ribosomeBindingSite"], "ids": ["https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B1/1", "https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B2/1", "https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/B3/1"]}};
+const CELLO_CATS = { "Cello_promoter": { "promoter": ["pLitR", "pQacR", "pIcaRA", "pSrpR", "pPhlF", "pLuxStar", "pTac", "pAmtR", "pTet", "pLmrA", "pCONST", "pAmeR", "pBAD", "pBetI", "pHlyIIR", "pBM3R1", "pPsrA"]},
+  "Cello_CDS": {"cds": ["sigmaK1FR", "LmrA", "LacI", "QacR", "LitR", "IcaRA", "SrpR", "PhlF", "LuxR", "AmtR", "TetR", "AmeR", "BetI", "HlyIIR", "BM3R1", "PsrA", "BFP", "sigmaT3", "sigmaCGG", "AraC", "sigmaT7", "YFP", "RFP"]},
+  "Cello_RBS": {"ribosomeBindingSite": ["P2", "N1", "B3", "S1", "BBa_B0064_rbs", "S2", "H1", "E1", "Q2", "P1", "B1", "S4", "R1", "B2", "L1", "Q1", "A1", "P3", "F1", "I1", "S3"]},
+  "Cello_terminator": {"terminator": ["L3S2P24", "L3S2P11", "ECK120010818", "ECK120019600", "ECK120010876", "L3S3P11", "ECK120033736", "L3S3P31", "ECK120033737", "L3S2P21_terminator", "ECK120016170", "ECK120029600", "ECK120015440", "L3S2P55"]},
+  "Cello_ribozyme": {"ribozyme": ["RiboJ54", "BydvJ", "RiboJ10", "SarJ", "RiboJ51", "RiboJ57", "ElvJ", "PlmJ", "ScmJ", "RiboJ", "RiboJ60", "RiboJ53", "RiboJ64"]}
+};
+
 const AMEM = getAllIDs(CATEGORIES.a);
 const BMEM = getAllIDs(CATEGORIES.b);
 const CMEM = getAllIDs(CATEGORIES.c);
@@ -20,7 +24,7 @@ const CLEN = CMEM.length;
 
 const CATSTR = JSON.stringify(CATEGORIES);
 const TOLSTR = JSON.stringify(FOR_TOLERANCE);
-// const CELLOSTR = JSON.stringify(CELLO_CATS);
+const CELLOSTR = JSON.stringify(CELLO_CATS);
 
 const NODE = 'NODE';
 const EDGE = 'EDGE';
@@ -569,6 +573,18 @@ module.exports = function() {
       it('_', async() => {
         await expect(constellation.goldbar('_a', CATSTR, NODE_REP)).to.be.rejectedWith('_a is not defined in categories');
         await expect(constellation.goldbar('_a', CATSTR, EDGE_REP)).to.be.rejectedWith('_a is not defined in categories');
+      });
+    });
+
+    describe('Show design limit message', function () {
+      it('Designs were limited - return the warning message', async () => {
+        const result = await constellation.goldbar('one-or-more(Cello_promoter then zero-or-one(Cello_promoter) then Cello_ribozyme then Cello_RBS then Cello_CDS then Cello_terminator)', CELLOSTR, EDGE_REP);
+        expect(result.messages.exceedsDesigns).to.exist;
+      });
+
+      it('Designs were not limited - do not return the warning message', async () => {
+        const result = await constellation.goldbar('a', CATSTR, EDGE_REP);
+        expect(result.messages.exceedsDesigns).to.be.null;
       });
     });
 
