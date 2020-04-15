@@ -554,6 +554,14 @@ $(document).ready(function() {
       if (String(data.designs).includes('is not defined')) {
         displayDesigns(editors, data.designs);
       } else {
+        if ('exceedsDesigns' in data.messages) {
+          // show the tooltip and give it the warning message
+          $('#designWarning').removeClass('hidden');
+          $("#designWarning").attr("data-original-title", data.messages.exceedsDesigns);
+        } else {
+          // hide the tooltip
+          $('#designWarning').addClass('hidden');
+        }
         displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
       }
 
@@ -735,6 +743,7 @@ function resetStepTwo(editors){
   $('#goldarSubmitBtn').addClass('hidden');
   $('#SBOLSubmitBtn').addClass('hidden');
   $('#goldbar-btns').addClass('hidden');
+  $('#designWarning').addClass('hidden');
 }
 
 
