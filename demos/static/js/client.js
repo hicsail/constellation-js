@@ -554,7 +554,7 @@ $(document).ready(function() {
       if (String(data.designs).includes('is not defined')) {
         displayDesigns(editors, data.designs);
       } else {
-        if (data.messages.exceedsDesigns !== null) {
+        if ('exceedsDesigns' in data.messages) {
           // show the tooltip and give it the warning message
           $('#designWarning').removeClass('hidden');
           $("#designWarning").attr("data-original-title", data.messages.exceedsDesigns);
@@ -743,6 +743,7 @@ function resetStepTwo(editors){
   $('#goldarSubmitBtn').addClass('hidden');
   $('#SBOLSubmitBtn').addClass('hidden');
   $('#goldbar-btns').addClass('hidden');
+  $('#designWarning').addClass('hidden');
 }
 
 

@@ -584,7 +584,7 @@ module.exports = function() {
 
       it('Designs were not limited - do not return the warning message', async () => {
         const result = await constellation.goldbar('a', CATSTR, EDGE_REP);
-        expect(result.messages.exceedsDesigns).to.be.null;
+        expect(result.messages).to.not.have.any.keys('exceedsDesigns');
       });
     });
 
