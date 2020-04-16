@@ -454,8 +454,6 @@ $(document).ready(function() {
 
   document.getElementById('numDesigns').value = 40;
   document.getElementById('maxCycles').value = 0;
-  document.getElementById('andTolerance').value = 0;
-  document.getElementById('mergeTolerance').value = 0;
 
   editors.specEditor.setOption("theme", THEME);
   editors.catEditor.setOption("theme", THEME);
@@ -530,8 +528,6 @@ $(document).ready(function() {
     numDesigns = document.getElementById('numDesigns').value;
     maxCycles = document.getElementById('maxCycles').value;
     designName = document.getElementById('designName').value;
-    andTolerance = document.getElementById('andTolerance').value;
-    mergeTolerance = document.getElementById('mergeTolerance').value;
 
     //replace all spaces and special characters for SBOL
     designName = designName.replace(/[^A-Z0-9]/ig, "_");
@@ -542,8 +538,6 @@ $(document).ready(function() {
       "categories": categories,
       "numDesigns": numDesigns,
       "maxCycles": maxCycles,
-      "andTolerance": andTolerance,
-      "mergeTolerance": mergeTolerance,
       "number": "2.0",
       "name": "specificationname",
       "clientid": "userid",

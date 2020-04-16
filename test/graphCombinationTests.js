@@ -31,7 +31,7 @@ function expectAllReturnValues(result) {
 async function expectIntersection(goldbar1, goldbar2) {
   const one = await constellation.goldbar(goldbar1, CATSTR, EDGE_REP);
   const two = await constellation.goldbar(goldbar2, CATSTR, EDGE_REP);
-  const result = await constellation.goldbar(goldbar1 + ' and ' + goldbar2, CATSTR, EDGE_REP);
+  const result = await constellation.goldbar(goldbar1 + ' and0 ' + goldbar2, CATSTR, EDGE_REP);
   expectAllReturnValues(result);
   const intersection = one.designs.filter(value => two.designs.includes(value));
   expect(result.designs.length).to.equal(intersection.length);
@@ -71,23 +71,23 @@ function expectUnion(result) {
 module.exports = function() {
   describe('AND tests', function() {
     describe('toy examples', function () {
-      it('cds1 and cds2', async () => {
+      it('cds1 and0 cds2', async () => {
         await expectIntersection('cds1', 'cds2');
       });
 
-      it('zero-or-one(cds1) and zero-or-one(cds2)', async () => {
+      it('zero-or-one(cds1) and0 zero-or-one(cds2)', async () => {
         await expectIntersection('zero-or-one(cds1)', 'zero-or-one(cds2)');
       });
 
-      it('zero-or-more(cds1) and zero-or-more(cds2)', async () => {
+      it('zero-or-more(cds1) and0 zero-or-more(cds2)', async () => {
         await expectIntersection('zero-or-more(cds1)', 'zero-or-more(cds2)');
       });
 
-      it('one-or-more(cds1) and one-or-more(cds2)', async () => {
+      it('one-or-more(cds1) and0 one-or-more(cds2)', async () => {
         await expectIntersection('one-or-more(cds1)', 'one-or-more(cds2)');
       });
 
-      it('(cds1 then cds3) and (cds2 then cds4)', async () => {
+      it('(cds1 then cds3) and0 (cds2 then cds4)', async () => {
         await expectIntersection('(cds1 then cds3)', '(cds2 then cds4)');
       });
 
@@ -96,30 +96,30 @@ module.exports = function() {
       //   await expectIntersection('(cds1 then cds3)', 'one-or-more(cds5)');
       // });
 
-      it('cds1 and (cds2 then zero-or-one(cds4))', async () => {
+      it('cds1 and0 (cds2 then zero-or-one(cds4))', async () => {
         await expectIntersection('cds1', '(cds2 then zero-or-one(cds4))');
       });
 
-      it('one-or-more(cds5) and (cds2 then zero-or-one(cds4))', async () => {
+      it('one-or-more(cds5) and0 (cds2 then zero-or-one(cds4))', async () => {
         await expectIntersection('one-or-more(cds5)', '(cds2 then zero-or-one(cds4))');
       });
 
       it('and NODE', async () => {
-        await expect(constellation.goldbar('a1 and a2', TOLSTR, NODE_REP)).to.be.rejectedWith('The AND operation is not supported in the NODE representation');
+        await expect(constellation.goldbar('a1 and0 a2', TOLSTR, NODE_REP)).to.be.rejectedWith('The AND operation is not supported in the NODE representation');
       });
 
       it('and tolerance 0', async () => {
-        let result = await constellation.goldbar('a1 and a2', TOLSTR, EDGE_REP);
+        let result = await constellation.goldbar('a1 and0 a2', TOLSTR, EDGE_REP);
         expectTol0(result);
       });
 
       it('and tolerance 1', async () => {
-        let result = await constellation.goldbar('a1 and a3', TOLSTR, {representation:EDGE, andTolerance:1});
+        let result = await constellation.goldbar('a1 and1 a3', TOLSTR, {representation:EDGE, andTolerance:1});
         expectTol1(result);
       });
 
       it('and tolerance 2', async () => {
-        let result = await constellation.goldbar('a3 and a4', TOLSTR, {representation:EDGE, andTolerance:2});
+        let result = await constellation.goldbar('a3 and2 a4', TOLSTR, {representation:EDGE, andTolerance:2});
         expectAllReturnValues(result);
         expect(result.designs.length).to.equal(0);
       });
