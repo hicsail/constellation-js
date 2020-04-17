@@ -15,6 +15,7 @@ const EPSILON = 'epsilon';
 const ACCEPT = 'accept';
 const ATOM = 'atom';
 const OR_MORE = "OrMore";
+
 /* * * * * * */
 /*  DESIGNS  */
 /* * * * * * */
@@ -467,12 +468,35 @@ $(document).ready(function() {
   dropArea.addEventListener('dragleave', sbolDragLeave, false)
   dropArea.addEventListener('dragover', sbolDragOver, false)
 
-  $('#demo-option').on('click', function() {
-    document.getElementById('designName').value = "demo-example";
-    editors.specEditor.setValue('one-or-more(one-or-more(promoter then nonCodingRna)then cds then \n (zero-or-more \n (nonCodingRna or (one-or-more \n (nonCodingRna then promoter then nonCodingRna) then cds)) then \n (terminator or (terminator then nonCodingRna) or (nonCodingRna then terminator)))))')
-    editors.catEditor.setValue('{"promoter": {"promoter": ["BBa_R0040", "BBa_J23100"]},\n "ribosomeBindingSite": {"ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"]}, \n"cds": {"cds": ["BBa_E0040", "BBa_E1010"]},\n"nonCodingRna": {"nonCodingRna": ["BBa_F0010"]},\n"terminator": {"terminator": ["BBa_B0010"]}}');
+  $('#and0-option').on('click', function() {
+    document.getElementById('designName').value = "cello-AND-example";
+    editors.specEditor.setValue(and0GOLDBAR);
+    editors.catEditor.setValue(JSON.stringify(celloCategories));
   });
 
+  $('#and1-option-norb').on('click', function() {
+    document.getElementById('designName').value = "cello-no-roadblocking-example";
+    editors.specEditor.setValue(and1GOLDBAR_NORB);
+    editors.catEditor.setValue(JSON.stringify(celloCategories));
+  });
+
+  $('#and1-option-rb').on('click', function() {
+    document.getElementById('designName').value = "cello-roadblocking-example";
+    editors.specEditor.setValue(and1GOLDBAR_RB);
+    editors.catEditor.setValue(JSON.stringify(celloCategories));
+  });
+
+  $('#and2-option').on('click', function() {
+    document.getElementById('designName').value = "cello-AND-example2";
+    editors.specEditor.setValue(and2GOLDBAR);
+    editors.catEditor.setValue(JSON.stringify(celloCategories));
+  });
+
+  $('#merge-option').on('click', function() {
+    document.getElementById('designName').value = "rebeccamycin-example";
+    editors.specEditor.setValue(rebeccamycinGOLDBAR);
+    editors.catEditor.setValue(JSON.stringify(biosynthesisCategories));
+  });
 
   $('#debug-option').on('click', function() {
     document.getElementById('designName').value = "debug-example";

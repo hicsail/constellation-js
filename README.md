@@ -4,19 +4,19 @@
 
 ### Latest stable version available at [ConstellationCAD](http://constellationcad.org/)
 
-#### Local Build
-##### Requirements
+## Usage
+### Requirements
 
 [![node](https://user-images.githubusercontent.com/7750862/70819282-d5ad4a80-1da3-11ea-8f65-dcf2468c74ef.png)](https://nodejs.org/en/download/) [![python](https://user-images.githubusercontent.com/7750862/70819279-d3e38700-1da3-11ea-9321-309ec4d3cc51.png)](https://www.python.org/downloads/)
 
-##### Instructions
+### Local UI
 ```shell
 git clone git@github.com:hicsail/constellation-js.git
 npm run build && npm run start
 ```
 Then open `http://localhost:8082/` on browser
 
-#### NPM Package
+### NPM Package
 
 The package can be installed in the following way.
 ```shell
@@ -67,7 +67,7 @@ let result = constellation.symbolic(
 ```
 
 ## Case Studies
-The web version of Constellation contains several examples that can be chosen from the dropdown menu. Additional case studies from the manuscript can be found [here]().
+GOLDBAR syntax for the case studies described in the manuscript are available [here](demos/static/use-cases) and can be demoed on Constellation's UI via the drop down menu.
 
 ## Design Space Representations
 Genetic design spaces in Constellation are represented in three ways:
