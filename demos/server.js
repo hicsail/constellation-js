@@ -8,8 +8,8 @@ const xmlparser = require('express-xml-bodyparser');
 
 let constellation = require('../lib/constellation');
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
 app.set('json spaces', 1);
 
 app.use(function(req, res, next) {
@@ -32,22 +32,29 @@ app.get('/', function(req,res) {
   res.sendFile((path.join(__dirname + '/static/client.html')));
 });
 
-app.post('/postSpecs', function(req,res) {
-  let designName = req.body.designName;
+app.post('/postSpecs', async function(req,res) {
+  let designName = req.body.designName || 'constellation-design';
   let langText = req.body.specification;
   let categories = req.body.categories;
-  let numDesigns = req.body.numDesigns;
-  let maxCycles = req.body.maxCycles;
+  let numDesigns = req.body.numDesigns || 20;
+  let maxCycles = req.body.maxCycles || 0;
+  let representation = req.body.representation || 'EDGE';
   console.log('---Received new input---');
   console.log('Design Name: ', designName);
   console.log('Specification: ', langText);
   console.log('Categories: ', categories);
   console.log('numDesigns: ', numDesigns);
   console.log('maxCycles: ', maxCycles);
+  console.log('Representation:', representation);
 
   let data;
   try {
-    data = constellation.goldbar(designName, langText, categories, numDesigns, maxCycles);
+    data = await constellation.goldbar(langText, categories,
+      {designName: designName,
+      numDesigns: numDesigns,
+      maxCycles: maxCycles,
+      representation: representation,
+  });
     res.status(200).send(data);
   } catch (error) {
     console.log(error);
@@ -55,10 +62,19 @@ app.post('/postSpecs', function(req,res) {
   }
 });
 
-app.post('/importSBOL', xmlparser(), async function(req,res) {
+// app.post('/importSBOL', xmlparser(), async function(req,res) {
+app.post('/importSBOL', async function(req,res) {
+  let sbolDocs = req.body.sbol;
+  let combineMethod = req.body.combineMethod || '';
+  let tolerance = req.body.tolerance || 0;
+  console.log('---Received new input---');
+  console.log('combineMethod: ', combineMethod);
+  console.log('tolerance: ', tolerance);
+  console.log('sbolDocs: ', sbolDocs);
+
   let data;
   try {
-    data = await constellation.sbol(req.rawBody);
+    data = await constellation.sbol(sbolDocs, combineMethod, tolerance);
     res.status(200).send(data);
   } catch (error) {
     console.log(error);

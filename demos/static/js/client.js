@@ -4,9 +4,17 @@ const MAXDISTANCE = 100;
 const IMAGESIZE = 30;
 const RADIUS = 7;
 const INTERMEDIATE = 'intermediate';
+const REPRESENTATION = 'EDGE';
 
-let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDoc, sbolFile;
+let nodePointer, linkPointer, simulationPointer, svgPointer, circlePointer, imagePointer, textPointer, width, height, sbolDoc;
+let sbolFiles = [];
 let designName = 'Constellation';
+
+const ROOT = 'root';
+const EPSILON = 'epsilon';
+const ACCEPT = 'accept';
+const ATOM = 'atom';
+const OR_MORE = "OrMore";
 
 /* * * * * * */
 /*  DESIGNS  */
@@ -29,7 +37,6 @@ function displayDesigns(editors, designs) {
  */
 function displayDiagram(stateGraph) {
   let {nodes, links} = generateGraph(stateGraph);
-
   updateSvgSize();
   // Create SVG
   svgPointer = d3.select('#graph')
@@ -67,25 +74,37 @@ function generateGraph(stateGraph) {
     let text;
     let node = stateGraph[nodeId];
 
-    if (node.type === ROOT) {
+    if (node.type === graph.ROOT) {
       text = 'Root';
-    } else if (node.type === EPSILON) {
+    } else if (node.type === graph.EPSILON) {
       text = 'Epsilon'
-    } else if (node.type === ACCEPT) {
+    } else if (node.type === graph.ACCEPT) {
       text =  'Accept';
-    } else if (node.type === ATOM) {
+    } else if (node.type === graph.ATOM) {
       text = node.text;
     }
-    nodes.push({id: nodeId, type: node.type, text, operator: node.operator});
+    nodes.push({id: nodeId, type: node.type, component: node.component, text, operator: node.operator});
   }
 
   // Get edges from stateGraph
   let id = 0;
   for (let node in stateGraph) {
     for (let edge of stateGraph[node].edges) {
-      nodes.push({id, type: INTERMEDIATE});
-      links.push({source: node, target: id});
-      links.push({source: id, target: edge});
+      // check if is edge representation
+      if (REPRESENTATION === 'NODE') {
+        // handle case of self-loop
+        if (edge === node) {
+          links.push({source: node, target: edge, component: stateGraph[node].component});
+        } else {
+          nodes.push({id, type: INTERMEDIATE, component: stateGraph[node].component});
+          links.push({source: node, target: id, component: stateGraph[node].component});
+          links.push({source: id, target: edge, component: stateGraph[node].component});
+        }
+      } else {
+        nodes.push({id, type: INTERMEDIATE, text: edge.text, component: edge.component});
+        links.push({source: edge.src, type: edge.type, text: EPSILON, target: id});
+        links.push({source: id, type: edge.type, text: edge.text, target: edge.dest});
+      }
       id++;
     }
   }
@@ -116,10 +135,10 @@ function drawLinks(links) {
     .enter().append('path')
     .attr('class', 'link')
     .style('stroke', 'rgb(150,150,150)')
-    .style( 'stroke-width', 1);
+    .style( 'stroke-width', 1)
+    .style('fill', 'transparent');
 
-  // Attach arrowhead
-  linkPointer.filter( function(d) { return d.source.type  === INTERMEDIATE; } )
+  linkPointer.filter( function(d) { return d.source.type  === INTERMEDIATE || d.source === d.target; } )
     .attr('marker-end', 'url(#arrow)');
 }
 
@@ -128,6 +147,7 @@ function drawLinks(links) {
  * @param nodes D3 nodes object
  */
 function drawNodes(nodes) {
+  console.log(nodes);
   // Add g component
   nodePointer = svgPointer.selectAll('.node')
     .data(nodes)
@@ -135,33 +155,50 @@ function drawNodes(nodes) {
     .append('g')
     .attr('class', 'node');
 
-  // Add tooltip
+  // Add tooltip for node representation
+  // if (REPRESENTATION === "NODE") {
+  //   textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
+  //     .append('text')
+  //     .text( function(d) {return d.operator; })
+  //     .attr('opacity', 0)
+  //     .attr('dx', '20px')
+  //     .attr('dy', '4px')
+  //     .style('fill', 'rgb(100,)')
+  //     .style('font-family', 'Montserrat');
+  // }
+
   textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
     .append('text')
-    .text( function(d) {return d.operator; })
+    .text( function(d) {return d.operator + ',' + d.id; })
     .attr('opacity', 0)
     .attr('dx', '20px')
     .attr('dy', '4px')
     .style('fill', 'rgb(100,)')
     .style('font-family', 'Montserrat');
 
+
   // Add circles
-  circlePointer = nodePointer.filter(function (d) { return d.type !== ATOM; })
+  circlePointer = nodePointer.filter(function (d) { return d.type !== graph.ATOM; })
     .append('circle')
     .attr('fill', function(d) {
-      if (d.type === ROOT) {
-        return 'rgb(33,168,174)';
-      } else if (d.type === ACCEPT) {
-        return 'rgb(133,151,41)';
-      } else if (d.type === EPSILON) {
-        return 'rgb(253,183,152)';
-      } else if (d.type === INTERMEDIATE) {
-        return 'rgb(253,183,152)';
+      if (d.type === EPSILON) {
+        return 'rgb(240,95,64)';
       } else {
         return '#ffffff';
       }
     })
-    .attr('stroke', 'rgb(200,200,200)')
+    .attr('stroke', function(d) {
+      if (d.type === ROOT) {
+        return 'rgb(5,168,170)';
+      } else if (d.type === ACCEPT) {
+        return 'rgb(231,29,54)';
+      } else if (d.type === EPSILON) {
+        return '#ffffff';
+      } else {
+        return '#ffffff';
+      }
+    })
+    .style( 'stroke-width', 2)
     .attr('title', function(d) {return d.type})
     .attr('r', function(d) {
       if (d.type === INTERMEDIATE) {
@@ -171,42 +208,57 @@ function drawNodes(nodes) {
     });
 
   // Add images
-  imagePointer = nodePointer.filter(function(d) { return d.type === ATOM; })
+
+  imagePointer = nodePointer.filter(filterByRep)
     .append('g')
     .attr('transform', 'translate(-15 , -30)')
     .append('svg:image')
     .attr('xlink:href', function(d) {
-      switch (d.text) {
+      switch (d.component) {
         // KEEP IN ALPHABETICAL ORDER
-        case 'aptamer':
-        case 'assemblyScar':
-        case 'bluntRestrictionSite':
-        case 'cds':
-        case 'dnaStabilityElement':
-        case 'engineeredRegion':
-        case 'fivePrimeOverhang':
-        case 'fivePrimeStickyRestrictionSite':
-        case 'insulator':
-        case 'nonCodingRna':
-        case 'operator':
-        case 'originOfReplication':
-        case 'originOfTrasnfer':
-        case 'polyA':
-        case 'promoter':
-        case 'proteaseSite':
-        case 'proteinStabilityElement':
-        case 'ribosomeBindingSite':
-        case 'ribozyme':
-        case 'signature':
-        case 'terminator':
-          return './sbol/' + d.text + '.svg';
+        case EPSILON:
+        case OR_MORE:
+        case 'ZERO':
+          return;
         default:
-          return './sbol/' + 'noGlyphAssigned.svg';
+          switch (Object.keys(d.component)[0]) {
+            case 'aptamer':
+            case 'assemblyScar':
+            case 'bluntRestrictionSite':
+            case 'cds':
+            case 'dnaStabilityElement':
+            case 'engineeredRegion':
+            case 'fivePrimeOverhang':
+            case 'fivePrimeStickyRestrictionSite':
+            case 'insulator':
+            case 'nonCodingRna':
+            case 'operator':
+            case 'originOfReplication':
+            case 'originOfTrasnfer':
+            case 'polyA':
+            case 'promoter':
+            case 'proteaseSite':
+            case 'proteinStabilityElement':
+            case 'ribosomeBindingSite':
+            case 'ribozyme':
+            case 'signature':
+            case 'terminator':
+              return './sbol/' + Object.keys(d.component)[0] + '.svg';
+            default:
+              return './sbol/' + 'noGlyphAssigned.svg';
+          }
       }
     })
     .attr('width', IMAGESIZE);
 }
 
+function filterByRep(d) {
+  if (REPRESENTATION === 'NODE') {
+    return d.type === ATOM;
+  } else {
+    return d.type === INTERMEDIATE;
+  }
+}
 /* * * * * * * */
 /*   UPDATES   */
 /* * * * * * * */
@@ -227,14 +279,22 @@ function tick() {
     return 'translate(' + d.x + ',' + d.y + ')'
   });
 
-  // Update image positions
+  // update image positions
   imagePointer.attr('transform', function(d) {
     d.x = Math.max(20, Math.min(width - 20, d.x));
     d.y = Math.max(25, Math.min(height - 10, d.y));
     return 'translate(' + d.x + ',' + d.y + ')'
   });
 
-  // Update text positions
+  // update tooltip positions for node representation
+  // if (REPRESENTATION === 'NODE') {
+  //   textPointer.attr('transform', function(d) {
+  //     d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
+  //     d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
+  //     return 'translate(' + d.x + ',' + d.y + ')'
+  //   });
+  // }
+
   textPointer.attr('transform', function(d) {
     d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
     d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
@@ -254,8 +314,12 @@ function updateLinks(d) {
   let deltaX = d.target.x - d.source.x,
     deltaY = d.target.y - d.source.y,
     dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
-    normX = deltaX / dist,
+    normX = 0,
+    normY = 0;
+  if (dist !== 0) {
+    normX = deltaX / dist;
     normY = deltaY / dist;
+  }
 
   let sourcePadding = 10,
     targetPadding = 10;
@@ -265,12 +329,26 @@ function updateLinks(d) {
   } else if (d.target.type === INTERMEDIATE) {
     targetPadding = 0;
   }
-
   let sourceX = d.source.x + normX * sourcePadding,
     sourceY = d.source.y + normY * sourcePadding,
     targetX = d.target.x - normX * targetPadding,
-    targetY = d.target.y - normY * targetPadding;
-  return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
+    targetY = d.target.y - normY * targetPadding,
+    drx = 0,
+    dry = 0,
+    xRotation = 0,
+    largeArc = 0,
+    sweep = 1;
+  if (sourceX === targetX && sourceY === targetY) {
+      xRotation = -45;
+      largeArc = 1;
+      drx = 30;
+      dry = 20;
+      targetX+=5;
+      targetY+=10;
+    }
+
+  return 'M' + sourceX + ',' + sourceY + 'A' + drx + ',' + dry + ' ' +
+    xRotation + ',' + largeArc + ',' + sweep + ' ' + targetX + ',' + targetY;
 }
 
 /**
@@ -341,45 +419,31 @@ function dragEnded() {
   d3.event.subject.fy = null;
 }
 
-/* * * * * * */
-/*  CLEANUP  */
-/* * * * * * */
-/**
- * Resets graph and removes SVG elements
- */
-function resetDiagram() {
-  if(simulationPointer){
-    simulationPointer.stop();
-  }
-  d3.selectAll('svg').remove();
-}
 
-function processSBOLFile(file) {
-  return new Promise((resolve) => {
-    // Parse file into XML object
-    let parser = new DOMParser();
-    let reader = new FileReader();
-    reader.readAsText(file, "UTF-8");
-    reader.onload = function (evt) {
-      let data = parser.parseFromString(evt.target.result, "application/xml");
-      resolve(data);
-    };
-  });
-}
+
+
 
 /* * * * * * */
 /*  BROWSER  */
 /* * * * * * */
 $(document).ready(function() {
 
+
+  $('#playground').on('click', function() {
+    $('#demo-space').addClass('hidden');
+    $('#step1-content').removeClass('hidden');
+  });
+
+
   const THEME = 'ambiance';
+  let combineMethod, tolerance;
 
   const editors = {
-    "specEditor": CodeMirror.fromTextArea(document.getElementById('goldbar-input'), {
+    "specEditor": CodeMirror.fromTextArea(document.getElementById('goldbar-input-0'), {
       lineNumbers: true,
       lineWrapping:true
     }),
-    "catEditor": CodeMirror.fromTextArea(document.getElementById('categories'), {
+    "catEditor": CodeMirror.fromTextArea(document.getElementById('categories-0'), {
       lineNumbers: true,
       lineWrapping:true
     }),
@@ -396,48 +460,73 @@ $(document).ready(function() {
   editors.catEditor.setOption("theme", THEME);
   editors.designsEditor.setOption("theme", THEME);
 
-  /* * * * * * */
-  /*    SBOL   */
-  /* * * * * * */
-  async function processSBOL(file) {
-    //read SBOL file
-    let sbolXML = await processSBOLFile(file);
+  let dropArea = document.getElementById('sbol-drop-area');
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false)
+  })
+  dropArea.addEventListener('drop', handleDrop, false)
+  dropArea.addEventListener('dragleave', sbolDragLeave, false)
+  dropArea.addEventListener('dragover', sbolDragOver, false)
 
-    // Parse SBOL and display results
-    $.ajax({
-      url: 'http://34.227.115.255:80/importSBOL',
-      type: 'POST',
-      data: sbolXML,
-      contentType: "text/xml",
-      dataType: "text",
-      processData: false,
-      success: function(data){
-        data = JSON.parse(data);
-        displayDiagram(data.stateGraph);
-        // Undefined design
-        if (String(data.designs).includes('is not defined')) {
-          displayDesigns(editors, data.designs);
-        } else {
-          displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
-        }
-      }
-    })
-      .fail((response) => {
-        alert(response.responseText);
-      });
-  };
-
-  $('#demo-option').on('click', function() {
-    document.getElementById('designName').value = "demo-example";
-    editors.specEditor.setValue('one-or-more(one-or-more(promoter then nonCodingRna)then cds then \n (zero-or-more \n (nonCodingRna or (one-or-more \n (nonCodingRna then promoter then nonCodingRna) then cds)) then \n (terminator or (terminator then nonCodingRna) or (nonCodingRna then terminator)))))')
-    editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
+  $('#and0-option').on('click', function() {
+    document.getElementById('designName').value = "cello-AND-example";
+    editors.specEditor.setValue(and0GOLDBAR);
+    editors.catEditor.setValue(JSON.stringify(celloCategories));
   });
 
+  $('#and1-option-norb').on('click', function() {
+    document.getElementById('designName').value = "cello-no-roadblocking-example";
+    editors.specEditor.setValue(and1GOLDBAR_NORB);
+    editors.catEditor.setValue(JSON.stringify(celloCategories));
+  });
+
+  $('#and1-option-rb').on('click', function() {
+    document.getElementById('designName').value = "cello-roadblocking-example";
+    editors.specEditor.setValue(and1GOLDBAR_RB);
+    editors.catEditor.setValue(JSON.stringify(celloCategories));
+  });
+
+  $('#and2-option').on('click', function() {
+    document.getElementById('designName').value = "cello-AND-example2";
+    editors.specEditor.setValue(and2GOLDBAR);
+    editors.catEditor.setValue(JSON.stringify(celloCategories));
+  });
+
+  $('#merge-option').on('click', function() {
+    document.getElementById('designName').value = "rebeccamycin-example";
+    editors.specEditor.setValue(rebeccamycinGOLDBAR);
+    editors.catEditor.setValue(JSON.stringify(biosynthesisCategories));
+  });
 
   $('#debug-option').on('click', function() {
     document.getElementById('designName').value = "debug-example";
     editors.specEditor.setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
-    editors.catEditor.setValue('{"promoter": ["BBa_R0040", "BBa_J23100"],\n "ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"], \n"cds": ["BBa_E0040", "BBa_E1010"],\n"nonCodingRna": ["BBa_F0010"],\n"terminator": ["BBa_B0010"]}');
+    editors.catEditor.setValue('{"promoter": {"promoter": ["BBa_R0040", "BBa_J23100"]},\n "ribosomeBindingSite": {"ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"]}, \n"cds": {"cds": ["BBa_E0040", "BBa_E1010"]},\n"nonCodingRna": {"nonCodingRna": ["BBa_F0010"]},\n"terminator": {"terminator": ["BBa_B0010"]}}');
+  });
+
+  $('#and').on('click', function() {
+    document.getElementById('operationMenu').innerText = 'And';
+    combineMethod = 'and';
+  });
+
+  $('#merge').on('click', function() {
+    document.getElementById('operationMenu').innerText = 'Merge';
+    combineMethod = 'merge';
+  });
+
+  $('#zero').on('click', function() {
+    document.getElementById('toleranceMenu').innerText = 0;
+    tolerance = 0;
+  });
+
+  $('#one').on('click', function() {
+    document.getElementById('toleranceMenu').innerText = 1;
+    tolerance = 1;
+  });
+
+  $('#two').on('click', function() {
+    document.getElementById('toleranceMenu').innerText = 2;
+    tolerance = 2;
   });
 
 
@@ -448,15 +537,14 @@ $(document).ready(function() {
   $('[data-toggle="tooltip"]').tooltip();
 
 
-  $("#submitBtn").click(function(){
+  $("#goldarSubmitBtn").click(function() {
     // Reset UI
     resetDiagram();
     displayDesigns(editors, '');
     $("#exportSBOLBtn").addClass('hidden');
-    $('#goldbarSpinner').removeClass('hidden'); // show spinner
+    $('#spinner').removeClass('hidden'); // show spinner
 
-    let maxCycles = 0;
-    let numDesigns = 10;
+    let numDesigns, maxCycles, andTolerance, mergeTolerance;
 
     const specification = editors.specEditor.getValue();
     const categories = editors.catEditor.getValue();
@@ -476,33 +564,100 @@ $(document).ready(function() {
       "maxCycles": maxCycles,
       "number": "2.0",
       "name": "specificationname",
-      "clientid": "userid"
+      "clientid": "userid",
+      "representation": REPRESENTATION
     }, function (data) {
       displayDiagram(data.stateGraph);
       // Undefined design
       if (String(data.designs).includes('is not defined')) {
         displayDesigns(editors, data.designs);
       } else {
+        if ('exceedsDesigns' in data.messages) {
+          // show the tooltip and give it the warning message
+          $('#designWarning').removeClass('hidden');
+          $("#designWarning").attr("data-original-title", data.messages.exceedsDesigns);
+        } else {
+          // hide the tooltip
+          $('#designWarning').addClass('hidden');
+        }
         displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+      }
+
+      // if no numDesigns provided
+      if (numDesigns === '') {
+        document.getElementById('numDesigns').value = 20;
+      }
+      // if no maxCycles provided
+      if (maxCycles === '') {
+        document.getElementById('maxCycles').value = 0;
+      }
+      // if no andTolerance provided
+      if (andTolerance === '') {
+        document.getElementById('andTolerance').value = 0;
+      }
+      // if no mergeTolerance provided
+      if (mergeTolerance === '') {
+        document.getElementById('mergeTolerance').value = 0;
       }
       sbolDoc = data.sbol;
 
       $("#exportSBOLBtn").removeClass('hidden'); //show export button
-      $("#goldbarSpinner").addClass('hidden');
+      $("#spinner").addClass('hidden');
 
     }).fail((response) => {
       alert(response.responseText);
-      $("#goldbarSpinner").addClass('hidden');
+      $("#spinner").addClass('hidden');
     });
 
   });
 
+  /*$("#submitBtnSym").click(function() {
+    // Reset UI
+    resetDiagram();
+    displayDesigns(editors, '');
+    $("#exportSBOLBtn").addClass('hidden');
+
+    // let maxCycles = 0;
+    // let numDesigns = 10;
+
+    let numDesigns, maxCycles, andTolerance, mergeTolerance;
+
+    const specification = editors.specEditor.getValue();
+    const categories = editors.catEditor.getValue();
+
+    numDesigns = document.getElementById('numDesigns').value;
+    maxCycles = document.getElementById('maxCycles').value;
+    designName = document.getElementById('designName').value;
+    andTolerance = document.getElementById('andTolerance').value;
+    mergeTolerance = document.getElementById('mergeTolerance').value;
+
+    var ast = parse(specification);
+    update(editors, ast, categories);
+  });*/
+
   /*
-  Auto check the SBOL radio button when SBOL file is uploaded
+  Update list of sbol files when upload button is clicked or when file is dragged and dropped
    */
   $('#importSBOLBtn').on('change', function() {
     $("#specification-sbol").prop("checked", true).change(); //trigger change
-    sbolFile = this.files[0];
+    if (this.files) {
+      updateSBOLFiles(this.files);
+    }
+  });
+
+  $('#clearSBOLBtn').click(function () {
+    clearAllFiles();
+  })
+
+  $("#SBOLSubmitBtn").click(async function(){
+    resetDiagram();
+    displayDesigns(editors, '');
+    if(sbolFiles.length === 0) {
+      alert('No file uploaded!');
+      resetStepOne();
+      return;
+    }
+    await processSBOL(editors, sbolFiles, combineMethod, tolerance);
   });
 
   /*
@@ -520,16 +675,11 @@ $(document).ready(function() {
     $('#sbolSpinner').removeClass('hidden'); // show spinner
 
     let specMethod = $("input[name='spec-method']:checked").val();
+
     if (specMethod === 'goldbar'){
       showGoldBarStepTwo();
     }
-
     if(specMethod === 'sbol'){
-      if(!sbolFile){
-        alert('No file uploaded!');
-        resetStepOne();
-      }
-      await processSBOL(sbolFile);
       showSBOLStepTwo();
     }
 
@@ -540,32 +690,48 @@ $(document).ready(function() {
   Back button & Constellation on navbar goes back to step 1 and clears everything
    */
   $("#backBtn").click(function(){
-    resetAll();
+    resetAll(editors);
   });
 
   $("#navbarBrand").click(function(){
-    resetAll();
+    resetAll(editors);
+    $('#demo-space').removeClass('hidden');
+    $('#step1-content').addClass('hidden');
   });
 
-  function resetAll(){
-    resetStepOne();
-    resetStepTwo();
-    $('#step1-content').removeClass('hidden'); //show step 1
-  }
-
-  function resetStepTwo(){
-    resetDiagram();
-    displayDesigns(editors, '');
-    $('#goldbarSpinner').addClass('hidden');
-    $("#exportSBOLBtn").addClass('hidden');
-    $('#step2-content').addClass('hidden');
-    $('#graph-designs-col').addClass('hidden');
-    $('#spec-categories-col').addClass('hidden');
-    $('#goldbar-parameters').addClass('hidden');
-    $('#goldbar-btns').addClass('hidden');
-  }
-
 });
+
+
+
+
+
+
+/* * * * * * */
+/*  CLEANUP  */
+/* * * * * * */
+
+/**
+ * Removes all uploaded SBOL files
+ */
+function clearAllFiles(){
+  sbolFiles = [];
+  $('#sbol-filenames').empty();
+  $("#operationMenu").attr("disabled", true);
+  $("#toleranceMenu").attr("disabled", true);
+}
+
+function resetDiagram() {
+  if(simulationPointer){
+    simulationPointer.stop();
+  }
+  d3.selectAll('svg').remove();
+}
+
+function resetAll(editors){
+  resetStepOne();
+  resetStepTwo(editors);
+  $('#step1-content').removeClass('hidden'); //show step 1
+}
 
 function resetStepOne(){
   $("#importSBOLBtn").val("");
@@ -575,18 +741,68 @@ function resetStepOne(){
   $("#specification-goldbar").prop("checked", false);
 }
 
+function resetStepTwo(editors){
+  $('#designName').val('');
+  resetDiagram();
+  clearAllFiles();
+  //clear CodeMirror editors
+  Object.values(editors).forEach(function(cm) {
+    cm.setValue("");
+    cm.clearHistory();
+  });
+
+  $('#spinner').addClass('hidden');
+  $("#exportSBOLBtn").addClass('hidden');
+  $('#step2-content').addClass('hidden');
+  $('#graph-designs-row').addClass('hidden');
+  $('#spec-categories-row-0').addClass('hidden');
+  $('#goldbar-parameters').addClass('hidden');
+  $('#sbol-parameters').addClass('hidden');
+  $('#goldarSubmitBtn').addClass('hidden');
+  $('#SBOLSubmitBtn').addClass('hidden');
+  $('#goldbar-btns').addClass('hidden');
+  $('#designWarning').addClass('hidden');
+}
+
+
+
+
+
+
+
+/* * * * * * */
+/*  STEP TWO  */
+/* * * * * * */
+
 function showSBOLStepTwo(){
   $('#step2-content').removeClass('hidden');
-  $('#graph-designs-col').removeClass('hidden'); //show only graph and designs
+  $('#sbol-parameters').removeClass('hidden');
+  $('#graph-designs-row').removeClass('hidden'); //show only graph and designs
+  $('#goldbar-btns').removeClass('hidden');
+  $('#SBOLSubmitBtn').removeClass('hidden');
+
 }
 
 function showGoldBarStepTwo(){
   $('#step2-content').removeClass('hidden');
-  $('#graph-designs-col').removeClass('hidden');
-  $('#spec-categories-col').removeClass('hidden');
+  $('#graph-designs-row').removeClass('hidden');
+  $('#spec-categories-row-0').removeClass('hidden');
   $('#goldbar-parameters').removeClass('hidden');
   $('#goldbar-btns').removeClass('hidden');
+  $('#goldarSubmitBtn').removeClass('hidden');
 }
+
+
+
+
+
+
+
+
+
+/* * * * * * */
+/*    SBOL   */
+/* * * * * * */
 
 function downloadSBOL(text, filename) {
   let element = document.createElement('a');
@@ -597,4 +813,110 @@ function downloadSBOL(text, filename) {
   element.click();
   document.body.removeChild(element);
 }
+
+function preventDefaults (e) {
+  e.preventDefault()
+  e.stopPropagation()
+}
+
+function sbolDragOver(ev) {
+  ev.stopPropagation();
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = 'copy';
+  $('#sbol-drop-area').removeClass('dragdefault');
+  $('#sbol-drop-area').addClass('dragenter');
+}
+
+function sbolDragLeave() {
+  $('#sbol-drop-area').removeClass('dragenter');
+}
+
+
+function handleDrop(ev) {
+  ev.preventDefault();
+  $('#sbol-drop-area').removeClass('dragenter');
+  if (ev.dataTransfer.files.length >= 10) {
+    alert('Error: Too many files');
+    return;
+  }
+  if (!ev.dataTransfer.files[0].name.endsWith(".sbol") && !ev.dataTransfer.files[0].name.endsWith(".xml")) {
+    alert('Error: Invalid file type');
+    return;
+  }
+  let dt = ev.dataTransfer
+  let files = dt.files
+  updateSBOLFiles(files)
+}
+
+function updateSBOLFiles(files) {
+  if (sbolFiles.length >= 10) {
+    alert('You have uploaded the maximum number of files.');
+  }
+  for (let file of files) {
+    sbolFiles.push(file);
+    $('#sbol-filenames').append(file.name + '<br>');
+  }
+  if (sbolFiles.length > 1) {
+    $("#operationMenu").attr("disabled", false);
+    $("#toleranceMenu").attr("disabled", false);
+  }
+}
+
+function processSBOLFile(file) {
+  return new Promise((resolve) => {
+    // Parse file into XML object
+    let parser = new DOMParser();
+    let reader = new FileReader();
+    reader.readAsText(file, "UTF-8");
+    reader.onload = function (evt) {
+      let data = evt.target.result;
+      // let data = parser.parseFromString(evt.target.result, "application/xml");
+      resolve(data);
+    };
+  });
+}
+
+async function processSBOL(editors, files, combineMethod, tolerance) {
+  $("#spinner").removeClass('hidden');
+
+  //read SBOL file
+  let sbolXMLs = [];
+  for (let i = 0; i < files.length; i++) {
+    let file = files[i];
+    let xmlString = await processSBOLFile(file);
+    sbolXMLs.push(xmlString);
+  }
+
+  let data = {
+    sbol: sbolXMLs,
+    combineMethod: combineMethod,
+    tolerance: tolerance
+  }
+  // Parse SBOL and display results
+  $.ajax({
+    url: 'http://34.227.115.255:80/importSBOL',
+    type: 'POST',
+    data: JSON.stringify(data),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    processData: false,
+    success: function(data){
+      console.log(typeof data);
+      console.log(data);
+      // data = JSON.parse(data);
+      displayDiagram(data.stateGraph);
+      // Undefined design
+      if (String(data.designs).includes('is not defined')) {
+        displayDesigns(editors, data.designs);
+      } else {
+        displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
+      }
+      $("#spinner").addClass('hidden');
+    }
+  })
+    .fail((response) => {
+      alert(response.responseText);
+      $("#spinner").addClass('hidden');
+    });
+};
 

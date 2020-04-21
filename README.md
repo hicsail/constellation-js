@@ -2,94 +2,124 @@
 
 [![Build Status](https://travis-ci.org/hicsail/constellation-js.svg?branch=master)](https://travis-ci.org/hicsail/constellation-js) [![npm version](https://badge.fury.io/js/constellation-js.svg)](https://badge.fury.io/js/constellation-js)[![Coverage Status](https://coveralls.io/repos/github/hicsail/constellation-js/badge.svg?branch=master)](https://coveralls.io/github/hicsail/constellation-js?branch=master)
 
+### Latest stable version available at [ConstellationCAD](http://constellationcad.org/)
 
-## Quickstart
+## Usage
+### Requirements
 
+[![node](https://user-images.githubusercontent.com/7750862/70819282-d5ad4a80-1da3-11ea-8f65-dcf2468c74ef.png)](https://nodejs.org/en/download/) [![python](https://user-images.githubusercontent.com/7750862/70819279-d3e38700-1da3-11ea-9321-309ec4d3cc51.png)](https://www.python.org/downloads/)
+
+### Local UI
+```shell
+git clone git@github.com:hicsail/constellation-js.git
+npm run build && npm run start
+```
+Then open `http://localhost:8082/` on browser
+
+### NPM Package
+
+The package can be installed in the following way.
 ```shell
 npm install constellation-js
 ```
-
+It is possible to generate a collection of designs that match a specification using graph construction and traversals.
 ```javascript
 const constellation = require('constellation-js');
-var langText = '{a . b}';
-var categories = {'a': ['a1', 'a2'], 'b': ['b1']};
-var numDesigns = 3;
-var cycleDepth = 1
+let goldbar = '{PT7_a then galK}';
+let categories = {
+	"PT7_a":{
+	  "promoter": [
+	    "PT7_WTa",
+	    "PT7_3a",
+	    "PT7_1a"
+	    ]
+      },
+	"galK":{
+	  "cds": [
+	    "galK"
+	    ]
+      }
+}
+let result = constellation.goldbar(goldbar, categories, {designName: 'my-first-design'});
+// result.stateGraph, result.designs, result.sbol
+```
+|Optional parameters| Description|
+|--|--|
+|`designName`|Name of design space for SBOL output, defaults is "constellation-design"|
+|`numDesigns`|Max number of designs to enumerate, default is 20|
+|`maxCycles`|Cycle depth for -orMore operators, default is 0|
+|`representation`|Choose between `EDGE` or `NODE` based graph, default is EDGE|
+|`andTolerance`|Choose between 0, 1, 2 for the AND operator, default is 0|
+|`mergeTolerance`|Choose between 0, 1, 2 for the MERGE operator, default is 0|
 
-var result = constellation(langText, categories, numDesigns, cycleDepth);
+|Output|Description|
+|--|--|
+|`stateGraph`|See [Graph Data Structure](#Graph-Data-Structure)|
+|`designs`|List of enumerated designs|
+|`sbol`| See [Synthetic Biology Open Language](#Synthetic-Biology-Open-Language)|
+
+It is also possible to generate a collection of designs that match a specification using a purely symbolic approach (note that this approach supports only a tolerance of `0` for the AND operator and does not support the MERGE operator).
+```javascript
+let result = constellation.symbolic(
+               "(one-or-more a) then (one-or-more x)", 
+               {"a": {"b": ["c"]}, "x":{"y": ["z1", "z2", "z3"]}}, 
+               {"numDesigns": 'all', "maxCycles":7});
 ```
 
-## Demos
+## Case Studies
+GOLDBAR syntax for the case studies described in the manuscript are available [here](demos/static/use-cases) and can be demoed on Constellation's UI via the drop down menu.
 
-```shell
-node demos/server.js
+## Design Space Representations
+Genetic design spaces in Constellation are represented in three ways:
+1. GOLDBAR
+2. Directed cyclic graph
+3. SBOL
+
+### GOLDBAR Syntax
+The supported GOLDBAR concrete syntax for genetic design spaces is presented below using extended BNF notation. Notice that `then` and `.` are equivalent, and the delimiters `(`...`)` and `{`...`}` are equivalent.
 ```
-Then view the demo in a browser at `http://localhost:8082/`.
+ <seq> ::= <exp> then <seq>
+        |  <exp> . <seq>
+        |  <exp>
 
-## Dependencies
-- [imparse](http://imparse.org/)
-- [reservoir](https://github.com/imbcmdth/reservoir)
-- [uuidv4](https://github.com/thenativeweb/uuidv4)
+ <exp> ::= <term> or <exp>
+        |  <term> and <exp>
+        |  <term> merge <exp>
+        |  <term>
 
-## Supported Operators
-```a```  <br />
-<img width="86" alt="atom" src="https://user-images.githubusercontent.com/6438622/34654704-86d369c8-f3cd-11e7-8405-96b67a1202f1.png">
+<term> ::= one-or-more <term>
+        |  zero-or-more <term>
+        |  zero-or-one <term>
+        |  ( <seq> )
+        |  { <seq> }
+        |  <atom>
 
-```a or b```  <br />
-<img width="94" alt="or" src="https://user-images.githubusercontent.com/6438622/34654699-79ac8388-f3cd-11e7-9bce-3b43153281a1.png">
-
-```a then b```  <br />
-<img width="102" alt="then" src="https://user-images.githubusercontent.com/6438622/34654706-8805feaa-f3cd-11e7-8a47-dea5cc17efdc.png">
-
-```zero-or-more a```  <br />
-<img width="71" alt="zero" src="https://user-images.githubusercontent.com/6438622/34654691-65bfcca4-f3cd-11e7-860b-557168dc36ee.png">
-
-```one-or-more a```  <br />
-<img width="104" alt="one" src="https://user-images.githubusercontent.com/6438622/34654707-8ac29702-f3cd-11e7-8e92-7c694241fbd7.png">
-
-## Example
-Specification <br/>
+<atom> ::= ([A-Za-z0-9]|-|_)+
 ```
-one-or-more (a or (a then (zero-or-more b)))
-```
+The JSON schema for the GOLDBAR abstract syntax tree representation (parsed from the concrete syntax presented above) can be found in [`schemas/ast.schema.json`](schemas/ast.schema.json).
 
-Part Categories <br/>
-```
-{"a": ["a1", "a2"],
-"b": ["b1", "b2"]}
-```
-<strong>Results</strong> <br/>
-Graph <br/>
-<img width="168" alt="screen shot 2018-01-07 at 5 24 17 pm" src="https://user-images.githubusercontent.com/6438622/34654908-165ca382-f3d0-11e7-803d-4bdf7d3c1145.png">
+### Graph Data Structure
+Constellation supports both NODE and EDGE based versions of a design space. Below are examples equivalent to the GOLDBAR specification `promoter then one-or-more CDS then terminator`
 
-Designs: <br/>
-```
-[
-	"a1,b1",
-	"a1,b2",
-	"a2,b1",
-	"a2,b2",
-	"a1",
-	"a2"
-]
-```
+|![node-graph](https://user-images.githubusercontent.com/7750862/70357131-21ac3c80-1844-11ea-901f-2a744ce65238.png) | ![edge-graph](https://user-images.githubusercontent.com/7750862/70357132-22dd6980-1844-11ea-8d70-73e28f70c39d.png)|
+| ------------- | ------------- |
+Visualization of node-based graph| Visualization of edge-based graph
 
-## Data Structures
-
-### Boundary Graph
-
-### Node Object
-
-#### Example
+The JSON schema for a design space graph can be found in [`schemas/graph.schema.json`](schemas/graph.schema.json). Below is an example of a node-based graph within a single node in JSON format.
 ```
 {
-  "id": "604571a7-9e38-4647-afd0-9546399480b5",
-  "text": "root",
-  "type": "root",
-  "edges": [
-    "b79407eb-95f0-4b78-99da-779f2c9cad46",
-    "7f6ca2fb-ef67-4687-924c-4285de896877"]
+  "604571a7-9e38-4647-afd0-9546399480b5": {
+    "id": "604571a7-9e38-4647-afd0-9546399480b5",
+    "text": "root",
+    "type": "root",
+    "edges": [
+      "b79407eb-95f0-4b78-99da-779f2c9cad46",
+      "7f6ca2fb-ef67-4687-924c-4285de896877"
+    ],
+    "operator": ["One"]
+  }
 }
 ```
 
-
+### Synthetic Biology Open Language
+[SBOL](https://sbolstandard.org/) is an open standard for the representation of *in silico* biological designs, and the icons used in this tool are provided by [SBOL Visual](https://sbolstandard.org/visual/glyphs/). Design spaces are expressed in SBOL via the `CombinatorialDerivation` extension and can be exported and stored in [Knox](https://github.com/CIDARLAB/knox). This third form of design space representation allows Constellation to be easily integrated in the synthetic biology [community](https://sbolstandard.org/applications/).
