@@ -38,8 +38,6 @@ app.post('/postSpecs', async function(req,res) {
   let categories = req.body.categories;
   let numDesigns = req.body.numDesigns || 20;
   let maxCycles = req.body.maxCycles || 0;
-  let andTolerance = req.body.andTolerance || 0;
-  let mergeTolerance = req.body.mergeTolerance || 0;
   let representation = req.body.representation || 'EDGE';
   console.log('---Received new input---');
   console.log('Design Name: ', designName);
@@ -47,8 +45,6 @@ app.post('/postSpecs', async function(req,res) {
   console.log('Categories: ', categories);
   console.log('numDesigns: ', numDesigns);
   console.log('maxCycles: ', maxCycles);
-  console.log('andTolerance: ', andTolerance);
-  console.log('mergeTolerance: ', mergeTolerance);
   console.log('Representation:', representation);
 
   let data;
@@ -58,8 +54,6 @@ app.post('/postSpecs', async function(req,res) {
       numDesigns: numDesigns,
       maxCycles: maxCycles,
       representation: representation,
-      andTolerance: andTolerance,
-      mergeTolerance: mergeTolerance
   });
     res.status(200).send(data);
   } catch (error) {

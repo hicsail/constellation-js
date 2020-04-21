@@ -23,6 +23,9 @@
     <script type="application/javascript" src="./designEnumeration.js"></script>
     <script type="application/javascript" src="./constellation.js"></script-->
     <script type="application/javascript" src="js/constellation.js"></script>
+    <script type="text/javascript" src="use-cases/rebeccamycin.js"></script>
+    <script type="text/javascript" src="use-cases/cello-AND-circuits.js"></script>
+    <script type="text/javascript" src="use-cases/cello-categories.js"></script>
 
     <script type="application/javascript" src="js/codemirror.js"></script>
     <script type="application/javascript" src="js/scheme.js"></script>
@@ -197,17 +200,6 @@
                   <input id="maxCycles" type="number" min="0" max="1000">
                 </div>
               </div>
-              <div class="row">
-                <div class="col-sm">
-                  <label><h5>AND Tolerance (0-2):</h5></label>
-                  <input id="andTolerance" type="number" min="0" max="2">
-                </div>
-
-                <div class="col-sm">
-                  <label><h5>MERGE Tolerance (0-2):</h5></label>
-                  <input id="mergeTolerance" type="number" min="0" max="2">
-                </div>
-              </div>
             </div>
             <!--  End GOLDBAR Parameters  -->
             <!--  GOLDBAR Specification and Categories  -->
@@ -219,7 +211,11 @@
                       Examples
                     </button>
                     <div id="examples-list" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                      <a id='demo-option' class="dropdown-item" href="#">Demo</a>
+                      <a id='and0-option' class="dropdown-item" href="#">Cello AND Circuit (AND0)</a>
+                      <a id='and1-option-norb' class="dropdown-item" href="#">Cello No Roadblocking (AND1)</a>
+                      <a id='and1-option-rb' class="dropdown-item" href="#">Cello Roadblocking (AND1)</a>
+                      <a id='and2-option' class="dropdown-item" href="#">Cello AND Circuit (AND2)</a>
+                      <a id='merge-option' class="dropdown-item" href="#">Rebeccamycin (MERGE)</a>
                       <a id='debug-option' class="dropdown-item" href="#">Debug</a>
                     </div>
                   <textarea class="codemirror" id="goldbar-input-0" name="paragraph_text" cols="50" rows="10"></textarea>

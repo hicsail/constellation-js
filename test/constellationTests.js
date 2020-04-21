@@ -108,16 +108,6 @@ module.exports = function() {
       await expect(constellation.goldbar('a', CATEGORIES, {representation:'HOBBITS'})).to.be.rejectedWith('Invalid graph representation');
     });
 
-    it('Invalid AND tolerance', async() => {
-      await expect(constellation.goldbar('a', CATEGORIES, {andTolerance:-5})).to.be.rejectedWith('Invalid tolerance parameter for AND');
-      await expect(constellation.goldbar('a', CATEGORIES, {andTolerance:5})).to.be.rejectedWith('Invalid tolerance parameter for AND');
-    });
-
-    it('Invalid MERGE tolerance', async() => {
-      await expect(constellation.goldbar('a', CATEGORIES, {mergeTolerance:-5})).to.be.rejectedWith('Invalid tolerance parameter for MERGE');
-      await expect(constellation.goldbar('a', CATEGORIES, {mergeTolerance:5})).to.be.rejectedWith('Invalid tolerance parameter for MERGE');
-    });
-
   });
 
   describe('Operator unit tests, base cases', function() {
@@ -266,7 +256,7 @@ module.exports = function() {
       });
       // AND only works on EDGE representation
       it('one-or-more (atom and atom)', async() => {
-        const result = await constellation.goldbar('one-or-more (a and a)', CATSTR, EDGE_REP);
+        const result = await constellation.goldbar('one-or-more (a and0 a)', CATSTR, EDGE_REP);
         expectA(result);
       });
 
@@ -286,7 +276,7 @@ module.exports = function() {
       });
       // AND only works on EDGE representation
       it('zero-or-more (atom and atom)', async() => {
-        const result = await constellation.goldbar('zero-or-more (a and a)', CATSTR, EDGE_REP);
+        const result = await constellation.goldbar('zero-or-more (a and0 a)', CATSTR, EDGE_REP);
         expectA(result);
       });
 
@@ -306,7 +296,7 @@ module.exports = function() {
       });
       // AND only works on EDGE representation
       it('zero-or-one (atom and atom)', async() => {
-        const result = await constellation.goldbar('zero-or-one (a and a)', CATSTR, EDGE_REP);
+        const result = await constellation.goldbar('zero-or-one (a and0 a)', CATSTR, EDGE_REP);
         expectA(result);
       });
 
@@ -337,7 +327,7 @@ module.exports = function() {
       });
       // AND only works on EDGE representation
       it('(atom or atom) and atom', async() => {
-        const result = await constellation.goldbar('(a or c) and a', CATSTR, EDGE_REP);
+        const result = await constellation.goldbar('(a or c) and0 a', CATSTR, EDGE_REP);
         expectA(result);
       });
 
@@ -356,20 +346,20 @@ module.exports = function() {
       // And
       // AND only works on EDGE representation
       it('(atom and atom) or atom', async() => {
-        const result = await constellation.goldbar('(a and b) or c', CATSTR, EDGE_REP);
+        const result = await constellation.goldbar('(a and0 b) or c', CATSTR, EDGE_REP);
         expectAllReturnValues(result);
         expect(result.designs.length).to.equal(CLEN);
         expect(result.designs).to.have.members(CMEM);
       });
 
       it('(atom and atom) and atom', async() => {
-        const result = await constellation.goldbar('(a and a) and b', CATSTR, EDGE_REP);
+        const result = await constellation.goldbar('(a and0 a) and0 b', CATSTR, EDGE_REP);
         expectAllReturnValues(result);
         expect(result.designs.length).to.equal(0);
       });
 
       it('(atom and atom) then atom', async() => {
-        const result = await constellation.goldbar('(a and a) then b', CATSTR, EDGE_REP);
+        const result = await constellation.goldbar('(a and0 a) then b', CATSTR, EDGE_REP);
         expectACartesianB(result);
       });
 
@@ -399,7 +389,7 @@ module.exports = function() {
       });
       // AND only works on EDGE representation
       it('(atom then atom) and atom', async() => {
-        const result = await constellation.goldbar('(a then b) and a', CATSTR, EDGE_REP);
+        const result = await constellation.goldbar('(a then b) and0 a', CATSTR, EDGE_REP);
         expectAllReturnValues(result);
         expect(result.designs.length).to.equal(0);
       });
@@ -431,17 +421,17 @@ module.exports = function() {
       // AND
       // AND only works on EDGE representation
       it('atom and (one-or-more atom)', async() => {
-        const result = await constellation.goldbar('a and (one-or-more a)', CATSTR, EDGE_REP);
+        const result = await constellation.goldbar('a and0 (one-or-more a)', CATSTR, EDGE_REP);
         expectA(result);
       });
 
       it('atom and (zero-or-more atom)', async() => {
-        const result = await constellation.goldbar('a and (zero-or-more a)', CATSTR, EDGE_REP);
+        const result = await constellation.goldbar('a and0 (zero-or-more a)', CATSTR, EDGE_REP);
         expectA(result);
       });
 
       it('atom and (zero-or-one atom)', async() => {
-        const result = await constellation.goldbar('a and (zero-or-one a)', CATSTR, EDGE_REP);
+        const result = await constellation.goldbar('a and0 (zero-or-one a)', CATSTR, EDGE_REP);
         expectA(result);
       });
 
