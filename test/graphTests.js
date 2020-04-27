@@ -4,7 +4,6 @@
 // noinspection JSUnusedLocalSymbols
 const expect = require('chai').expect;
 // noinspection JSUnusedLocalSymbols
-const graph = require('../lib/graphDataOnNodes');
 // noinspection JSUnusedLocalSymbols
 const imparse = require('imparse');
 
