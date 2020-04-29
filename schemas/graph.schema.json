@@ -14,7 +14,7 @@
     },
     "operator": {
       "type": "string",
-      "enum": ["OneOrMore", "ZeroOrMore", "ZeroOrOne", "One", "Then", "Or", "And", "Merge"]
+      "enum": ["OneOrMore", "ZeroOrMore", "ZeroOrOne", "Then", "Or", "And", "Merge"]
     },
     "node_type": {
       "type": "string",
