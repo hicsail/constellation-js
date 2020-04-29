@@ -91,11 +91,6 @@ module.exports = function() {
         await expectIntersection('(cds1 then cds3)', '(cds2 then cds4)');
       });
 
-      // TODO: not sure how to write this one because the result is not the intersection of the original designs
-      // it('(cds1 then cds3) and one-or-more(cds5)', async () => {
-      //   await expectIntersection('(cds1 then cds3)', 'one-or-more(cds5)');
-      // });
-
       it('cds1 and0 (cds2 then zero-or-one(cds4))', async () => {
         await expectIntersection('cds1', '(cds2 then zero-or-one(cds4))');
       });

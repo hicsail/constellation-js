@@ -99,14 +99,6 @@ module.exports = function() {
 
     });
 
-    // it('Multi-level graphs', function() {
-    //   const collection = {'a': ['a1', 'a2'], 'b': ['b1']};
-    //   const path = [generateRoot(), generateAtom('a')];
-    //   const paths = [path, path];
-    //   const designs = enumeration(paths, collection, 4);
-    //   // TODO finish
-    // });
-
     describe('Number of IDs kept after pruning', function () {
       it('Product too large - select part of the IDs', function () {
         const pathStr = ["Cello_promoter", "Cello_promoter", "Cello_ribozyme", "Cello_RBS", "Cello_CDS", "Cello_terminator"];
