@@ -486,12 +486,12 @@ $(document).ready(function() {
 
   $('#and').on('click', function() {
     document.getElementById('operationMenu').innerText = 'And';
-    combineMethod = 'and';
+    combineMethod = 'And';
   });
 
   $('#merge').on('click', function() {
     document.getElementById('operationMenu').innerText = 'Merge';
-    combineMethod = 'merge';
+    combineMethod = 'Merge';
   });
 
   $('#zero').on('click', function() {
