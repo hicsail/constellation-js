@@ -6,7 +6,6 @@ const expect = chai.expect;
 const constellation = require('../lib/constellation');
 
 const CATEGORIES = {"a":{"a":["a1","a2"]},"b":{"b":["b1","b2","b3"]},"c":{"c":["c1"]}};
-const FOR_TOLERANCE = {"a1":{"a":["first","second"]},"a2":{"a":["first"], "letter": ["first"]},"a3":{"a":[]}, "a4":{"letter":[]}};
 const CELLO_CATS = { "Cello_promoter": { "promoter": ["pLitR", "pQacR", "pIcaRA", "pSrpR", "pPhlF", "pLuxStar", "pTac", "pAmtR", "pTet", "pLmrA", "pCONST", "pAmeR", "pBAD", "pBetI", "pHlyIIR", "pBM3R1", "pPsrA"]},
   "Cello_CDS": {"cds": ["sigmaK1FR", "LmrA", "LacI", "QacR", "LitR", "IcaRA", "SrpR", "PhlF", "LuxR", "AmtR", "TetR", "AmeR", "BetI", "HlyIIR", "BM3R1", "PsrA", "BFP", "sigmaT3", "sigmaCGG", "AraC", "sigmaT7", "YFP", "RFP"]},
   "Cello_RBS": {"ribosomeBindingSite": ["P2", "N1", "B3", "S1", "BBa_B0064_rbs", "S2", "H1", "E1", "Q2", "P1", "B1", "S4", "R1", "B2", "L1", "Q1", "A1", "P3", "F1", "I1", "S3"]},
@@ -23,7 +22,6 @@ const BLEN = BMEM.length;
 const CLEN = CMEM.length;
 
 const CATSTR = JSON.stringify(CATEGORIES);
-const TOLSTR = JSON.stringify(FOR_TOLERANCE);
 const CELLOSTR = JSON.stringify(CELLO_CATS);
 
 const NODE = 'NODE';
@@ -84,16 +82,6 @@ module.exports = function() {
     it('Missing categories', async() => {
       await expect(constellation.goldbar('a', '{}')).to.be.rejectedWith('No categories specified');
     });
-
-    // it('Missing ids in categories', async() => {
-    //   await expect(constellation.goldbar('a', '{"a": {"roles":["a"]}}')).to.be.rejectedWith('Every category must have ids and a role');
-    //   await expect(constellation.goldbar('a', '{"a": {"roles":["a"]}}')).to.be.rejectedWith('Every category must have ids and a role');
-    // });
-    //
-    // it('Missing roles in categories', async() => {
-    //   await expect(constellation.goldbar('a', '{"a": {"ids":["a"]}}')).to.be.rejectedWith('Every category must have ids and a role');
-    //   await expect(constellation.goldbar('a', '{"a": {"ids":["a"]}}')).to.be.rejectedWith('Every category must have ids and a role');
-    // });
 
     it('Invalid num designs', async() => {
       await expect(constellation.goldbar('a', CATEGORIES, {numDesigns:0})).to.be.rejectedWith('Invalid number of designs');
@@ -579,37 +567,4 @@ module.exports = function() {
     });
 
   });
-
-
-
-  //   it('Multiple one-or-more', function() {
-  //     const result = constellation.goldbar('one-or-more (one-or-more a)', CATSTR, 10, 1);
-  //     expect(result.designs.length).to.equal(ALEN + ALEN * ALEN);
-  //     expect(result.designs).to.contain('a1');
-  //     expect(result.designs).to.contain('a2');
-  //     expect(result.designs).to.contain('a1,a1');
-  //     expect(result.designs).to.contain('a1,a2');
-  //     expect(result.designs).to.contain('a2,a1');
-  //     expect(result.designs).to.contain('a2,a2');
-  //     expect(result.paths.length).to.equal(2);
-  //   });
-
-  //   it('Multiple zero-or-more', function() {
-  //     const result = constellation.goldbar('zero-or-more (zero-or-more a)', CATSTR, 10, 1);
-  //     expect(result.designs.length).to.equal(ALEN + ALEN * ALEN);
-  //     expect(result.designs).to.contain('a1');
-  //     expect(result.designs).to.contain('a2');
-  //     expect(result.designs).to.contain('a1,a1');
-  //     expect(result.designs).to.contain('a1,a2');
-  //     expect(result.designs).to.contain('a2,a1');
-  //     expect(result.designs).to.contain('a2,a2');
-  //     expect(result.paths.length).to.equal(2);
-  //   });
-
-  //   it('Then downstream from cycle', function() {
-  //     const result = constellation.goldbar('zero-or-more a then b', CATSTR, 50, 1);
-  //     expect(result.designs.length).to.equal(BLEN + ALEN * BLEN + ALEN * ALEN * BLEN);
-  //   });
-
-  // });
 };

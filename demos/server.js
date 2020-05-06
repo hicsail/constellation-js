@@ -2,10 +2,6 @@ let express = require('express');
 let app = express();
 let path = require('path');
 let bodyParser = require('body-parser');
-let FormData = require('form-data');
-const Readable = require('stream').Readable;
-const xmlparser = require('express-xml-bodyparser');
-
 let constellation = require('../lib/constellation');
 
 app.use(bodyParser.json({limit: '50mb'}));
@@ -80,31 +76,4 @@ app.post('/importSBOL', async function(req,res) {
     console.log(error);
     res.status(500).send(String(error));
   }
-});
-
-app.post('/sendToKnox', function(req,res) {
-
-  let form = new FormData();
-  let sbolDocs = JSON.parse(req.body['sbolDocs[]']);
-
-  for(let sbol of sbolDocs){
-    let stream = new Readable();
-    stream.push(sbol);
-    stream.push(null);
-    form.append('inputSBOLFiles[]', stream, {
-      filename : 'test.xml',
-      contentType: 'application/xml',
-      knownLength: sbol.length
-    }); //extra fields necessary
-  }
-  form.append('outputSpaceID', req.body.designName);
-
-  form.submit('http://localhost:8080/sbol/importCombinatorial', function(error, result) {
-    if (error) {
-      console.log('Error!');
-      res.status(405).send(String(error));
-    } else{
-      res.status(200).send(String(result));
-    }
-  });
 });

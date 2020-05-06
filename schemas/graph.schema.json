@@ -4,11 +4,7 @@
   "description": "A JavaScript graph representation of a genetic design space",
   "type": "object",
   "patternProperties": {
-    "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$": {
-      "anyOf": [
-        { "$ref": "#/definitions/node" }
-      ]
-    }
+    "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$": { "$ref": "#/definitions/node" }
   },
   "additionalProperties": false,
   "definitions": {
@@ -18,22 +14,56 @@
     },
     "operator": {
       "type": "string",
-      "enum": ["OneOrMore", "ZeroOrMore", "ZeroOrOne", "One", "Then", "And", "Merge"]
+      "enum": ["OneOrMore", "ZeroOrMore", "ZeroOrOne", "Then", "Or", "And", "Merge"]
     },
     "node_type": {
       "type": "string",
       "enum": ["epsilon", "atom", "accept", "root"]
+    },
+    "edge_type": {
+      "type": "string",
+      "enum": ["epsilon", "ZeroOrMore", "ZeroOrOne", "OneOrMore", "atom"]
+    },
+    "edge_component": {
+      "type": "object",
+      "patternProperties": {
+        "^.*$": { "type": "array" }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "required": ["src", "dest", "component", "type", "text"],
+      "properties": {
+        "src": { "$ref": "#/definitions/uuid" },
+        "dest": { "$ref": "#/definitions/uuid" },
+        "component": {
+          "oneOf": [
+            {"$ref":  "#/definitions/edge_component"},
+            {"type": "string",
+              "enum": ["epsilon"]}
+          ]
+        },
+        "type": { "$ref": "#/definitions/edge_type" },
+        "text": { "type": "string" }
+      }
     },
     "node": {
       "type": "object",
       "required": ["id", "text", "type", "edges"],
       "properties": {
         "id": { "$ref": "#/definitions/uuid" },
-        "text": { "$ref": "#/definitions/node_type" },
+        "text": {
+          "anyOf": [
+            { "$ref": "#/definitions/node_type" },
+            { "type": "string", "pattern": "^.*$"}
+          ]
+        },
         "type": { "$ref": "#/definitions/node_type" },
         "edges": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/uuid" }
+          "anyOf": [
+            {"type": "array", "items": { "$ref": "#/definitions/edge" }},
+            {"type": "array", "items": { "$ref": "#/definitions/uuid" }}
+          ]
         },
         "operator": {
           "type": "array",

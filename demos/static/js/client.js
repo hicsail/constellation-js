@@ -147,7 +147,6 @@ function drawLinks(links) {
  * @param nodes D3 nodes object
  */
 function drawNodes(nodes) {
-  console.log(nodes);
   // Add g component
   nodePointer = svgPointer.selectAll('.node')
     .data(nodes)
@@ -156,17 +155,6 @@ function drawNodes(nodes) {
     .attr('class', 'node');
 
   // Add tooltip for node representation
-  // if (REPRESENTATION === "NODE") {
-  //   textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
-  //     .append('text')
-  //     .text( function(d) {return d.operator; })
-  //     .attr('opacity', 0)
-  //     .attr('dx', '20px')
-  //     .attr('dy', '4px')
-  //     .style('fill', 'rgb(100,)')
-  //     .style('font-family', 'Montserrat');
-  // }
-
   textPointer = nodePointer.filter( function(d) { return d.type !== INTERMEDIATE} )
     .append('text')
     .text( function(d) {return d.operator + ',' + d.id; })
@@ -287,14 +275,6 @@ function tick() {
   });
 
   // update tooltip positions for node representation
-  // if (REPRESENTATION === 'NODE') {
-  //   textPointer.attr('transform', function(d) {
-  //     d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
-  //     d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
-  //     return 'translate(' + d.x + ',' + d.y + ')'
-  //   });
-  // }
-
   textPointer.attr('transform', function(d) {
     d.x = Math.max(RADIUS, Math.min(width - RADIUS, d.x));
     d.y = Math.max(RADIUS, Math.min(height - RADIUS, d.y));
@@ -611,30 +591,6 @@ $(document).ready(function() {
 
   });
 
-  /*$("#submitBtnSym").click(function() {
-    // Reset UI
-    resetDiagram();
-    displayDesigns(editors, '');
-    $("#exportSBOLBtn").addClass('hidden');
-
-    // let maxCycles = 0;
-    // let numDesigns = 10;
-
-    let numDesigns, maxCycles, andTolerance, mergeTolerance;
-
-    const specification = editors.specEditor.getValue();
-    const categories = editors.catEditor.getValue();
-
-    numDesigns = document.getElementById('numDesigns').value;
-    maxCycles = document.getElementById('maxCycles').value;
-    designName = document.getElementById('designName').value;
-    andTolerance = document.getElementById('andTolerance').value;
-    mergeTolerance = document.getElementById('mergeTolerance').value;
-
-    var ast = parse(specification);
-    update(editors, ast, categories);
-  });*/
-
   /*
   Update list of sbol files when upload button is clicked or when file is dragged and dropped
    */
@@ -901,8 +857,6 @@ async function processSBOL(editors, files, combineMethod, tolerance) {
     dataType: "json",
     processData: false,
     success: function(data){
-      console.log(typeof data);
-      console.log(data);
       // data = JSON.parse(data);
       displayDiagram(data.stateGraph);
       // Undefined design
