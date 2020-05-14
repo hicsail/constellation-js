@@ -854,7 +854,8 @@ async function processSBOL(editors, files, combineMethod, tolerance) {
   let data = {
     sbol: sbolXMLs,
     combineMethod: combineMethod,
-    tolerance: tolerance
+    tolerance: tolerance,
+    representation: REPRESENTATION
   }
   // Parse SBOL and display results
   $.ajax({
