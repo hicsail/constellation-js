@@ -536,7 +536,7 @@ $(document).ready(function() {
     //replace all spaces and special characters for SBOL
     designName = designName.replace(/[^A-Z0-9]/ig, "_");
 
-    $.post('http://34.227.115.255:80/postSpecs', {
+    $.post('http://54.198.163.107/postSpecs', {
       "designName": designName,
       "specification": specification,
       "categories": categories,
@@ -850,7 +850,7 @@ async function processSBOL(editors, files, combineMethod, tolerance) {
   }
   // Parse SBOL and display results
   $.ajax({
-    url: 'http://34.227.115.255:80/importSBOL',
+    url: 'http://54.198.163.107/importSBOL',
     type: 'POST',
     data: JSON.stringify(data),
     contentType: "application/json; charset=utf-8",
