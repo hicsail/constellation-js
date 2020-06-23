@@ -101,7 +101,7 @@ function generateGraph(stateGraph) {
           links.push({source: id, target: edge, component: stateGraph[node].component});
         }
       } else {
-        nodes.push({id, type: INTERMEDIATE, text: edge.text, component: edge.component});
+        nodes.push({id, type: INTERMEDIATE, text: edge.text, component: edge.component, orientation:edge.orientation});
         links.push({source: edge.src, type: edge.type, text: EPSILON, target: id});
         links.push({source: id, type: edge.type, text: edge.text, target: edge.dest});
       }
@@ -271,7 +271,12 @@ function tick() {
   imagePointer.attr('transform', function(d) {
     d.x = Math.max(20, Math.min(width - 20, d.x));
     d.y = Math.max(25, Math.min(height - 10, d.y));
-    return 'translate(' + d.x + ',' + d.y + ')'
+    let cenX = imagePointer.node(d).getBBox().width / 2;
+    let cenY = imagePointer.node(d).getBBox().height / 2;
+    if(d.orientation === "ReverseComp") {
+      return `translate(${d.x}, ${d.y}) rotate(180, ${cenX}, ${cenY})`;
+    }
+    return `translate(${d.x}, ${d.y})`;
   });
 
   // update tooltip positions for node representation
