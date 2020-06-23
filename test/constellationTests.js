@@ -38,27 +38,56 @@ function expectAllReturnValues(result) {
   expect(result.sbol).to.not.equal(undefined);
 }
 
-function expectA(result) {
-  expectAllReturnValues(result);
-  expect(result.designs.length).to.equal(ALEN);
-  expect(result.designs).to.have.members(AMEM);
+function revCompPart(partList) {
+  let RC_MEM = [];
+  for (let p of partList) {
+    RC_MEM.push(`reverse-comp(${p})`);
+  }
+  return RC_MEM;
 }
 
-function expectAConcatB(result) {
+function expectA(result, reverse=false) {
   expectAllReturnValues(result);
-  expect(result.designs.length).to.equal(ALEN + BLEN);
-  expect(result.designs).to.have.members((AMEM).concat(BMEM));
+  let partListA = AMEM;
+  if (reverse) {
+    partListA = revCompPart(partListA);
+  }
+  expect(result.designs.length).to.equal(partListA.length);
+  expect(result.designs).to.have.members(partListA);
 }
 
-function expectACartesianB(result) {
+function expectAConcatB(result, reverse=false) {
   expectAllReturnValues(result);
-  expect(result.designs.length).to.equal(ALEN * BLEN);
-  expect(result.designs).to.have.members(cartesian(AMEM, BMEM));
+  let partListA = AMEM;
+  let partListB = BMEM;
+  if (reverse) {
+    partListA = revCompPart(partListA);
+    partListB = revCompPart(partListB);
+  }
+  expect(result.designs.length).to.equal(partListA.length + partListB.length);
+  expect(result.designs).to.have.members((partListA).concat(partListB));
 }
 
-function expectACartBAndEmpty(result) {
+function expectACartesianB(result, reverse=false) {
   expectAllReturnValues(result);
-  const emptiesAndCart = AMEM.concat(cartesian(AMEM, BMEM));
+  let partListA = AMEM;
+  let partListB = BMEM;
+  // if a THEN is RC-ed, switch the order as well
+  if (reverse) {
+    const tmp = partListA;
+    partListA = revCompPart(partListB);
+    partListB = revCompPart(tmp);
+  }
+  expect(result.designs.length).to.equal(partListA.length * partListB.length);
+  expect(result.designs).to.have.members(cartesian(partListA, partListB));
+}
+
+function expectACartBAndEmpty(result, reverse=false) {
+  expectAllReturnValues(result);
+  let emptiesAndCart = AMEM.concat(cartesian(AMEM, BMEM));
+  if (reverse) {
+    emptiesAndCart = revCompPart(emptiesAndCart);
+  }
   expect(result.designs.length).to.equal(emptiesAndCart.length);
   expect(result.designs).to.have.members(emptiesAndCart);
 }
@@ -134,6 +163,15 @@ module.exports = function() {
         expectA(resultEdge);
         // TODO: state that empty string is not an option as an explicit design choice
       });
+
+      it('reverse-comp', async() => {
+        const resultNode = await constellation.goldbar('reverse-comp(a)', CATSTR, NODE_REP);
+        expectA(resultNode, true);
+        // expectRevCompPart(resultNode, AMEM);
+        const resultEdge = await constellation.goldbar('reverse-comp(a)', CATSTR, EDGE_REP);
+        expectA(resultEdge, true);
+        // expectRevCompPart(resultEdge, AMEM);
+      });
     });
 
     describe('Binary expressions', function() {
@@ -164,74 +202,7 @@ module.exports = function() {
   });
 
   describe('Operator compositions', function() {
-    describe('unary op (unary exp)', function() {
-      it('one-or-more (one-or-more atom)', async () => {
-        const resultNode = await constellation.goldbar('one-or-more (one-or-more a)', CATSTR, NODE_REP);
-        expectA(resultNode);
-        const resultEdge = await constellation.goldbar('one-or-more (one-or-more a)', CATSTR, EDGE_REP);
-        expectA(resultEdge);
-      });
-
-      // TODO: this graph looks wrong
-      it('one-or-more (zero-or-more atom)', async() => {
-        const resultNode = await constellation.goldbar('one-or-more (zero-or-more a)', CATSTR, NODE_REP);
-        expectA(resultNode);
-        const resultEdge = await constellation.goldbar('one-or-more (zero-or-more a)', CATSTR, EDGE_REP);
-        expectA(resultEdge);
-      });
-
-      it('one-or-more (zero-or-one atom)', async() => {
-        const resultNode = await constellation.goldbar('one-or-more (zero-or-one a)', CATSTR, NODE_REP);
-        expectA(resultNode);
-        const resultEdge = await constellation.goldbar('one-or-more (zero-or-one a)', CATSTR, EDGE_REP);
-        expectA(resultEdge);
-      });
-
-      it('zero-or-more (one-or-more atom)', async() => {
-        const resultNode = await constellation.goldbar('zero-or-more (one-or-more a)', CATSTR, NODE_REP);
-        expectA(resultNode);
-        const resultEdge = await constellation.goldbar('zero-or-more (one-or-more a)', CATSTR, EDGE_REP);
-        expectA(resultEdge);
-      });
-
-      it('zero-or-more (zero-or-more atom)', async() => {
-        const resultNode = await constellation.goldbar('zero-or-more (zero-or-more a)', CATSTR, NODE_REP);
-        expectA(resultNode);
-        const resultEdge = await constellation.goldbar('zero-or-more (zero-or-more a)', CATSTR, EDGE_REP);
-        expectA(resultEdge);
-      });
-
-      it('zero-or-more (zero-or-one atom)', async() => {
-        const resultNode = await constellation.goldbar('zero-or-more (zero-or-one a)', CATSTR, NODE_REP);
-        expectA(resultNode);
-        const resultEdge = await constellation.goldbar('zero-or-more (zero-or-one a)', CATSTR, EDGE_REP);
-        expectA(resultEdge);
-      });
-
-      it('zero-or-one (one-or-more atom)', async() => {
-        const resultNode = await constellation.goldbar('zero-or-one (one-or-more a)', CATSTR, NODE_REP);
-        expectA(resultNode);
-        const resultEdge = await constellation.goldbar('zero-or-one (one-or-more a)', CATSTR, EDGE_REP);
-        expectA(resultEdge);
-      });
-
-      it('zero-or-one (zero-or-more atom)', async() => {
-        const resultNode = await constellation.goldbar('zero-or-one (zero-or-more a)', CATSTR, NODE_REP);
-        expectA(resultNode);
-        const resultEdge = await constellation.goldbar('zero-or-one (zero-or-more a)', CATSTR, EDGE_REP);
-        expectA(resultEdge);
-      });
-
-      it('zero-or-one (zero-or-one atom)', async() => {
-        const resultNode = await constellation.goldbar('zero-or-one (zero-or-one a)', CATSTR, NODE_REP);
-        expectA(resultNode);
-        const resultEdge = await constellation.goldbar('zero-or-one (zero-or-one a)', CATSTR, EDGE_REP);
-        expectA(resultEdge);
-      });
-
-    });
-
-
+    // unary-op(unary-exp) is covered in the simplification tests
     describe('unary-op (binary-exp)', function() {
       // one-or-more
       it('one-or-more (atom or atom)', async() => {
@@ -293,6 +264,25 @@ module.exports = function() {
         expectACartesianB(resultNode);
         const resultEdge = await constellation.goldbar('zero-or-one (a then b)', CATSTR, EDGE_REP);
         expectACartesianB(resultEdge);
+      });
+
+      it('reverse-comp(atom or atom)', async() => {
+        const resultNode = await constellation.goldbar('reverse-comp(a or b)', CATSTR, NODE_REP);
+        expectAConcatB(resultNode, true);
+        const resultEdge = await constellation.goldbar('reverse-comp(a or b)', CATSTR, EDGE_REP);
+        expectAConcatB(resultEdge, true);
+      });
+      // AND only works on EDGE representation
+      it('reverse-comp (atom and atom)', async() => {
+        const result = await constellation.goldbar('reverse-comp(a and0 a)', CATSTR, EDGE_REP);
+        expectA(result, true);
+      });
+
+      it('reverse-comp (atom then atom)', async() => {
+        const resultNode = await constellation.goldbar('reverse-comp(a then b)', CATSTR, NODE_REP);
+        expectACartesianB(resultNode, true);
+        const resultEdge = await constellation.goldbar('reverse-comp(a then b)', CATSTR, EDGE_REP);
+        expectACartesianB(resultEdge, true);
       });
     });
 

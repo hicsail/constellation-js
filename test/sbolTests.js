@@ -5,10 +5,10 @@ let fs = require('fs').promises;
 
 const CATEGORIES = '{"rbs":{"rbs":["a1","a2"]},"cds":{"cds":["b1","b2","b3"]},"promoter":{"promoter":["c1"]}, "terminator": {"terminator":["t"]}}';
 const NODE = 'NODE';
-const NODE_REP = {designName: 'design', representation:NODE};
+const NODE_REP = {designName: 'constellation_design', representation:NODE};
 
 const EDGE = 'EDGE';
-const EDGE_REP = {designName: 'design', representation:EDGE};
+const EDGE_REP = {designName: 'constellation_design', representation:EDGE};
 
 function trimX(str) {
   return str.replace(/\s/g, "X");
