@@ -3,7 +3,7 @@ const constellation = require('../lib/constellation');
 const expect = require('chai').expect;
 let fs = require('fs').promises;
 
-const CATEGORIES = '{"rbs":{"rbs":["a1","a2"]},"cds":{"cds":["b1","b2","b3"]},"promoter":{"promoter":["c1"]}, "terminator": {"terminator":["t"]}}';
+const CATEGORIES = '{"rbs":{"rbs":["a1","a2"]},"cds":{"cds":["b1","b2","b3"]},"promoter":{"promoter":["c1"]}, "terminator": {"terminator":["t"]}, "promoter2":{"promoter":["c1"]}}';
 const NODE = 'NODE';
 const NODE_REP = {designName: 'design', representation:NODE};
 
@@ -179,6 +179,14 @@ module.exports = function() {
         }
         operators.sort();
         expect(operators).to.deep.eql(['Then', 'Then', 'ZeroOrMore']);
+    });
+
+    it('Parse SBOL and', async () => {
+      let result1 = await constellation.goldbar('promoter', CATEGORIES, EDGE_REP);
+      let result2 = await constellation.goldbar('promoter2', CATEGORIES, EDGE_REP);
+      let result = await constellation.sbol([result1.sbol, result2.sbol], 'And', 0, EDGE);
+      let atomTexts = getEdgeAtoms(result.stateGraph).sort();
+      expect(atomTexts).to.be.an('array').that.includes('promoter_promoter2');
     });
   });
 
