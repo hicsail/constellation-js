@@ -19,7 +19,7 @@ app.use(express.static(__dirname + '/static'));
 // app.use(express.static(__dirname + '/static/js'));
 app.use(express.static(__dirname + '/../lib/'));
 
-const server = app.listen(80, function () {
+const server = app.listen(8080, function () {
   console.log('Listening on port %d', server.address().port);
   console.log('http://localhost:80/');
 });
