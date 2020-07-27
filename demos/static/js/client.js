@@ -486,12 +486,12 @@ $(document).ready(function() {
 
   $('#and').on('click', function() {
     document.getElementById('operationMenu').innerText = 'And';
-    combineMethod = 'and';
+    combineMethod = 'And';
   });
 
   $('#merge').on('click', function() {
     document.getElementById('operationMenu').innerText = 'Merge';
-    combineMethod = 'merge';
+    combineMethod = 'Merge';
   });
 
   $('#zero').on('click', function() {
@@ -560,6 +560,15 @@ $(document).ready(function() {
           // hide the tooltip
           $('#designWarning').addClass('hidden');
         }
+
+        $("#exportSBOLBtn").removeClass('hidden'); //show export button
+        if ('hasMerge' in data.messages) {
+          $("#exportSBOLBtn").attr('disabled', true);
+          $("#sbolIcon").attr('data-original-title', data.messages.hasMerge);
+        } else {
+          $("#exportSBOLBtn").attr('disabled', false);
+          $("#sbolIcon").attr('data-original-title', 'Export design as SBOL');
+        }
         displayDesigns(editors, JSON.stringify(data.designs, null, "\t"));
       }
 
@@ -581,7 +590,6 @@ $(document).ready(function() {
       }
       sbolDoc = data.sbol;
 
-      $("#exportSBOLBtn").removeClass('hidden'); //show export button
       $("#spinner").addClass('hidden');
 
     }).fail((response) => {
@@ -846,7 +854,8 @@ async function processSBOL(editors, files, combineMethod, tolerance) {
   let data = {
     sbol: sbolXMLs,
     combineMethod: combineMethod,
-    tolerance: tolerance
+    tolerance: tolerance,
+    representation: REPRESENTATION
   }
   // Parse SBOL and display results
   $.ajax({
