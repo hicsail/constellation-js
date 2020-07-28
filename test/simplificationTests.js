@@ -40,6 +40,7 @@ module.exports = function() {
     });
 
     describe('Or', function () {
+      // start with one-or-more
       it('one-or-more(a) or one-or-more(a)', function () {
         let toParse = JSON.parse('{"Or":[{"OneOrMore":[{"Atom":["a"]}]}, {"OneOrMore":[{"Atom":["a"]}]}]}');
         let result = JSON.stringify(simplify(toParse));
@@ -52,12 +53,19 @@ module.exports = function() {
         expect(result).to.equal('{"ZeroOrMore":[{"Atom":["a"]}]}')
       });
 
+      it('one-or-more(a) or zero-or-one(a)', function () {
+        let toParse = JSON.parse('{"Or":[{"OneOrMore":[{"Atom":["a"]}]}, {"ZeroOrOne":[{"Atom":["a"]}]}]}');
+        let result = JSON.stringify(simplify(toParse));
+        expect(result).to.equal('{"ZeroOrMore":[{"Atom":["a"]}]}')
+      });
+
       it('one-or-more(a) or a', function () {
         let toParse = JSON.parse('{"Or":[{"OneOrMore":[{"Atom":["a"]}]}, {"Atom":["a"]}]}');
         let result = JSON.stringify(simplify(toParse));
         expect(result).to.equal('{"OneOrMore":[{"Atom":["a"]}]}')
       });
 
+      // start with zero-or-more
       it('zero-or-more(a) or one-or-more(a)', function () {
         let toParse = JSON.parse('{"Or":[{"ZeroOrMore":[{"Atom":["a"]}]}, {"OneOrMore":[{"Atom":["a"]}]}]}');
         let result = JSON.stringify(simplify(toParse));
@@ -68,6 +76,43 @@ module.exports = function() {
         let toParse = JSON.parse('{"Or":[{"ZeroOrMore":[{"Atom":["a"]}]}, {"ZeroOrMore":[{"Atom":["a"]}]}]}');
         let result = JSON.stringify(simplify(toParse));
         expect(result).to.equal('{"ZeroOrMore":[{"Atom":["a"]}]}')
+      });
+
+      it('zero-or-more(a) or zero-or-one(a)', function () {
+        let toParse = JSON.parse('{"Or":[{"ZeroOrMore":[{"Atom":["a"]}]}, {"ZeroOrOne":[{"Atom":["a"]}]}]}');
+        let result = JSON.stringify(simplify(toParse));
+        expect(result).to.equal('{"ZeroOrMore":[{"Atom":["a"]}]}')
+      });
+
+      it('zero-or-more(a) or a', function () {
+        let toParse = JSON.parse('{"Or":[{"ZeroOrMore":[{"Atom":["a"]}]}, {"Atom":["a"]}]}');
+        let result = JSON.stringify(simplify(toParse));
+        expect(result).to.equal('{"ZeroOrMore":[{"Atom":["a"]}]}')
+      });
+
+      // start with zero-or-one
+      it('zero-or-one(a) or one-or-more(a)', function () {
+        let toParse = JSON.parse('{"Or":[{"ZeroOrOne":[{"Atom":["a"]}]}, {"OneOrMore":[{"Atom":["a"]}]}]}');
+        let result = JSON.stringify(simplify(toParse));
+        expect(result).to.equal('{"ZeroOrMore":[{"Atom":["a"]}]}')
+      });
+
+      it('zero-or-one(a) or zero-or-more(a)', function () {
+        let toParse = JSON.parse('{"Or":[{"ZeroOrOne":[{"Atom":["a"]}]}, {"ZeroOrMore":[{"Atom":["a"]}]}]}');
+        let result = JSON.stringify(simplify(toParse));
+        expect(result).to.equal('{"ZeroOrMore":[{"Atom":["a"]}]}')
+      });
+
+      it('zero-or-one(a) or zero-or-one(a)', function () {
+        let toParse = JSON.parse('{"Or":[{"ZeroOrOne":[{"Atom":["a"]}]}, {"ZeroOrOne":[{"Atom":["a"]}]}]}');
+        let result = JSON.stringify(simplify(toParse));
+        expect(result).to.equal('{"ZeroOrOne":[{"Atom":["a"]}]}')
+      });
+
+      it('zero-or-one(a) or a', function () {
+        let toParse = JSON.parse('{"Or":[{"ZeroOrOne":[{"Atom":["a"]}]}, {"Atom":["a"]}]}');
+        let result = JSON.stringify(simplify(toParse));
+        expect(result).to.equal('{"ZeroOrOne":[{"Atom":["a"]}]}')
       });
 
     });
