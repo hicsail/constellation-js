@@ -8,6 +8,28 @@ const constellation = require('../lib/constellation');
 const CATEGORIES = {"a":{"a":["a1","a2"]},"b":{"b":["b1","b2","b3"]},"c":{"c":["c1"]}};
 
 module.exports = function() {
+  describe('Missing input errors', function() {
+
+    it('Missing specification', async() => {
+      await expect(constellation.symbolic(null)).to.be.rejectedWith('No input received');
+      await expect(constellation.symbolic(null)).to.be.rejectedWith('No input received');
+    });
+
+    it('Missing categories', async() => {
+      await expect(constellation.symbolic('a', '{}')).to.be.rejectedWith('No categories specified');
+    });
+
+    it('Invalid num designs', async() => {
+      await expect(constellation.symbolic('a', CATEGORIES, {numDesigns:0})).to.be.rejectedWith('Number of designs must be a positive integer.');
+      await expect(constellation.symbolic('a', CATEGORIES, {numDesigns:'test'})).to.be.rejectedWith('Number of designs must be an integer or "all".');
+    });
+
+    it('Invalid cycle depth', async() => {
+      await expect(constellation.symbolic('a', CATEGORIES, {maxCycles:-5})).to.be.rejectedWith('Number of allowed cycles must be at least 0.');
+    });
+
+  });
+
   describe('operator tests', function() {
     describe('unary', function() {
       it('one-or-more', async() => {
