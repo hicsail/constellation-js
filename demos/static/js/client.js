@@ -483,6 +483,12 @@ $(document).ready(function() {
     editors.catEditor.setValue(JSON.stringify(biosynthesisCategories));
   });
 
+  $('#reverse-option').on('click', function() {
+    document.getElementById('designName').value = "reverse-complement-example";
+    editors.specEditor.setValue(reverseGOLDBAR);
+    editors.catEditor.setValue(JSON.stringify(celloCategories));
+  });
+
   $('#debug-option').on('click', function() {
     document.getElementById('designName').value = "debug-example";
     editors.specEditor.setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
