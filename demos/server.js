@@ -19,9 +19,8 @@ app.use(express.static(__dirname + '/static'));
 // app.use(express.static(__dirname + '/static/js'));
 app.use(express.static(__dirname + '/../lib/'));
 
-const server = app.listen(8080, function () {
-  console.log('Listening on port %d', server.address().port);
-  console.log('http://localhost:80/');
+const server = app.listen(8080, "http://constellationcad.org", function () {
+  console.log('Listening on constellationcad.org:%d', server.address().port);
 });
 
 app.get('/', function(req,res) {
