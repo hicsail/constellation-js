@@ -23,6 +23,7 @@
     <script type="text/javascript" src="use-cases/rebeccamycin.js"></script>
     <script type="text/javascript" src="use-cases/cello-AND-circuits.js"></script>
     <script type="text/javascript" src="use-cases/cello-categories.js"></script>
+    <script type="text/javascript" src="use-cases/reverse.js"></script>
 
     <script type="application/javascript" src="js/codemirror.js"></script>
     <script type="application/javascript" src="js/scheme.js"></script>
@@ -166,6 +167,7 @@
                       <a id='and1-option-rb' class="dropdown-item" href="#">Cello Roadblocking (AND1)</a>
                       <a id='and2-option' class="dropdown-item" href="#">Cello AND Circuit (AND2)</a>
                       <a id='merge-option' class="dropdown-item" href="#">Rebeccamycin (MERGE)</a>
+                      <a id='reverse-option' class="dropdown-item" href="#">Reverse Complement</a>
                       <a id='debug-option' class="dropdown-item" href="#">Debug</a>
                     </div>
                   <textarea class="codemirror" id="goldbar-input-0" name="paragraph_text" cols="50" rows="10"></textarea>
@@ -231,7 +233,7 @@
             <!--  Graph, Designs, and Submit  -->
               <div id="graph-designs-row" class="row hidden">
                 <div class="col-sm">
-                  <i id="exportSBOLBtn" class="fas fa-download pull-right hidden" data-toggle="tooltip" title="Export design as SBOL"></i>
+                  <button id="exportSBOLBtn" class="pull-right hidden"><i id="sbolIcon" class="fas fa-download" data-toggle="tooltip" title="Export design as SBOL"></i></button>
                   <label for="graph">Graph</label>
                   <div id="graph"></div>
                 </div>

@@ -63,14 +63,15 @@ app.post('/importSBOL', async function(req,res) {
   let sbolDocs = req.body.sbol;
   let combineMethod = req.body.combineMethod || '';
   let tolerance = req.body.tolerance || 0;
+  let representation = req.body.representation || 'EDGE';
   console.log('---Received new input---');
   console.log('combineMethod: ', combineMethod);
   console.log('tolerance: ', tolerance);
-  console.log('sbolDocs: ', sbolDocs);
+  console.log('representation: ', representation);
 
   let data;
   try {
-    data = await constellation.sbol(sbolDocs, combineMethod, tolerance);
+    data = await constellation.sbol(sbolDocs, combineMethod, tolerance, representation);
     res.status(200).send(data);
   } catch (error) {
     console.log(error);

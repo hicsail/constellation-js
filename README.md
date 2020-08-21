@@ -90,6 +90,7 @@ The supported GOLDBAR concrete syntax for genetic design spaces is presented bel
 <term> ::= one-or-more <term>
         |  zero-or-more <term>
         |  zero-or-one <term>
+        |  reverse-comp <term>
         |  ( <seq> )
         |  { <seq> }
         |  <atom>

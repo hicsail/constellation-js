@@ -1,26 +1,38 @@
 
 const constellation = require('../lib/constellation');
 const expect = require('chai').expect;
-let fs = require('fs');
+let fs = require('fs').promises;
 
-const CATEGORIES = '{"rbs":{"rbs":["a1","a2"]},"cds":{"cds":["b1","b2","b3"]},"promoter":{"promoter":["c1"]}, "terminator": {"terminator":["t"]}}';
+const CATEGORIES = '{"rbs":{"rbs":["a1","a2"]},"cds":{"cds":["b1","b2","b3"]},"promoter":{"promoter":["c1"]}, "terminator": {"terminator":["t"]}, "promoter2":{"promoter":["c1"]}}';
 const NODE = 'NODE';
-const NODE_REP = {designName: 'design', representation:NODE};
+const NODE_REP = {designName: 'constellation_design', representation:NODE};
 
-const EDGE = 'NODE';
-const EDGE_REP = {designName: 'design', representation:EDGE};
+const EDGE = 'EDGE';
+const EDGE_REP = {designName: 'constellation_design', representation:EDGE};
 
 function trimX(str) {
   return str.replace(/\s/g, "X");
 }
 
-function readModuleFile(path, callback) {
+async function readModuleFile(path) {
+  let filename = require.resolve(path);
   try {
-      let filename = require.resolve(path);
-      fs.readFile(filename, 'utf8', callback);
+    return await fs.readFile(filename, 'utf8');
   } catch (e) {
-      callback(e);
+    return e;
   }
+}
+
+function getEdgeAtoms(stateGraph) {
+  let parts = [];
+  for (let id in stateGraph) {
+    for (let edge of stateGraph[id].edges) {
+      if (edge.type === 'atom') {
+        parts.push(edge.text);
+      }
+    }
+  }
+  return parts;
 }
 
 module.exports = function() {
@@ -30,62 +42,44 @@ module.exports = function() {
     describe('Unary expressions NODE', function() {
       it('atom', async() => {
         let result = await constellation.goldbar('rbs', CATEGORIES, NODE_REP);
-
-        readModuleFile('./sbolResults/atom.txt', function (err, words) {
-          expect(err).to.be.a('null');
-          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
-        });
+        let words = await readModuleFile('./sbolResults/atom.txt');
+        expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
       });
 
       it('one-or-more', async()=> {
         const spec = 'one-or-more rbs';
         let result = await constellation.goldbar(spec, CATEGORIES, NODE_REP);
-
-        readModuleFile('./sbolResults/one-or-more.txt', function (err, words) {
-          expect(err).to.be.a('null');
-          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
-        });
+        let words = await readModuleFile('./sbolResults/one-or-more.txt');
+        expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
       });
 
       it('zero-or-more', async() => {
         const spec = 'zero-or-more rbs';
         let result = await constellation.goldbar(spec, CATEGORIES, NODE_REP);
-
-        readModuleFile('./sbolResults/zero-or-more.txt', function (err, words) {
-          expect(err).to.be.a('null');
-          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
-        });
+        let words = await readModuleFile('./sbolResults/zero-or-more.txt');
+        expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
       });
     });
 
     describe('Unary expressions EDGE', function() {
       it('atom', async() => {
         let result = await constellation.goldbar('rbs', CATEGORIES, EDGE_REP);
-
-        readModuleFile('./sbolResults/atom.txt', function (err, words) {
-          expect(err).to.be.a('null');
-          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
-        });
+        let words = await readModuleFile('./sbolResults/atom.txt');
+        expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
       });
 
       it('one-or-more', async()=> {
         const spec = 'one-or-more rbs';
         let result = await constellation.goldbar(spec, CATEGORIES, EDGE_REP);
-
-        readModuleFile('./sbolResults/one-or-more.txt', function (err, words) {
-          expect(err).to.be.a('null');
-          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
-        });
+        let words = await readModuleFile('./sbolResults/one-or-more.txt');
+        expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
       });
 
       it('zero-or-more', async() => {
         const spec = 'zero-or-more rbs';
         let result = await constellation.goldbar(spec, CATEGORIES, EDGE_REP);
-
-        readModuleFile('./sbolResults/zero-or-more.txt', function (err, words) {
-          expect(err).to.be.a('null');
-          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
-        });
+        let words = await readModuleFile('./sbolResults/zero-or-more.txt');
+        expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
       });
     });
 
@@ -94,21 +88,15 @@ module.exports = function() {
       it('or', async() => {
         const spec = 'promoter or rbs';
         let result = await constellation.goldbar(spec, CATEGORIES, NODE_REP);
-
-        readModuleFile('./sbolResults/or.txt', function (err, words) {
-          expect(err).to.be.a('null');
-          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
-        });
+        let words = await readModuleFile('./sbolResults/or.txt');
+        expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
       });
 
       it('then', async() => {
         const spec = 'promoter then rbs';
         let result = await constellation.goldbar(spec, CATEGORIES, NODE_REP);
-
-        readModuleFile('./sbolResults/then.txt', function (err, words) {
-          expect(err).to.be.a('null');
-          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
-        });
+        let words = await readModuleFile('./sbolResults/then.txt');
+        expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
       });
     });
 
@@ -117,21 +105,15 @@ module.exports = function() {
       it('or', async() => {
         const spec = 'promoter or rbs';
         let result = await constellation.goldbar(spec, CATEGORIES, EDGE_REP);
-
-        readModuleFile('./sbolResults/or.txt', function (err, words) {
-          expect(err).to.be.a('null');
-          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
-        });
+        let words = await readModuleFile('./sbolResults/or.txt');
+        expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
       });
 
       it('then', async() => {
         const spec = 'promoter then rbs';
         let result = await constellation.goldbar(spec, CATEGORIES, EDGE_REP);
-
-        readModuleFile('./sbolResults/then.txt', function (err, words) {
-          expect(err).to.be.a('null');
-          expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
-        });
+        let words = await readModuleFile('./sbolResults/then.txt');
+        expect(trimX(result.sbol.trim())).to.eql(trimX(words.trim()));
       });
     });
 
@@ -172,7 +154,7 @@ module.exports = function() {
     it('Parse SBOL or', async() => {
       let result = await constellation.goldbar('promoter or cds', CATEGORIES, EDGE_REP);
       result = await constellation.sbol([result.sbol],'', 0, EDGE);
-      let atomTexts = Object.values(result.stateGraph).map(obj => obj.text).sort();
+      let atomTexts = getEdgeAtoms(result.stateGraph).sort();
       expect(atomTexts).to.be.an('array').that.includes('promoter');
       expect(atomTexts).to.be.an('array').that.includes('cds');
 
@@ -186,7 +168,7 @@ module.exports = function() {
     it('Parse SBOL repeat', async() => {
       let result = await constellation.goldbar('promoter then zero-or-more rbs then cds', CATEGORIES, EDGE_REP);
       result = await constellation.sbol([result.sbol], '', 0, EDGE);
-      let atomTexts = Object.values(result.stateGraph).map(obj => obj.text).sort();
+      let atomTexts = getEdgeAtoms(result.stateGraph).sort();
       expect(atomTexts).to.be.an('array').that.includes('promoter');
       expect(atomTexts).to.be.an('array').that.includes('rbs');
       expect(atomTexts).to.be.an('array').that.includes('cds');
@@ -197,6 +179,14 @@ module.exports = function() {
         }
         operators.sort();
         expect(operators).to.deep.eql(['Then', 'Then', 'ZeroOrMore']);
+    });
+
+    it('Parse SBOL and', async () => {
+      let result1 = await constellation.goldbar('promoter', CATEGORIES, EDGE_REP);
+      let result2 = await constellation.goldbar('promoter2', CATEGORIES, EDGE_REP);
+      let result = await constellation.sbol([result1.sbol, result2.sbol], 'And', 0, EDGE);
+      let atomTexts = getEdgeAtoms(result.stateGraph).sort();
+      expect(atomTexts).to.be.an('array').that.includes('promoter_promoter2');
     });
   });
 

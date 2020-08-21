@@ -1,62 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:prov="http://www.w3.org/ns/prov#" xmlns:sbol="http://sbols.org/v2#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#dateTime/" xmlns:ns0="https://github.com/hicsail/constellation-js/">
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:prov="http://www.w3.org/ns/prov#" xmlns:sbol="http://sbols.org/v2#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#dateTime/" xmlns:om="http://www.ontology-of-units-of-measure.org/resource/om-2/" xmlns:ns0="https://github.com/hicsail/constellation-js/">
   <sbol:Collection rdf:about="http://constellationcad.org/rbs_collection/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/rbs_collection"/>
-    <sbol:displayId>rbs</sbol:displayId>
+    <sbol:displayId>rbs_collection</sbol:displayId>
     <sbol:version>1</sbol:version>
-    <sbol:member rdf:resource="http://constellationcad.org/generic_definition/a1/1"/>
-    <sbol:member rdf:resource="http://constellationcad.org/generic_definition/a2/1"/>
+    <sbol:member rdf:resource="http://constellationcad.org/a1/1"/>
+    <sbol:member rdf:resource="http://constellationcad.org/a2/1"/>
   </sbol:Collection>
-  <sbol:ComponentDefinition rdf:about="http://constellationcad.org/generic_definition/rbs/1">
-    <sbol:persistentIdentity rdf:resource="http://constellationcad.org/generic_definition/rbs"/>
-    <sbol:displayId>rbs</sbol:displayId>
-    <sbol:version>1</sbol:version>
-    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
-    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000804"/>
-  </sbol:ComponentDefinition>
-  <sbol:ComponentDefinition rdf:about="http://constellationcad.org/generic_definition/a1/1">
-    <sbol:persistentIdentity rdf:resource="http://constellationcad.org/generic_definition/a1"/>
+  <sbol:ComponentDefinition rdf:about="http://constellationcad.org/a1/1">
+    <sbol:persistentIdentity rdf:resource="http://constellationcad.org/a1"/>
     <sbol:displayId>a1</sbol:displayId>
     <sbol:version>1</sbol:version>
     <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
     <sbol:role rdf:resource="http://identifiers.org/so/SO:0000804"/>
   </sbol:ComponentDefinition>
-  <sbol:ComponentDefinition rdf:about="http://constellationcad.org/generic_definition/a2/1">
-    <sbol:persistentIdentity rdf:resource="http://constellationcad.org/generic_definition/a2"/>
+  <sbol:ComponentDefinition rdf:about="http://constellationcad.org/a2/1">
+    <sbol:persistentIdentity rdf:resource="http://constellationcad.org/a2"/>
     <sbol:displayId>a2</sbol:displayId>
     <sbol:version>1</sbol:version>
     <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
     <sbol:role rdf:resource="http://identifiers.org/so/SO:0000804"/>
   </sbol:ComponentDefinition>
-  <sbol:ComponentDefinition rdf:about="http://constellationcad.org/design/root_template/design/1">
-    <sbol:persistentIdentity rdf:resource="http://constellationcad.org/design/root_template/design"/>
-    <sbol:displayId>design</sbol:displayId>
+  <sbol:ComponentDefinition rdf:about="http://constellationcad.org/constellation_design_rbs/1">
+    <sbol:persistentIdentity rdf:resource="http://constellationcad.org/constellation_design_rbs"/>
+    <sbol:displayId>constellation_design_rbs</sbol:displayId>
     <sbol:version>1</sbol:version>
-    <sbol:type rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000110"/>
+  </sbol:ComponentDefinition>
+  <sbol:ComponentDefinition rdf:about="http://constellationcad.org/constellation_design_root_template/1">
+    <sbol:persistentIdentity rdf:resource="http://constellationcad.org/constellation_design_root_template"/>
+    <sbol:displayId>constellation_design_root_template</sbol:displayId>
+    <sbol:version>1</sbol:version>
+    <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
+    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000804"/>
     <sbol:component>
-      <sbol:Component rdf:about="http://constellationcad.org/design/root_template/design/rbs_component1/1">
-        <sbol:persistentIdentity rdf:resource="http://constellationcad.org/design/root_template/design/rbs_component1"/>
+      <sbol:Component rdf:about="http://constellationcad.org/constellation_design_root_template/rbs_component1/1">
+        <sbol:persistentIdentity rdf:resource="http://constellationcad.org/constellation_design_root_template/rbs_component1"/>
         <sbol:displayId>rbs_component1</sbol:displayId>
         <sbol:version>1</sbol:version>
-        <sbol:definition rdf:resource="http://constellationcad.org/generic_definition/rbs/1"/>
+        <sbol:definition rdf:resource="http://constellationcad.org/constellation_design_rbs/1"/>
         <sbol:access rdf:resource="http://sbols.org/v2#public"/>
       </sbol:Component>
     </sbol:component>
+    <sbol:sequenceAnnotation>
+      <sbol:SequenceAnnotation rdf:about="http://constellationcad.org/constellation_design_root_template/sequence_annotation1/1">
+        <sbol:persistentIdentity rdf:resource="http://constellationcad.org/constellation_design_root_template/sequence_annotation1"/>
+        <sbol:displayId>sequence_annotation1</sbol:displayId>
+        <sbol:version>1</sbol:version>
+        <sbol:location>
+          <sbol:GenericLocation rdf:about="http://constellationcad.org/constellation_design_root_template/sequence_annotation1/sequence_annotation1_generic_location/1">
+            <sbol:persistentIdentity rdf:resource="http://constellationcad.org/constellation_design_root_template/sequence_annotation1/sequence_annotation1_generic_location"/>
+            <sbol:displayId>sequence_annotation1_generic_location</sbol:displayId>
+            <sbol:version>1</sbol:version>
+            <sbol:orientation rdf:resource="http://sbols.org/v2#inline"/>
+          </sbol:GenericLocation>
+        </sbol:location>
+        <sbol:component rdf:resource="http://constellationcad.org/constellation_design_root_template/rbs_component1/1"/>
+      </sbol:SequenceAnnotation>
+    </sbol:sequenceAnnotation>
   </sbol:ComponentDefinition>
-  <sbol:CombinatorialDerivation rdf:about="http://constellationcad.org/design/root_template/design/design_combinatorial_derivation/1">
-    <sbol:persistentIdentity rdf:resource="http://constellationcad.org/design/root_template/design/design_combinatorial_derivation"/>
-    <sbol:displayId>design_combinatorial_derivation</sbol:displayId>
+  <sbol:CombinatorialDerivation rdf:about="http://constellationcad.org/constellation_design_derivation/1">
+    <sbol:persistentIdentity rdf:resource="http://constellationcad.org/constellation_design_derivation"/>
+    <sbol:displayId>constellation_design_derivation</sbol:displayId>
     <sbol:version>1</sbol:version>
-    <ns0:numDesigns>10</ns0:numDesigns>
+    <ns0:numDesigns>20</ns0:numDesigns>
     <ns0:maxCycles>0</ns0:maxCycles>
-    <sbol:template rdf:resource="http://constellationcad.org/design/root_template/design/1"/>
+    <sbol:template rdf:resource="http://constellationcad.org/constellation_design_root_template/1"/>
     <sbol:variableComponent>
-      <sbol:VariableComponent rdf:about="http://constellationcad.org/design/root_template/design/design_combinatorial_derivation/rbs_component1_variable/1">
-        <sbol:persistentIdentity rdf:resource="http://constellationcad.org/design/root_template/design/design_combinatorial_derivation/rbs_component1_variable"/>
+      <sbol:VariableComponent rdf:about="http://constellationcad.org/constellation_design_derivation/rbs_component1_variable/1">
+        <sbol:persistentIdentity rdf:resource="http://constellationcad.org/constellation_design_derivation/rbs_component1_variable"/>
         <sbol:displayId>rbs_component1_variable</sbol:displayId>
         <sbol:version>1</sbol:version>
-        <sbol:variable rdf:resource="http://constellationcad.org/design/root_template/design/rbs_component1/1"/>
+        <sbol:variable rdf:resource="http://constellationcad.org/constellation_design_root_template/rbs_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
+        <sbol:variantCollection rdf:resource="http://constellationcad.org/rbs_collection/1"/>
         <sbol:variantCollection rdf:resource="http://constellationcad.org/rbs_collection/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
