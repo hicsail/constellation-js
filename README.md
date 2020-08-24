@@ -41,7 +41,7 @@ let categories = {
       }
 }
 let result = constellation.goldbar(goldbar, categories, {designName: 'my-first-design'});
-// result.stateGraph, result.designs, result.sbol
+// result.stateGraph, result.designs, result.sbol, result.messages
 ```
 |Optional parameters| Description|
 |--|--|
@@ -49,14 +49,13 @@ let result = constellation.goldbar(goldbar, categories, {designName: 'my-first-d
 |`numDesigns`|Max number of designs to enumerate, default is 20|
 |`maxCycles`|Cycle depth for -orMore operators, default is 0|
 |`representation`|Choose between `EDGE` or `NODE` based graph, default is EDGE|
-|`andTolerance`|Choose between 0, 1, 2 for the AND operator, default is 0|
-|`mergeTolerance`|Choose between 0, 1, 2 for the MERGE operator, default is 0|
 
 |Output|Description|
 |--|--|
 |`stateGraph`|See [Graph Data Structure](#Graph-Data-Structure)|
 |`designs`|List of enumerated designs|
 |`sbol`| See [Synthetic Biology Open Language](#Synthetic-Biology-Open-Language)|
+|`messages`| Errors or warnings, if applicable|
 
 It is also possible to generate a collection of designs that match a specification using a purely symbolic approach (note that this approach supports only a tolerance of `0` for the AND operator and does not support the MERGE operator).
 ```javascript
