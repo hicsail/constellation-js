@@ -14,7 +14,12 @@
     },
     "operator": {
       "type": "string",
-      "enum": ["OneOrMore", "ZeroOrMore", "ZeroOrOne", "Then", "Or", "And", "Merge"]
+      "enum": [
+        "OneOrMore", "ZeroOrMore", "ZeroOrOne",
+        "ZeroOrOneSBOL", "ZeroOrMoreSBOL",
+        "ReverseComp",
+        "Then", "Or", "And0", "And1", "And2", "Merge"
+      ]
     },
     "node_type": {
       "type": "string",
@@ -22,7 +27,11 @@
     },
     "edge_type": {
       "type": "string",
-      "enum": ["epsilon", "ZeroOrMore", "ZeroOrOne", "OneOrMore", "atom"]
+      "enum": ["epsilon", "atom"]
+    },
+    "edge_orientation": {
+      "type": "string",
+      "enum": ["Inline", "ReverseComp", "None"]
     },
     "edge_component": {
       "type": "object",
@@ -39,10 +48,10 @@
         "component": {
           "oneOf": [
             {"$ref":  "#/definitions/edge_component"},
-            {"type": "string",
-              "enum": ["epsilon"]}
+            {"type": "string", "enum": ["epsilon"]}
           ]
         },
+        "orientation": { "$ref": "#/definitions/edge_orientation" },
         "type": { "$ref": "#/definitions/edge_type" },
         "text": { "type": "string" }
       }
