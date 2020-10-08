@@ -74,6 +74,12 @@ input[type=radio] {
   height: 180px;
 }
 
+.goldbar-desc {
+  font-size: 80%;
+  margin: 0;
+  padding: 0;
+}
+
 /*
 Main page table
  */

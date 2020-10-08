@@ -489,10 +489,21 @@ $(document).ready(function() {
     editors.catEditor.setValue(JSON.stringify(celloCategories));
   });
 
-  $('#debug-option').on('click', function() {
-    document.getElementById('designName').value = "debug-example";
+  let debugCats = '{"promoter": {"promoter": ["BBa_R0040", "BBa_J23100"]},\n ' +
+    '"ribosomeBindingSite": {"ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"]}, \n' +
+    '"cds": {"cds": ["BBa_E0040", "BBa_E1010"]},\n"nonCodingRna": {"nonCodingRna": ["BBa_F0010"]},\n' +
+    '"terminator": {"terminator": ["BBa_B0010"]}}'
+
+  $('#oOM-option').on('click', function() {
+    document.getElementById('designName').value = "one-or-more-exampleI";
     editors.specEditor.setValue('one-or-more (promoter or ribosomeBindingSite) then (zero-or-more cds) then terminator');
-    editors.catEditor.setValue('{"promoter": {"promoter": ["BBa_R0040", "BBa_J23100"]},\n "ribosomeBindingSite": {"ribosomeBindingSite": ["BBa_B0032", "BBa_B0034"]}, \n"cds": {"cds": ["BBa_E0040", "BBa_E1010"]},\n"nonCodingRna": {"nonCodingRna": ["BBa_F0010"]},\n"terminator": {"terminator": ["BBa_B0010"]}}');
+    editors.catEditor.setValue(debugCats);
+  });
+
+  $('#oOM-option2').on('click', function() {
+    document.getElementById('designName').value = "one-or-more-exampleII";
+    editors.specEditor.setValue('one-or-more (promoter then zero-or-one(ribosomeBindingSite) then cds then terminator)');
+    editors.catEditor.setValue(debugCats);
   });
 
   $('#and').on('click', function() {
