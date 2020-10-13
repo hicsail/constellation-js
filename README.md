@@ -82,7 +82,9 @@ The supported GOLDBAR concrete syntax for genetic design spaces is presented bel
         |  <exp>
 
  <exp> ::= <term> or <exp>
-        |  <term> and <exp>
+        |  <term> and0 <exp>
+        |  <term> and1 <exp>
+        |  <term> and2 <exp>
         |  <term> merge <exp>
         |  <term>
 

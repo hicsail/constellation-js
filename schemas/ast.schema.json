@@ -26,7 +26,20 @@
         },
         {
           "type": "object",
-          "required": ["ZeroOrMore"],
+          "required": ["ZeroOrOneSBOL"],
+          "properties": {
+            "ZeroOrOne": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/node"},
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["ZeroOrMoreSBOL"],
           "properties": {
             "ZeroOrMore": {
               "type": "array",
@@ -42,6 +55,32 @@
           "required": ["ZeroOrOne"],
           "properties": {
             "ZeroOrOne": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/node"},
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["ZeroOrMore"],
+          "properties": {
+            "ZeroOrMore": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/node"},
+              "minItems": 1,
+              "maxItems": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["ReverseComp"],
+          "properties": {
+            "ZeroOrMore": {
               "type": "array",
               "items": {"$ref": "#/definitions/node"},
               "minItems": 1,
@@ -78,7 +117,33 @@
         },
         {
           "type": "object",
-          "required": ["And"],
+          "required": ["And0"],
+          "properties": {
+            "And": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/node"},
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["And1"],
+          "properties": {
+            "And": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/node"},
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["And2"],
           "properties": {
             "And": {
               "type": "array",
