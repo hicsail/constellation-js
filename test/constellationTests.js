@@ -64,8 +64,8 @@ function expectAConcatB(result, reverse=false) {
     partListA = revCompPart(partListA);
     partListB = revCompPart(partListB);
   }
-  expect(result.designs.length).to.equal(partListA.length + partListB.length);
-  expect(result.designs).to.have.members((partListA).concat(partListB));
+  expect(result.designs.length).to.equal(partListB.length + partListA.length);
+  expect(result.designs).to.have.members((partListB).concat(partListA));
 }
 
 function expectACartesianB(result, reverse=false) {
