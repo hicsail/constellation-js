@@ -587,6 +587,9 @@ $(document).ready(function() {
         if ('hasMerge' in data.messages) {
           $("#exportSBOLBtn").attr('disabled', true);
           $("#sbolIcon").attr('data-original-title', data.messages.hasMerge);
+        } else if ('hasAnd' in data.messages) {
+          $("#exportSBOLBtn").attr('disabled', true);
+          $("#sbolIcon").attr('data-original-title', data.messages.hasAnd);
         } else {
           $("#exportSBOLBtn").attr('disabled', false);
           $("#sbolIcon").attr('data-original-title', 'Export design as SBOL');
