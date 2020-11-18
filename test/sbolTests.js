@@ -186,7 +186,7 @@ module.exports = function() {
       let result2 = await constellation.goldbar('promoter2', CATEGORIES, EDGE_REP);
       let result = await constellation.sbol([result1.sbol, result2.sbol], 'And', 0, EDGE);
       let atomTexts = getEdgeAtoms(result.stateGraph).sort();
-      expect(atomTexts).to.be.an('array').that.includes('promoter_promoter2');
+      expect(atomTexts).to.be.an('array').that.includes('promoter_and0_promoter2');
     });
   });
 

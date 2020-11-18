@@ -19,20 +19,23 @@
     <sbol:version>1</sbol:version>
     <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
     <sbol:role rdf:resource="http://identifiers.org/so/SO:0000167"/>
+    <sbol:sequence rdf:resource="http://constellationcad.org/c1_seq/1"/>
   </sbol:ComponentDefinition>
   <sbol:ComponentDefinition rdf:about="http://constellationcad.org/a1/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/a1"/>
     <sbol:displayId>a1</sbol:displayId>
     <sbol:version>1</sbol:version>
     <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
-    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:role rdf:resource="http://constellationcad.org/#rbs"/>
+    <sbol:sequence rdf:resource="http://constellationcad.org/a1_seq/1"/>
   </sbol:ComponentDefinition>
   <sbol:ComponentDefinition rdf:about="http://constellationcad.org/a2/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/a2"/>
     <sbol:displayId>a2</sbol:displayId>
     <sbol:version>1</sbol:version>
     <sbol:type rdf:resource="http://www.biopax.org/release/biopax-level3.owl#DnaRegion"/>
-    <sbol:role rdf:resource="http://identifiers.org/so/SO:0000804"/>
+    <sbol:role rdf:resource="http://constellationcad.org/#rbs"/>
+    <sbol:sequence rdf:resource="http://constellationcad.org/a2_seq/1"/>
   </sbol:ComponentDefinition>
   <sbol:ComponentDefinition rdf:about="http://constellationcad.org/constellation_design_or_unit1/1">
     <sbol:persistentIdentity rdf:resource="http://constellationcad.org/constellation_design_or_unit1"/>
@@ -163,7 +166,6 @@
         <sbol:version>1</sbol:version>
         <sbol:variable rdf:resource="http://constellationcad.org/constellation_design_or_unit1_or_subunit1_template/rbs_component1/1"/>
         <sbol:operator rdf:resource="http://sbols.org/v2#one"/>
-        <sbol:variantCollection rdf:resource="http://constellationcad.org/rbs_collection/1"/>
         <sbol:variantCollection rdf:resource="http://constellationcad.org/rbs_collection/1"/>
       </sbol:VariableComponent>
     </sbol:variableComponent>
