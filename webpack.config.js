@@ -1,15 +1,20 @@
 var path = require('path');
 
 module.exports = {
+  devServer: {
+    host: '0.0.0.0',
+    allowedHosts: 'all'
+  },
   entry: './lib/constellation.js',
   output: {
     path: path.resolve(__dirname, 'demos/static/js'),
     filename: 'constellation.js',
     library: 'constellation',
   },
-  node: {
-    fs: 'empty',
-    child_process: 'empty',
+  resolve: {
+    fallback: {
+      fs: false
+    }
   },
   module: {
     rules: [
